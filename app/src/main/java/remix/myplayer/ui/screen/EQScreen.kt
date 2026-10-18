@@ -52,7 +52,6 @@ import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.ui.nav.ExtraRestorePlayingScreen
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
-import remix.myplayer.ui.theme.BrandColors
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.CommonAppBar
 import remix.myplayer.ui.widget.common.LineSlider
@@ -298,7 +297,7 @@ fun EQScreen(backStackEntry: NavBackStackEntry) {
       Column(
         modifier = Modifier
           .fillMaxWidth()
-          .background(BrandColors.Surface)
+          .background(theme.surface)
           .padding(horizontal = 16.dp, vertical = 12.dp)
           .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -369,9 +368,9 @@ private fun EqPresetChip(
   val theme = LocalTheme.current
   val bg = when {
     selected -> theme.secondary
-    else -> BrandColors.Surface2
+    else -> theme.surface2
   }
-  val border = if (selected) Color.Transparent else BrandColors.Divider
+  val border = if (selected) Color.Transparent else theme.divider
   val textColor = when {
     selected -> Color.White
     enabled -> theme.textPrimary

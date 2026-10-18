@@ -41,7 +41,6 @@ import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.nav.RouteHistory
 import remix.myplayer.ui.nav.RouteSearch
-import remix.myplayer.ui.theme.BrandColors
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.ext.clickWithRipple
@@ -55,11 +54,17 @@ fun LibraryChrome(songs: List<Song>) {
   val libraryVM = libraryViewModel
   val eqState = rememberDialogState()
   EqualizerSheet(eqState)
+  val theme = LocalTheme.current
+  val surface2 = theme.surface2
+  val textPrimary = theme.textPrimary
+  val textSecondary = theme.textSecondary
+  val textMuted = theme.textMuted
+  val divider = theme.divider
 
   Column(
     modifier = Modifier
       .fillMaxWidth()
-      .background(LocalTheme.current.mainBackground)
+      .background(theme.mainBackground)
       .padding(horizontal = 16.dp, vertical = 8.dp)
   ) {
     Row(
@@ -67,7 +72,7 @@ fun LibraryChrome(songs: List<Song>) {
         .fillMaxWidth()
         .heightIn(min = 48.dp)
         .clip(RoundedCornerShape(14.dp))
-        .background(BrandColors.Search)
+        .background(surface2)
         .semantics { contentDescription = "Search your library" }
         .clickWithRipple(circle = false) { nav.navigate(RouteSearch) }
         .padding(horizontal = 14.dp),
@@ -76,12 +81,12 @@ fun LibraryChrome(songs: List<Song>) {
       Icon(
         imageVector = Icons.Filled.Search,
         contentDescription = null,
-        tint = BrandColors.TextMuted,
+        tint = textMuted,
         modifier = Modifier.size(22.dp)
       )
       Text(
         text = stringResource(R.string.search_your_library),
-        color = BrandColors.TextMuted,
+        color = textMuted,
         fontSize = 15.sp,
         modifier = Modifier
           .weight(1f)
@@ -90,7 +95,7 @@ fun LibraryChrome(songs: List<Song>) {
       Icon(
         painter = painterResource(R.drawable.ic_player_eq_24dp),
         contentDescription = "Equalizer filter",
-        tint = BrandColors.TextSecondary,
+        tint = textSecondary,
         modifier = Modifier
           .size(40.dp)
           .padding(8.dp)
@@ -108,12 +113,18 @@ fun LibraryChrome(songs: List<Song>) {
         label = stringResource(R.string.shortcut_recent),
         contentDescription = "Recent",
         modifier = Modifier.weight(1f),
+        textColor = textPrimary,
+        background = surface2,
+        borderColor = divider,
         onClick = { nav.navigate(RouteHistory) }
       )
       ShortcutChip(
         label = stringResource(R.string.shortcut_favorites),
         contentDescription = "Favorites",
         modifier = Modifier.weight(1f),
+        textColor = textPrimary,
+        background = surface2,
+        borderColor = divider,
         onClick = {
           val favorite = libraryVM.playLists.value.firstOrNull { it.isFavorite() }
           if (favorite != null) {
@@ -127,6 +138,9 @@ fun LibraryChrome(songs: List<Song>) {
         label = stringResource(R.string.shortcut_playlists),
         contentDescription = "Playlists",
         modifier = Modifier.weight(1f),
+        textColor = textPrimary,
+        background = surface2,
+        borderColor = divider,
         onClick = { settingVM.requestLibraryTab(Library.TAG_PLAYLIST) }
       )
     }
@@ -147,20 +161,20 @@ fun LibraryChrome(songs: List<Song>) {
         Icon(
           painter = painterResource(R.drawable.ic_shuffle_white_24dp),
           contentDescription = "Shuffle playback",
-          tint = LocalTheme.current.secondary,
+          tint = theme.secondary,
           modifier = Modifier.size(22.dp)
         )
         Spacer(modifier = Modifier.width(10.dp))
         Column(modifier = Modifier.weight(1f)) {
           Text(
             text = stringResource(R.string.shuffle_playback),
-            color = BrandColors.TextPrimary,
+            color = textPrimary,
             fontSize = 15.sp,
             fontWeight = FontWeight.Medium
           )
           Text(
             text = stringResource(R.string.songs_count_tracks, songs.size),
-            color = BrandColors.TextSecondary,
+            color = textSecondary,
             fontSize = 12.sp
           )
         }
@@ -174,19 +188,22 @@ private fun ShortcutChip(
   label: String,
   contentDescription: String,
   modifier: Modifier = Modifier,
+  textColor: androidx.compose.ui.graphics.Color,
+  background: androidx.compose.ui.graphics.Color,
+  borderColor: androidx.compose.ui.graphics.Color,
   onClick: () -> Unit,
 ) {
   Text(
     text = label,
-    color = BrandColors.TextPrimary,
+    color = textColor,
     fontSize = 13.sp,
     fontWeight = FontWeight.Medium,
     textAlign = TextAlign.Center,
     modifier = modifier
       .heightIn(min = 40.dp)
       .clip(RoundedCornerShape(20.dp))
-      .background(BrandColors.Surface2)
-      .border(1.dp, BrandColors.Divider, RoundedCornerShape(20.dp))
+      .background(background)
+      .border(1.dp, borderColor, RoundedCornerShape(20.dp))
       .semantics { this.contentDescription = contentDescription }
       .clickWithRipple(circle = false, onClick = onClick)
       .padding(horizontal = 10.dp, vertical = 10.dp)

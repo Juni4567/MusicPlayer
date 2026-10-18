@@ -58,10 +58,23 @@ fun APlayerTheme(
 //        primary = Color(ThemeStore.materialPrimaryColor)
 //    )
   val theme = LocalTheme.current
-  val colorScheme = lightColorScheme(
-    primary = theme.primary,
-    secondary = theme.secondary,
-  )
+  val colorScheme = if (theme.isLight) {
+    lightColorScheme(
+      primary = theme.primary,
+      secondary = theme.secondary,
+    )
+  } else {
+    val bgColor = theme.mainBackground
+    val textColor = theme.textPrimary
+    darkColorScheme(
+      primary = theme.primary,
+      secondary = theme.secondary,
+      background = bgColor,
+      surface = bgColor,
+      onBackground = textColor,
+      onSurface = textColor,
+    )
+  }
   val view = LocalView.current
   if (!view.isInEditMode) {
     SideEffect {
