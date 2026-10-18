@@ -259,7 +259,7 @@ fun SpeedDialog(state: DialogState, settingState: SettingsState) {
         modifier = Modifier
           .fillMaxWidth()
           .horizontalScroll(rememberScrollState())
-          .padding(bottom = 8.dp),
+          .padding(bottom = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
       ) {
         EchoPresetNameRes.forEachIndexed { index, nameRes ->
@@ -279,6 +279,12 @@ fun SpeedDialog(state: DialogState, settingState: SettingsState) {
           )
         }
       }
+      Text(
+        text = stringResource(R.string.echo_hint),
+        color = theme.textMuted,
+        fontSize = 12.sp,
+        modifier = Modifier.padding(bottom = 8.dp)
+      )
     }
   }
 }

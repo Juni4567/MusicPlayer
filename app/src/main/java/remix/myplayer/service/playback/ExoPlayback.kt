@@ -45,6 +45,7 @@ class ExoPlayback(
   private val decoderMode: Int,
   private val audioFocusManager: AudioFocusManager,
   private val replayGainController: ReplayGainController,
+  private val echoController: EchoController,
 ) : Playback {
 
   override var speed: Float
@@ -95,7 +96,13 @@ class ExoPlayback(
   private val extractorsFactory = ApeExtractorsFactory()
   private val player: ExoPlayer = run {
     val rendererMode = resolveRendererMode(decoderMode)
-    val renderersFactory = ReplayGainRenderersFactory(context, rendererMode, replayGainController.processor)
+    echoController.applyFromPrefs()
+    val renderersFactory = EffectsRenderersFactory(
+      context,
+      rendererMode,
+      replayGainController.processor,
+      echoController.processor,
+    )
     Timber.v("rendererMode: $rendererMode, decoderMode: $decoderMode")
     ExoPlayer.Builder(context, renderersFactory).build().apply {
       playWhenReady = false
@@ -477,10 +484,11 @@ class ExoPlayback(
 }
 
 @OptIn(UnstableApi::class)
-private class ReplayGainRenderersFactory(
+private class EffectsRenderersFactory(
   context: Context,
   rendererMode: Int,
   private val replayGainProcessor: ReplayGainAudioProcessor,
+  private val echoProcessor: EchoDelayAudioProcessor,
 ) : DefaultRenderersFactory(context) {
 
   init {
@@ -495,7 +503,8 @@ private class ReplayGainRenderersFactory(
     return DefaultAudioSink.Builder(context)
       .setEnableFloatOutput(enableFloatOutput)
       .setEnableAudioTrackPlaybackParams(enableAudioTrackPlaybackParams)
-      .setAudioProcessors(arrayOf(replayGainProcessor))
+      // ReplayGain first, then DSP echo so the delay hears gain-normalized audio.
+      .setAudioProcessors(arrayOf(replayGainProcessor, echoProcessor))
       .build()
   }
 }

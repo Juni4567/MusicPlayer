@@ -143,7 +143,7 @@ object PrefKeys {
     /** 回声开关 */
     const val ENABLE_ECHO = "enable_echo"
 
-    /** 回声预设 (PresetReverb) */
+    /** 回声预设 (DSP delay index) */
     const val ECHO_PRESET = "echo_preset"
 
     /** 回放增益开关 */

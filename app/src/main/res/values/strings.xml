@@ -456,6 +456,7 @@
   <string name="volume_boost">Volume boost</string>
   <string name="volume_boost_hint">Up to 200%. High boost may distort loud tracks.</string>
   <string name="echo">Echo</string>
+  <string name="echo_hint">Delay echo applied in the player (not system reverb).</string>
   <string name="echo_off">Off</string>
   <string name="echo_small">Small</string>
   <string name="echo_medium">Medium</string>

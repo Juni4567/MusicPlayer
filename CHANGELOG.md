@@ -2,6 +2,23 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.1.5.0] — 2026-10-18
+
+### Highlights
+- **Working DSP echo** in the ExoPlayer audio pipeline (feedback delay, not system `PresetReverb`)
+- Now Playing seekbar is **full width** with a single `elapsed / duration` time label
+
+### Playback & audio
+- Echo uses an in-player `EchoDelayAudioProcessor` with Small / Medium / Large / Hall / Large hall / Plate delay presets
+- Removed the non-working session-based `PresetReverb` echo path
+- Echo still toggles from the Playback sheet on the main player
+
+### UI
+- Seekbar no longer flanks times on both ends; one centered time under a full-width scrubber
+
+### Notes
+- Signed for sideload with this fork’s debug keystore. Uninstall an upstream-signed build first if signatures conflict
+
 ## [2.1.4.0] — 2026-10-18
 
 ### Highlights
@@ -11,7 +28,7 @@ All notable changes to A-Music (fork of APlayer) are documented in this file.
 ### Playback & audio
 - Volume boost slider (100%–200%) with live preview; persisted across sessions
 - Pitch control (0.75–1.5) via ExoPlayer `PlaybackParameters`
-- Echo on/off with Small / Medium / Large / Hall / Large hall / Plate presets (`PresetReverb`)
+- Echo on/off with Small / Medium / Large / Hall / Large hall / Plate presets (session reverb; replaced by DSP in 2.1.5.0)
 - Speed control remains on the main player secondary action row
 
 ### UI
@@ -63,6 +80,7 @@ All notable changes to A-Music (fork of APlayer) are documented in this file.
 
 - See upstream APlayer release notes
 
+[2.1.5.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.5.0
 [2.1.4.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.4.0
 [2.1.3.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.3.0
 [2.1.2.1]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.2.1

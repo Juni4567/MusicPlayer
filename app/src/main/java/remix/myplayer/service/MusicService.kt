@@ -60,6 +60,7 @@ import remix.myplayer.service.notification.NotifyImpl24
 import remix.myplayer.service.playback.ExoPlayback
 import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.service.playback.Playback
+import remix.myplayer.service.playback.EchoController
 import remix.myplayer.service.playback.ReplayGainController
 import remix.myplayer.service.playback.PlaybackFavoriteState
 import remix.myplayer.service.playback.PlaybackProgressSaver
@@ -133,6 +134,9 @@ class MusicService : BaseService(),
 
   @Inject
   lateinit var replayGainController: ReplayGainController
+
+  @Inject
+  lateinit var echoController: EchoController
 
   private val stateSource = MusicStateSource
 
@@ -384,10 +388,10 @@ class MusicService : BaseService(),
           volumeController.restoreFullVolume()
         }
       }
-      // 回声
+      // 回声 (DSP delay in ExoPlayer audio sink)
       PrefKeys.Setting.ENABLE_ECHO,
       PrefKeys.Setting.ECHO_PRESET -> {
-        EQHelper.applyEcho(this, playback.audioSessionId)
+        echoController.applyFromPrefs()
       }
       // 回放增益
       PrefKeys.Setting.REPLAY_GAIN_ENABLED,
@@ -567,7 +571,13 @@ class MusicService : BaseService(),
    * 初始化Mediaplayer
    */
   private fun setUpPlayback() {
-    playback = ExoPlayback(this, settingPrefs.decoderMode, audioFocusManager, replayGainController)
+    playback = ExoPlayback(
+      this,
+      settingPrefs.decoderMode,
+      audioFocusManager,
+      replayGainController,
+      echoController,
+    )
     playback.attach(this)
     playback.speed = settingPrefs.speedValue
     playback.pitch = settingPrefs.pitchValue
