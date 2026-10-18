@@ -63,7 +63,6 @@ import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
 import remix.myplayer.service.playback.PlaybackUiState
 import remix.myplayer.ui.dialog.BottomDialog
-import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
@@ -108,8 +107,6 @@ internal fun PlayingControl(
     val iconModifier = if (iconSize != null) Modifier.size(iconSize) else Modifier
     ControlButton(
       onClick = {
-        val newMode = if (playMode == MODE_REPEAT) MODE_LOOP else playMode + 1
-        MessageNotifier.show(itemRes[newMode]!!.second)
         Util.sendCMDLocalBroadcast(Command.CHANGE_MODEL)
       },
       buttonSize = buttonSize

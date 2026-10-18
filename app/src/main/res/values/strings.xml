@@ -1,6 +1,6 @@
 <resources>
   <string name="version">v1.2.7</string>
-  <string name="app_name">APlayer</string>
+  <string name="app_name">A-Music</string>
 
   <string name="tab_song">Songs</string>
   <string name="tab_album">Albums</string>
@@ -17,8 +17,8 @@
   <string name="drawer_setting">Settings</string>
   <string name="drawer_history">Playback History</string>
 
-  <string name="from_aplayer">From APlayer</string>
-  <string name="about">About APlayer</string>
+  <string name="from_aplayer">From A-Music</string>
+  <string name="about">About A-Music</string>
   <string name="model_random">Shuffle</string>
   <string name="model_repeat">Repeat</string>
   <string name="model_normal">Loop</string>
@@ -40,8 +40,8 @@
   <string name="about_privacy_subtitle">Read our privacy policy</string>
   <string name="about_rate_title">Rate app</string>
   <string name="about_rate_subtitle">Give us 5 stars</string>
-  <string name="about_share_message">Check out APlayer, a great music player! %1$s</string>
-  <string name="about_share_chooser">Share APlayer</string>
+  <string name="about_share_message">Check out A-Music, a great music player! %1$s</string>
+  <string name="about_share_chooser">Share A-Music</string>
   <string name="my_favorite">My favorites</string>
   <string name="list_is_empty">The list is empty</string>
   <string name="folder">Folder</string>
@@ -225,9 +225,9 @@
   <string name="eq">Equalizer</string>
   <string name="collect">Add to my favorites</string>
   <string name="only_lollopop">Only support Android 5.0 and above</string>
-  <string name="aplayer_lockscreen">APlayer Lock-Screen</string>
+  <string name="aplayer_lockscreen">A-Music Lock-Screen</string>
   <string name="system_lockscreen">System Lock-Screen</string>
-  <string name="aplayer_lockscreen_tip">Album art as lock-screen background, using APlayer style</string>
+  <string name="aplayer_lockscreen_tip">Album art as lock-screen background, using A-Music style</string>
   <string name="system_lockscreen_tip">Album art as lock-screen background, using system style</string>
   <string name="lockscreen_off_tip">Lockscreen won\'t show album cover (some features will be unavailable)</string>
 
@@ -386,10 +386,10 @@
   <string name="cant_share_song">Could not share this file, I\'m aware of the issue</string>
   <string name="save_wechat_qrcode_success">We have saved WeChat QRCode. Please open WeChat to identify the qr code</string>
   <string name="play_breakpoint">Remember playback position</string>
-  <string name="play_breakpoint_tip">When you open the APlayer again, it will start playing from the breakpoint</string>
+  <string name="play_breakpoint_tip">When you open A-Music again, it will start playing from the breakpoint</string>
   <string name="list_loop">Loop playlist</string>
   <string name="list_loop_tip">Continue from the first song after the playlist reaches the end</string>
-  <string name="will_stop_at_x">APlayer will be closed in %d minutes</string>
+  <string name="will_stop_at_x">A-Music will be closed in %d minutes</string>
   <string name="saveing">Saving</string>
   <string name="ignore_mediastore_artwork">Ignore Media Store covers</string>
   <string name="ignore_mediastore_artwork_tips">Ignore media store cache and read embedded album covers from audio files (might cause slower image loading time)</string>
@@ -401,11 +401,11 @@
   <string name="paypal">Paypal</string>
   <string name="exit">Exit</string>
   <string name="plz_set_default_time">Please set the default time first</string>
-  <string name="app_widget_big_name">APlayer-Big</string>
-  <string name="app_widget_medium_name">APlayer-Medium</string>
-  <string name="app_widget_small_name">APlayer-Small</string>
-  <string name="app_widget_medium_transparent_name">APlayer-Medium-Transparent</string>
-  <string name="app_widget_small_transparent_name">APlayer-Small-Transparent</string>
+  <string name="app_widget_big_name">A-Music Big</string>
+  <string name="app_widget_medium_name">A-Music Medium</string>
+  <string name="app_widget_small_name">A-Music Small</string>
+  <string name="app_widget_medium_transparent_name">A-Music Medium Transparent</string>
+  <string name="app_widget_small_transparent_name">A-Music Small Transparent</string>
   <string name="create_playlist_fail">Create playlist failed: </string>
   <string name="export_playlist">Export Playlist</string>
   <string name="export_play_list_tip">Export playlist to external storage</string>
@@ -464,7 +464,7 @@
   <string name="force_sort">Force sort</string>
   <string name="force_sort_tip">Force sort songs, albums, artists and playlists by Pinyin\nMay make load time much longer</string>
   <string name="accent_color">Accent color</string>
-  <string name="accent_color_tip">Customize your favorite color for Aplayer</string>
+  <string name="accent_color_tip">Customize your favorite color for A-Music</string>
   <string name="dark_theme">Dark theme</string>
   <string name="always_off">Always off</string>
   <string name="always_on">Always on</string>
@@ -480,7 +480,7 @@
 
   <string name="init_failed">Init failed: %s</string>
   <string name="select_language">Language</string>
-  <string name="select_language_tips">Change APlayer language by force</string>
+  <string name="select_language_tips">Change A-Music language by force</string>
 
   <string name="auto">Auto</string>
   <string name="zh_simple">Simplified Chinese</string>

@@ -25,7 +25,6 @@ import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.EqualizerSheet
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.nav.LocalNavController
-import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.nav.RouteTagEdit
 import remix.myplayer.ui.theme.BrandColors
 import remix.myplayer.ui.theme.LocalTheme
@@ -80,10 +79,7 @@ internal fun PlayingSecondaryActions(
       contentDescription = if (canEditTags) "Edit tags" else "Edit tags unavailable",
       tint = tint.copy(alpha = if (canEditTags) 0.92f else 0.35f),
       onClick = {
-        if (!canEditTags) {
-          MessageNotifier.show(R.string.tag_edit_local_only)
-          return@SecondaryActionIcon
-        }
+        if (!canEditTags) return@SecondaryActionIcon
         tagEditVM.startTagEdit(song)
         nav.navigate(RouteTagEdit)
       }

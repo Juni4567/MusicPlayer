@@ -493,7 +493,7 @@ class MusicService : BaseService(),
 
     mediaSession = MediaSessionCompat(
       applicationContext,
-      "APlayer",
+      "A-Music",
       mediaButtonReceiverComponentName,
       pendingIntent
     )
