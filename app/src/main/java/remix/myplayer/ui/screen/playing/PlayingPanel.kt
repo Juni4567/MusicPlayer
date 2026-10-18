@@ -61,7 +61,7 @@ private fun Portrait(isVisible: Boolean) {
   Column(
     modifier = Modifier,
     horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.spacedBy(30.dp)
+    verticalArrangement = Arrangement.spacedBy(20.dp)
   ) {
     val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
@@ -108,6 +108,8 @@ private fun Portrait(isVisible: Boolean) {
     }
 
     PlayingIndicator(pagerState, swatch)
+
+    PlayingSecondaryActions(playbackState.song, swatch)
 
     PlayingSeekbarWithText(swatch)
 
@@ -225,6 +227,8 @@ private fun RegularLandscape(isVisible: Boolean) {
     }
 
     KeepPlayingScreenOn(isVisible)
+
+    PlayingSecondaryActions(playbackState.song, swatch)
 
     PlayingSeekbarWithText(swatch)
 

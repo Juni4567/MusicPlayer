@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -27,7 +26,6 @@ import remix.myplayer.data.model.audio.Song
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.highLightText
 import remix.myplayer.ui.widget.common.TextPrimary
-import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.library.GlideCover
 import remix.myplayer.ui.widget.popup.SongPopupButton
 
@@ -85,13 +83,11 @@ fun ListSong(
         Spacer(modifier = Modifier.width(16.dp))
       }
 
-//      Box(modifier = Modifier
-//        .background(Color.Red)
-//        .size(40.dp))
       GlideCover(
         model = song,
+        circle = false,
         modifier = Modifier
-          .size(40.dp)
+          .size(48.dp)
       )
 
       Column(
@@ -102,8 +98,6 @@ fun ListSong(
           .padding(start = 16.dp, end = 8.dp)
       ) {
         TextPrimary(song.showName)
-        Spacer(modifier = Modifier.height(4.dp))
-        TextSecondary(String.format("%s-%s", song.artist, song.album))
       }
 
       SongPopupButton(

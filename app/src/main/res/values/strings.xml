@@ -97,6 +97,11 @@
   <string name="use_black_color">Use black background color</string>
 
   <string name="play_queue">Playing queue(%d)</string>
+  <string name="up_next">Up next</string>
+  <string name="up_next_count">%d songs</string>
+  <string name="clear_queue">Clear all</string>
+  <string name="nothing_queued_next">Nothing queued next</string>
+  <string name="queue_empty_hint">Add songs from your library to keep listening.</string>
   <string name="choose_song">Choose songs</string>
   <string name="choose_no_song">No songs selected</string>
   <string name="set_album_cover_error">Failed to set album cover</string>

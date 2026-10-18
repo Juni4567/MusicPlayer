@@ -35,6 +35,7 @@ fun BottomDialog(
   visible: Boolean,
   onDismissRequest: (() -> Unit) = {},
   animationDurationMillis: Int = 220,
+  maxHeightFraction: Float = 0.4f,
   content: @Composable BoxScope.() -> Unit
 ) {
   val visibleState = remember { MutableTransitionState(false) }
@@ -84,7 +85,7 @@ fun BottomDialog(
         Surface(
           modifier = Modifier
             .fillMaxWidth(1f)
-            .heightIn(max = maxHeight * 0.4f)
+            .heightIn(max = maxHeight * maxHeightFraction)
             .clickable(
               interactionSource = remember { MutableInteractionSource() },
               indication = null,

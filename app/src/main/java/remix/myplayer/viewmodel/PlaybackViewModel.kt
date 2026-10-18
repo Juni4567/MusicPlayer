@@ -83,6 +83,17 @@ class PlaybackViewModel @Inject constructor(
     MusicServiceRemote.removeFromQueue(listOf(id))
   }
 
+  /** Removes every queued song except the one currently playing. */
+  fun clearUpcomingFromQueue() {
+    val currentId = playbackUiState.value.song.id
+    val toRemove = playQueueSongs.value
+      .map { it.id }
+      .filter { it != currentId }
+    if (toRemove.isNotEmpty()) {
+      MusicServiceRemote.removeFromQueue(toRemove)
+    }
+  }
+
   fun insertToQueue(queue: List<Song>) = viewModelScope.launch {
     val addedCount = MusicServiceRemote.insertToQueue(queue) ?: return@launch
     if (addedCount > 0) {

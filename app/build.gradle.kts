@@ -1,3 +1,17 @@
+import com.android.build.api.artifact.SingleArtifact
+import com.android.build.api.variant.BuiltArtifactsLoader
+import org.gradle.api.DefaultTask
+import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputDirectory
+import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.TaskAction
+import org.gradle.kotlin.dsl.register
+import java.io.File
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -37,7 +51,8 @@ android {
     namespace = "remix.myplayer"
 
     compileSdk = 36
-    ndkVersion = "28.2.13676358"
+    // Use the installed NDK (28.2.13676358 was incomplete on this machine).
+    ndkVersion = "27.1.12297006"
 
     defaultConfig {
         applicationId = "remix.myplayer"
@@ -130,7 +145,7 @@ android {
     externalNativeBuild {
         cmake {
             path("CMakeLists.txt")
-            version = "4.1.2"
+            version = "3.22.1"
         }
     }
 
@@ -186,25 +201,73 @@ android {
     }
 }
 
+/**
+ * AGP 9 removed [com.android.build.api.variant.VariantOutput.outputFileName].
+ * Copy + rename release APKs via the Artifacts API instead.
+ */
+abstract class RenameReleaseApkTask : DefaultTask() {
+    @get:InputDirectory
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val input: DirectoryProperty
+
+    @get:OutputDirectory
+    abstract val output: DirectoryProperty
+
+    @get:Input
+    abstract val apkFileName: Property<String>
+
+    @get:Internal
+    abstract val builtArtifactsLoader: Property<BuiltArtifactsLoader>
+
+    @TaskAction
+    fun taskAction() {
+        val outputDir = output.get().asFile
+        outputDir.deleteRecursively()
+        outputDir.mkdirs()
+
+        val builtArtifacts = builtArtifactsLoader.get().load(input.get())
+            ?: error("Cannot load APKs for renaming")
+
+        builtArtifacts.elements.forEach { artifact ->
+            File(artifact.outputFile).copyTo(
+                output.get().file(apkFileName.get()).asFile,
+                overwrite = true
+            )
+        }
+        builtArtifacts.save(output.get())
+    }
+}
+
 androidComponents {
     onVariants { variant ->
-        if (variant.buildType == "release") {
-            val flavor = variant.productFlavors
-                .firstOrNull { it.first == "distribution" }?.second
-            if (flavor == "normal" || flavor == "foss") {
-                val sortPrefix = when (flavor) {
-                    "normal" -> "1"
-                    "foss" -> "2"
-                    else -> ""
-                }
-                if (sortPrefix.isNotEmpty()) {
-                    val versionName = android.defaultConfig.versionName ?: ""
-                    variant.outputs.forEach { output ->
-                        output.outputFileName.set("${sortPrefix}-APlayer-v${versionName}-${flavor}-release.apk")
-                    }
-                }
-            }
+        if (variant.buildType != "release") return@onVariants
+
+        val flavor = variant.productFlavors
+            .firstOrNull { it.first == "distribution" }
+            ?.second
+            ?: return@onVariants
+        if (flavor != "normal" && flavor != "foss") return@onVariants
+
+        val sortPrefix = when (flavor) {
+            "normal" -> "1"
+            "foss" -> "2"
+            else -> return@onVariants
         }
+        val versionName = android.defaultConfig.versionName.orEmpty()
+        val apkName = "${sortPrefix}-APlayer-v${versionName}-${flavor}-release.apk"
+        val taskName =
+            "rename${variant.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}Apk"
+
+        val renameTask = tasks.register<RenameReleaseApkTask>(taskName) {
+            output.set(layout.buildDirectory.dir("outputs/apk-renamed/${variant.name}"))
+            apkFileName.set(apkName)
+            builtArtifactsLoader.set(variant.artifacts.getBuiltArtifactsLoader())
+        }
+
+        variant.artifacts
+            .use(renameTask)
+            .wiredWith { it.input }
+            .toListenTo(SingleArtifact.APK)
     }
 }
 

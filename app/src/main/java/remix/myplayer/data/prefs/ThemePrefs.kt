@@ -14,8 +14,8 @@ class ThemePrefs @Inject constructor(
 ) :
   AbstractPref(context, name = PrefKeys.Theme.NAME) {
 
-  var primaryColor by PrefsDelegate(sp, PrefKeys.Theme.PRIMARY_COLOR, "#698cf6".toColorInt())
-  var secondaryColor by PrefsDelegate(sp, PrefKeys.Theme.SECONDARY_COLOR, "#698cf6".toColorInt())
+  var primaryColor by PrefsDelegate(sp, PrefKeys.Theme.PRIMARY_COLOR, "#F04A6A".toColorInt())
+  var secondaryColor by PrefsDelegate(sp, PrefKeys.Theme.SECONDARY_COLOR, "#F04A6A".toColorInt())
 
   // 从settingPrefs迁移
   var darkTheme by PrefsDelegate(

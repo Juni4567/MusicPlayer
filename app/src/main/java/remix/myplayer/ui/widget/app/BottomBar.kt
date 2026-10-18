@@ -130,7 +130,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
         .fillMaxHeight()
         .padding(horizontal = 8.dp)
     ) {
-      TextPrimary(playbackState.song.title, fontSize = 16.sp)
+      TextPrimary(playbackState.song.showName, fontSize = 16.sp)
       Spacer(modifier = Modifier.height(2.dp))
       TextSecondary(text = playbackState.song.artist, fontSize = 14.sp)
     }
@@ -150,7 +150,9 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
             )
           }
           .padding(end = 16.dp),
-        painter = painterResource(if (playbackState.isPlaying) R.drawable.bf_btn_stop else R.drawable.bf_btn_play),
+        painter = painterResource(
+          if (playbackState.isPlaying) R.drawable.ic_pause_black_24dp else R.drawable.ic_play_arrow_black_24dp
+        ),
         contentDescription = "PlayPause",
         tint = buttonColor
       )
@@ -161,7 +163,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
               .putExtra(EXTRA_COMMAND, Command.SKIP_TO_NEXT)
           )
         },
-        painter = painterResource(R.drawable.bf_btn_next),
+        painter = painterResource(R.drawable.ic_player_next_24dp),
         contentDescription = "Next",
         tint = buttonColor
       )

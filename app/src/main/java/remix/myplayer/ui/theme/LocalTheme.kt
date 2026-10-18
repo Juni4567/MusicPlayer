@@ -16,8 +16,8 @@ import remix.myplayer.util.ColorUtil
 
 val LocalTheme = compositionLocalOf<AppTheme> {
   return@compositionLocalOf AppTheme(
-    primary = Color(0xff698cf6),
-    secondary = Color(0xff698cf6),
+    primary = BrandColors.DefaultPrimary,
+    secondary = BrandColors.DefaultPrimary,
     theme = LIGHT
   )
 }
@@ -112,6 +112,31 @@ data class AppTheme(
     @Composable
     @ReadOnlyComposable
     get() = if (isLight) R.drawable.artist_empty_bg_day else R.drawable.artist_empty_bg_night
+
+  val surface
+    @Composable
+    @ReadOnlyComposable
+    get() = if (isLight) mainBackground else colorResource(R.color.dark_surface_color)
+
+  val surface2
+    @Composable
+    @ReadOnlyComposable
+    get() = if (isLight) libraryBackground else colorResource(R.color.dark_surface2_color)
+
+  val control
+    @Composable
+    @ReadOnlyComposable
+    get() = if (isLight) colorResource(R.color.accent_gray_color) else colorResource(R.color.dark_control_color)
+
+  val textMuted
+    @Composable
+    @ReadOnlyComposable
+    get() = if (isLight) textSecondary else colorResource(R.color.dark_text_color_muted)
+
+  val divider
+    @Composable
+    @ReadOnlyComposable
+    get() = if (isLight) colorResource(R.color.light_divider_color) else colorResource(R.color.dark_divider_color)
 
   val isPrimaryLight: Boolean
     get() = ColorUtil.isColorLight(primary.toArgb())

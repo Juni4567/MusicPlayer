@@ -5,7 +5,6 @@ import android.content.Intent
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.gestures.snapTo
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.DropdownMenu
@@ -38,8 +37,8 @@ import remix.myplayer.lyric.LyricManager.Companion.SHOW_OFFSET_PANEL
 import remix.myplayer.lyric.LyricSearcher
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.DialogState
-import remix.myplayer.ui.dialog.InputDialog
 import remix.myplayer.ui.dialog.NormalDialog
+import remix.myplayer.ui.dialog.SpeedDialog
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.nav.ExtraRestorePlayingScreen
 import remix.myplayer.ui.nav.LocalNavController
@@ -53,7 +52,6 @@ import remix.myplayer.viewmodel.PlayingScreenValue
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.settingViewModel
-import remix.myplayer.viewmodel.settings.SettingsState
 import remix.myplayer.viewmodel.tagEditViewModel
 import remix.myplayer.viewmodel.timerViewModel
 
@@ -332,28 +330,3 @@ private fun LyricFontScaleDialog(state: DialogState) {
   )
 }
 
-@Composable
-private fun SpeedDialog(state: DialogState, settingState: SettingsState) {
-  val settingVM = settingViewModel
-
-  var text by rememberSaveable {
-    mutableStateOf(settingState.play.speed)
-  }
-
-  InputDialog(
-    dialogState = state,
-    text = text,
-    title = stringResource(R.string.speed),
-    onValueChange = {
-      text = it
-    },
-    onInput = {
-      it.toFloatOrNull()?.let { speed ->
-        if (speed > 2f || speed < 0.5f) {
-          MessageNotifier.show(R.string.speed_range_tip)
-          return@let
-        }
-        settingVM.setSpeed(it)
-      }
-    })
-}
