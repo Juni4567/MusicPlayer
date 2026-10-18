@@ -3,9 +3,10 @@ package remix.myplayer.ui.dialog
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
@@ -30,12 +31,14 @@ import kotlin.math.ceil
 
 private val TimerPresetsMinutes = listOf(10, 20, 30, 45, 60)
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun TimerDialog() {
   val timerVM = timerViewModel
   val timerState by timerVM.timerState.collectAsStateWithLifecycle()
   val running by SleepTimer.runningState.collectAsStateWithLifecycle()
-  val accent = LocalTheme.current.secondary
+  val theme = LocalTheme.current
+  val accent = theme.secondary
 
   MiBottomSheet(
     visible = timerVM.dialogState.isOpen,
@@ -45,73 +48,60 @@ fun TimerDialog() {
     },
     title = stringResource(R.string.sleep_timer),
   ) {
-    if (running) {
-      val remainMin = ceil(timerState.progress / 60.0).toInt().coerceAtLeast(0)
-      Text(
-        text = stringResource(R.string.timer_active_remaining, remainMin),
-        color = LocalTheme.current.textSecondary,
-        fontSize = 13.sp,
-        modifier = Modifier.padding(bottom = 12.dp)
-      )
-    }
-
-    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-      TimerPresetsMinutes.forEach { minutes ->
-        SheetActionRow(
-          label = stringResource(R.string.timer_minutes, minutes),
-          contentDescription = "Sleep timer $minutes minutes",
-          highlighted = false,
-          onClick = { timerVM.startPresetMinutes(minutes) }
-        )
-      }
-
-      SheetActionRow(
-        label = stringResource(R.string.timer_end_of_song),
-        contentDescription = "End of current song",
-        highlighted = false,
-        onClick = { timerVM.startEndOfCurrentSong() }
-      )
-
+    Column(
+      modifier = Modifier.fillMaxWidth(),
+      verticalArrangement = Arrangement.spacedBy(12.dp),
+    ) {
       if (running) {
-        SheetActionRow(
-          label = stringResource(R.string.cancel_timer),
-          contentDescription = "Cancel sleep timer",
-          highlighted = true,
-          accent = accent,
-          onClick = { timerVM.cancelActiveTimer() }
+        val remainMin = ceil(timerState.progress / 60.0).toInt().coerceAtLeast(0)
+        Row(
+          modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .background(accent.copy(alpha = 0.14f))
+            .padding(horizontal = 14.dp, vertical = 10.dp),
+          horizontalArrangement = Arrangement.SpaceBetween,
+          verticalAlignment = Alignment.CenterVertically,
+        ) {
+          Text(
+            text = stringResource(R.string.timer_active_remaining, remainMin),
+            color = accent,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
+          )
+          Text(
+            text = stringResource(R.string.cancel_timer),
+            color = accent,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.SemiBold,
+            modifier = Modifier
+              .semantics { contentDescription = "Cancel sleep timer" }
+              .clickWithRipple(circle = false) { timerVM.cancelActiveTimer() }
+              .padding(4.dp),
+          )
+        }
+      }
+
+      FlowRow(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+      ) {
+        TimerPresetsMinutes.forEach { minutes ->
+          SheetChip(
+            label = stringResource(R.string.timer_minutes, minutes),
+            selected = false,
+            contentDescription = "Sleep timer $minutes minutes",
+            onClick = { timerVM.startPresetMinutes(minutes) },
+          )
+        }
+        SheetChip(
+          label = stringResource(R.string.timer_end_of_song),
+          selected = false,
+          contentDescription = "End of current song",
+          onClick = { timerVM.startEndOfCurrentSong() },
         )
       }
     }
-  }
-}
-
-@Composable
-private fun SheetActionRow(
-  label: String,
-  contentDescription: String,
-  highlighted: Boolean,
-  accent: androidx.compose.ui.graphics.Color = LocalTheme.current.secondary,
-  onClick: () -> Unit,
-) {
-  val theme = LocalTheme.current
-  val surface2 = theme.surface2
-  val textPrimary = theme.textPrimary
-  Row(
-    modifier = Modifier
-      .fillMaxWidth()
-      .heightIn(min = 48.dp)
-      .clip(RoundedCornerShape(14.dp))
-      .background(if (highlighted) accent.copy(alpha = 0.18f) else surface2)
-      .semantics { this.contentDescription = contentDescription }
-      .clickWithRipple(circle = false, onClick = onClick)
-      .padding(horizontal = 16.dp, vertical = 14.dp),
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Text(
-      text = label,
-      color = if (highlighted) accent else textPrimary,
-      fontSize = 15.sp,
-      fontWeight = if (highlighted) FontWeight.SemiBold else FontWeight.Normal,
-    )
   }
 }

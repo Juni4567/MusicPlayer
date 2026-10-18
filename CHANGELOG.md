@@ -2,6 +2,21 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.1.7.0] — 2026-10-19
+
+### Highlights
+- Cleaner, more compact **Playback**, **Equalizer**, and **Sleep timer** bottom sheets
+
+### UI
+- Shared sheet chrome: tighter chips, denser sliders, consistent section labels
+- Playback effects: horizontal chip rows for speed / pitch / echo; slimmer volume boost
+- Equalizer: compact presets, labeled bass/virtualizer %, denser band rows with live dB
+- Sleep timer: chip grid instead of tall list rows; active timer shown as a compact status bar
+- Bottom sheets use a subtle drag handle and reduced padding
+
+### Notes
+- Signed for sideload with this fork’s debug keystore
+
 ## [2.1.6.0] — 2026-10-19
 
 ### Highlights
@@ -108,6 +123,7 @@ All notable changes to A-Music (fork of APlayer) are documented in this file.
 
 - See upstream APlayer release notes
 
+[2.1.7.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.7.0
 [2.1.6.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.6.0
 [2.1.5.1]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.5.1
 [2.1.5.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.5.0

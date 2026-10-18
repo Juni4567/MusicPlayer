@@ -1,8 +1,6 @@
 package remix.myplayer.ui.dialog
 
 import android.media.audiofx.AudioEffect
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,8 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -27,13 +25,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -43,8 +41,6 @@ import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.LineSlider
-import remix.myplayer.ui.widget.common.TextPrimary
-import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.common.defaultLineSliderProperties
 import remix.myplayer.util.ext.clickWithRipple
 import java.text.DecimalFormat
@@ -126,43 +122,46 @@ fun EqualizerSheet(state: DialogState) {
     onDismiss = { state.dismiss() },
     title = stringResource(R.string.eq),
   ) {
-    val textPrimary = theme.textPrimary
-    val onAccent = theme.primaryReverse
-    val surface2 = theme.surface2
-    val divider = theme.divider
     Column(
       modifier = Modifier
         .fillMaxWidth()
-        .heightIn(max = 520.dp)
-        .verticalScroll(rememberScrollState())
+        .heightIn(max = 460.dp)
+        .verticalScroll(rememberScrollState()),
+      verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
       Row(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(bottom = 8.dp),
+        modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
       ) {
-        TextSecondary(stringResource(R.string.use_eq), fontSize = 14.sp)
-        Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+          text = stringResource(R.string.use_eq),
+          color = theme.textPrimary,
+          fontSize = 14.sp,
+          fontWeight = FontWeight.Medium,
+        )
+        Row(
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
           Text(
             text = stringResource(R.string.reset),
             color = theme.secondary,
             fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
             modifier = Modifier
-              .padding(end = 12.dp)
               .semantics { contentDescription = "Reset equalizer" }
               .clickWithRipple(circle = false) { resetEq() }
-              .padding(4.dp)
+              .padding(horizontal = 8.dp, vertical = 4.dp),
           )
           Switch(
             modifier = Modifier
-              .scale(0.85f)
+              .scale(0.78f)
               .semantics { contentDescription = "Enable equalizer" },
             checked = enableEq,
             colors = SwitchDefaults.colors().copy(
               checkedTrackColor = theme.secondary,
-              uncheckedTrackColor = Color.Transparent
+              uncheckedTrackColor = Color.Transparent,
             ),
             onCheckedChange = { checked ->
               enableEq = checked
@@ -170,132 +169,99 @@ fun EqualizerSheet(state: DialogState) {
               if (!EQHelper.isBassBoostEnabled) {
                 bassStrength = EQHelper.bassBoostStrength.toFloat()
               }
-            }
+            },
           )
         }
       }
 
-      TextSecondary(
-        stringResource(R.string.eq_presets),
-        fontSize = 13.sp,
-        modifier = Modifier.padding(bottom = 8.dp)
-      )
-      Row(
-        modifier = Modifier
-          .fillMaxWidth()
-          .horizontalScroll(rememberScrollState()),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-      ) {
-        SheetEqPresets.forEachIndexed { index, preset ->
-          val selected = selectedPreset == index
-          Text(
-            text = stringResource(preset.nameRes),
-            color = if (selected) onAccent else textPrimary,
-            fontSize = 13.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-              .heightIn(min = 40.dp)
-              .clip(RoundedCornerShape(20.dp))
-              .background(if (selected) theme.secondary else surface2)
-              .border(
-                1.dp,
-                if (selected) Color.Transparent else divider,
-                RoundedCornerShape(20.dp)
-              )
-              .clickWithRipple(circle = false, enabled = enableEq) {
+      Column {
+        SheetSectionLabel(stringResource(R.string.eq_presets))
+        Row(
+          modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
+          horizontalArrangement = Arrangement.spacedBy(6.dp),
+        ) {
+          SheetEqPresets.forEachIndexed { index, preset ->
+            SheetChip(
+              label = stringResource(preset.nameRes),
+              selected = selectedPreset == index,
+              enabled = enableEq,
+              contentDescription = stringResource(preset.nameRes),
+              onClick = {
                 EQHelper.applyRelativeGains(preset.gains)
                 selectedPreset = index
                 refreshBands()
-              }
-              .padding(horizontal = 14.dp, vertical = 10.dp)
-          )
+              },
+            )
+          }
         }
       }
 
-      TextSecondary(
-        stringResource(R.string.bass_boost),
-        fontSize = 13.sp,
-        modifier = Modifier.padding(top = 16.dp, bottom = 4.dp)
-      )
-      LineSlider(
-        modifier = Modifier
-          .fillMaxWidth()
-          .height(40.dp),
+      SheetSliderRow(
+        label = stringResource(R.string.bass_boost),
+        valueLabel = "${(bassStrength / 10f).roundToInt()}%",
         value = bassStrength,
+        valueRange = 0f..1000f,
+        enabled = EQHelper.isBassBoostEnabled,
         onValueChange = { v ->
           bassStrength = v
           if (EQHelper.isBassBoostEnabled) {
             EQHelper.bassBoostStrength = v.roundToInt()
           }
         },
-        valueRange = 0f..1000f,
-        properties = defaultLineSliderProperties.copy(
-          trackHeight = 6.dp,
-          thumbWidth = 16.dp,
-          thumbHeight = 16.dp,
-        ),
-        enabled = EQHelper.isBassBoostEnabled
       )
 
-      TextSecondary(
-        stringResource(R.string.virtualizer),
-        fontSize = 13.sp,
-        modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
-      )
       if (EQHelper.isVirtualizerSupported) {
-        LineSlider(
-          modifier = Modifier
-            .fillMaxWidth()
-            .height(40.dp)
-            .padding(bottom = 12.dp),
+        SheetSliderRow(
+          label = stringResource(R.string.virtualizer),
+          valueLabel = "${(virtualizerStrength / 10f).roundToInt()}%",
           value = virtualizerStrength,
+          valueRange = 0f..1000f,
+          enabled = EQHelper.isVirtualizerEnabled,
           onValueChange = { v ->
             virtualizerStrength = v
             EQHelper.virtualizerStrength = v.roundToInt()
           },
-          valueRange = 0f..1000f,
-          properties = defaultLineSliderProperties.copy(
-            trackHeight = 6.dp,
-            thumbWidth = 16.dp,
-            thumbHeight = 16.dp,
-          ),
-          enabled = EQHelper.isVirtualizerEnabled
         )
       } else {
         Text(
           text = stringResource(R.string.virtualizer_unavailable_hint),
           color = theme.textMuted,
           fontSize = 12.sp,
-          modifier = Modifier.padding(bottom = 12.dp)
         )
       }
 
-      TextPrimary(
-        stringResource(R.string.eq),
-        fontSize = 14.sp,
-        modifier = Modifier.padding(bottom = 8.dp)
-      )
-      repeat(displayBands) { index ->
-        Column(
-          modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-        ) {
-          TextSecondary(
-            formatBandFreq(EQHelper.getCenterFreq(index)),
-            fontSize = 12.sp
-          )
+      Column(verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        SheetSectionLabel(stringResource(R.string.eq))
+        repeat(displayBands) { index ->
+          val progress = bandProgress.getOrElse(index) { 0f }
+          val db = ((progress + minLevel) / 100f).roundToInt()
           Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+              .fillMaxWidth()
+              .padding(vertical = 1.dp),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(6.dp),
           ) {
-            TextPrimary(minLevelText, fontSize = 11.sp)
+            Text(
+              text = formatBandFreq(EQHelper.getCenterFreq(index)),
+              color = theme.textSecondary,
+              fontSize = 11.sp,
+              textAlign = TextAlign.Start,
+              modifier = Modifier.width(52.dp),
+              maxLines = 1,
+            )
+            Text(
+              text = minLevelText,
+              color = theme.textMuted,
+              fontSize = 10.sp,
+            )
             LineSlider(
               modifier = Modifier
                 .weight(1f)
-                .height(40.dp),
-              value = bandProgress.getOrElse(index) { 0f },
+                .height(28.dp),
+              value = progress,
               onValueChange = { v ->
                 if (index < bandProgress.size) {
                   bandProgress[index] = v
@@ -307,13 +273,25 @@ fun EqualizerSheet(state: DialogState) {
               },
               valueRange = 0f..levelRange,
               properties = defaultLineSliderProperties.copy(
-                trackHeight = 8.dp,
-                thumbWidth = 18.dp,
-                thumbHeight = 18.dp,
+                trackHeight = 4.dp,
+                thumbWidth = 12.dp,
+                thumbHeight = 12.dp,
               ),
-              enabled = enableEq
+              enabled = enableEq,
             )
-            TextPrimary(maxLevelText, fontSize = 11.sp)
+            Text(
+              text = maxLevelText,
+              color = theme.textMuted,
+              fontSize = 10.sp,
+            )
+            Text(
+              text = if (db > 0) "+$db" else "$db",
+              color = theme.textPrimary,
+              fontSize = 11.sp,
+              fontWeight = FontWeight.Medium,
+              textAlign = TextAlign.End,
+              modifier = Modifier.width(28.dp),
+            )
           }
         }
       }
@@ -324,8 +302,8 @@ fun EqualizerSheet(state: DialogState) {
 private fun formatBandFreq(milliHz: Int): String {
   val hz = milliHz / 1000
   return if (hz >= 1000) {
-    String.format("%.1f kHz", hz / 1000f)
+    String.format("%.1fk", hz / 1000f)
   } else {
-    "$hz Hz"
+    "${hz}Hz"
   }
 }
