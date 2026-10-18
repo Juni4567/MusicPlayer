@@ -618,6 +618,10 @@
   </plurals>
 
   <!-- Desktop lyrics -->
+  <string name="media_action_favorite">Favorite</string>
+  <string name="media_action_unfavorite">Unfavorite</string>
+  <string name="media_action_desktop_lyrics">Desktop lyrics</string>
+  <string name="media_action_unlock_lyrics">Unlock lyrics</string>
   <string name="close_desktop_lyrics">Turn off desktop lyrics</string>
   <string name="lock_desktop_lyrics">Lock desktop lyrics</string>
   <string name="desktop_lyrics_settings">Show/hide settings of desktop lyric</string>

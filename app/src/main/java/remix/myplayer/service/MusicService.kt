@@ -164,6 +164,7 @@ class MusicService : BaseService(),
       playback.setMode(value, settingPrefs.listLoop)
       updateMediaSessionQueue()
       pushPlaybackUiState()
+      updatePlaybackState()
       appWidgetUpdater.partiallyUpdateWidget(this)
     }
 
@@ -360,7 +361,7 @@ class MusicService : BaseService(),
             mediaSession,
             playback,
             settingPrefs.lockScreen,
-            lyricManager.isDesktopLyricLocked
+            mediaSessionExtras()
           )
         }
       }
@@ -556,8 +557,19 @@ class MusicService : BaseService(),
       override fun onCustomAction(action: String?, extras: Bundle?) {
         Timber.v("onCustomAction, ac: $action extra: $extras")
         when (action) {
-          ACTION_UNLOCK_DESKTOP_LYRIC -> lyricManager.isDesktopLyricLocked = false
-          ACTION_TOGGLE_DESKTOP_LYRIC -> lyricManager.setDesktopLyricEnabled(!lyricManager.isDesktopLyricEnabled)
+          ACTION_LOVE -> handleCommand(Intent(ACTION_CMD).putExtra(EXTRA_COMMAND, Command.LOVE))
+          ACTION_CHANGE_MODE ->
+            handleCommand(Intent(ACTION_CMD).putExtra(EXTRA_COMMAND, Command.CHANGE_MODEL))
+          ACTION_TOGGLE_TIMER ->
+            handleCommand(Intent(ACTION_CMD).putExtra(EXTRA_COMMAND, Command.TOGGLE_TIMER))
+          ACTION_UNLOCK_DESKTOP_LYRIC -> {
+            lyricManager.isDesktopLyricLocked = false
+            updatePlaybackState()
+          }
+          ACTION_TOGGLE_DESKTOP_LYRIC -> {
+            lyricManager.setDesktopLyricEnabled(!lyricManager.isDesktopLyricEnabled)
+            updatePlaybackState()
+          }
         }
       }
     })
@@ -1133,7 +1145,7 @@ class MusicService : BaseService(),
       mediaSession,
       playback,
       settingPrefs.lockScreen,
-      lyricManager.isDesktopLyricLocked
+      mediaSessionExtras()
     )
     // 是否需要保存进度
     if (settingPrefs.playAtBreakPoint) {
@@ -1236,6 +1248,7 @@ class MusicService : BaseService(),
         playback.currentSong?.let {
           if (playbackFavoriteState.toggle(it, stateSource)) {
             appWidgetUpdater.updateWidget(this@MusicService, this, isPlaying, screenOn)
+            updatePlaybackState()
           }
         }
       }
@@ -1281,8 +1294,10 @@ class MusicService : BaseService(),
       Command.TOGGLE_TIMER -> {
         if (!settingPrefs.timerStartAuto) {
           MessageNotifier.show(R.string.plz_set_default_time)
+          return@launch
         }
         SleepTimer.toggleTimer((settingPrefs.timerDefaultDuration * 1000).toLong())
+        updatePlaybackState()
       }
       // Seek
       Command.SEEK_TO -> {
@@ -1308,7 +1323,17 @@ class MusicService : BaseService(),
   }
 
   fun updatePlaybackState() {
-    mediaSessionUpdater.updatePlaybackState(this, mediaSession, playback, lyricManager.isDesktopLyricLocked)
+    mediaSessionUpdater.updatePlaybackState(this, mediaSession, playback, mediaSessionExtras())
+  }
+
+  private fun mediaSessionExtras(): MediaSessionExtras {
+    return MediaSessionExtras(
+      isFavorite = stateSource.currentPlaybackUiState.isFavorite,
+      playMode = settingPrefs.playModel,
+      desktopLyricEnabled = lyricManager.isDesktopLyricEnabled,
+      desktopLyricLocked = lyricManager.isDesktopLyricLocked,
+      timerRunning = SleepTimer.isTicking(),
+    )
   }
 
   /**
@@ -1462,6 +1487,9 @@ class MusicService : BaseService(),
     const val ACTION_WIDGET_UPDATE = "$APLAYER_PACKAGE_NAME.widget_update"
     const val ACTION_UNLOCK_DESKTOP_LYRIC = "$APLAYER_PACKAGE_NAME.unlock.desktop_lyric"
     const val ACTION_TOGGLE_DESKTOP_LYRIC = "$APLAYER_PACKAGE_NAME.toggle.desktop_lyric"
+    const val ACTION_LOVE = "$APLAYER_PACKAGE_NAME.love"
+    const val ACTION_CHANGE_MODE = "$APLAYER_PACKAGE_NAME.change_mode"
+    const val ACTION_TOGGLE_TIMER = "$APLAYER_PACKAGE_NAME.toggle_timer"
 
     private const val INTERVAL_CONTROL = 500
   }
