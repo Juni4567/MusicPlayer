@@ -118,7 +118,7 @@ internal fun PlayingControl(
         modifier = iconModifier,
         painter = painterResource(itemRes[playMode]!!.first),
         contentDescription = "PlayingMode",
-        colorFilter = ColorFilter.tint(swatchColor.copy(0.5f))
+        colorFilter = ColorFilter.tint(swatchColor.copy(alpha = 0.85f))
       )
     }
 
@@ -218,7 +218,7 @@ internal fun PlayingControl(
         modifier = iconModifier,
         painter = painterResource(R.drawable.ic_player_queue_24dp),
         contentDescription = "PlayingPlayQueue",
-        colorFilter = ColorFilter.tint(swatchColor.copy(0.5f))
+        colorFilter = ColorFilter.tint(swatchColor.copy(alpha = 0.85f))
       )
     }
   }

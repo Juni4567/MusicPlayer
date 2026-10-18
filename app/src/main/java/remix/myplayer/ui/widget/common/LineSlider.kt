@@ -55,12 +55,12 @@ val defaultLineSliderProperties
   @Composable
   get() = LineSliderProperties(
     trackHeight = 4.dp,
-    trackProgressColor = LocalTheme.current.primary,
-    trackBackgroundColor = Color((if (LocalTheme.current.isLight) "#ffe0e0e0" else "#ff424242").toColorInt()),
+    trackProgressColor = LocalTheme.current.secondary,
+    trackBackgroundColor = LocalTheme.current.control,
     thumbWidth = 12.dp,
     thumbHeight = 12.dp,
     thumbShape = CircleShape,
-    thumbColor = LocalTheme.current.primary,
+    thumbColor = LocalTheme.current.secondary,
   )
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -18,7 +18,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.launch
 import remix.myplayer.data.model.misc.Library
 import remix.myplayer.ui.theme.LocalTheme
-import remix.myplayer.ui.widget.common.defaultAppBarActions
+import remix.myplayer.ui.widget.common.homeAppBarActions
 import remix.myplayer.ui.widget.popup.ScreenPopupButton
 import remix.myplayer.viewmodel.settingViewModel
 import androidx.compose.foundation.layout.WindowInsets
@@ -56,7 +56,7 @@ internal fun HomeAppBar(
         ScreenPopupButton(library)
       }
 
-      defaultAppBarActions.map {
+      homeAppBarActions.map {
         IconButton(onClick = {
           it.action()
         }) {

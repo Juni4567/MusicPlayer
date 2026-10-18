@@ -48,8 +48,10 @@ import remix.myplayer.data.prefs.ThemePrefs.Companion.BLACK
 import remix.myplayer.data.prefs.ThemePrefs.Companion.DARK
 import remix.myplayer.data.prefs.ThemePrefs.Companion.LIGHT
 import remix.myplayer.misc.receiver.ExitReceiver
+import androidx.navigation.compose.currentBackStackEntryAsState
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RouteHistory
+import remix.myplayer.ui.nav.RouteHome
 import remix.myplayer.ui.nav.RouteLastAdded
 import remix.myplayer.ui.nav.RouteSetting
 import remix.myplayer.ui.theme.AppTheme
@@ -81,6 +83,8 @@ private val drawerIcons = mutableListOf(
 @Composable
 fun Drawer(drawerState: DrawerState, vm: PlaybackViewModel = playbackViewModel) {
   val navController = LocalNavController.current
+  val navBackStackEntry by navController.currentBackStackEntryAsState()
+  val currentRoute = navBackStackEntry?.destination?.route
   val context = LocalContext.current
   val theme = LocalTheme.current
 
@@ -158,17 +162,37 @@ fun Drawer(drawerState: DrawerState, vm: PlaybackViewModel = playbackViewModel) 
               fontSize = 16.sp
             )
           },
-          selected = index == 0,
+          selected = when (item) {
+            R.string.drawer_song -> currentRoute == RouteHome || currentRoute == null
+            R.string.drawer_history -> currentRoute == RouteHistory
+            R.string.drawer_recently_add -> currentRoute == RouteLastAdded
+            R.string.drawer_setting -> currentRoute == RouteSetting
+            else -> false
+          },
           onClick = {
             when (item) {
               // 歌曲库
-              R.string.drawer_song -> scope.launch { drawerState.close() }
+              R.string.drawer_song -> {
+                if (currentRoute != RouteHome) {
+                  navController.popBackStack(RouteHome, inclusive = false)
+                }
+                scope.launch { drawerState.close() }
+              }
               // 历史
-              R.string.drawer_history -> navController.navigate(RouteHistory)
+              R.string.drawer_history -> {
+                navController.navigate(RouteHistory)
+                scope.launch { drawerState.close() }
+              }
               // 最近添加
-              R.string.drawer_recently_add -> navController.navigate(RouteLastAdded)
+              R.string.drawer_recently_add -> {
+                navController.navigate(RouteLastAdded)
+                scope.launch { drawerState.close() }
+              }
               // 设置
-              R.string.drawer_setting -> navController.navigate(RouteSetting)
+              R.string.drawer_setting -> {
+                navController.navigate(RouteSetting)
+                scope.launch { drawerState.close() }
+              }
               // 退出
               R.string.exit -> {
                 context.sendBroadcast(

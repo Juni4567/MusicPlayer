@@ -102,6 +102,9 @@ fun EqualizerSheet(state: DialogState) {
     }
   }
   var bassStrength by remember { mutableFloatStateOf(EQHelper.bassBoostStrength.toFloat()) }
+  var virtualizerStrength by remember {
+    mutableFloatStateOf(EQHelper.virtualizerStrength.toFloat())
+  }
   var selectedPreset by remember { mutableIntStateOf(-1) }
 
   fun refreshBands() {
@@ -114,6 +117,7 @@ fun EqualizerSheet(state: DialogState) {
     EQHelper.reset()
     selectedPreset = 0
     bassStrength = 0f
+    virtualizerStrength = 0f
     refreshBands()
   }
 
@@ -238,12 +242,33 @@ fun EqualizerSheet(state: DialogState) {
         fontSize = 13.sp,
         modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
       )
-      Text(
-        text = stringResource(R.string.virtualizer_unavailable_hint),
-        color = theme.textMuted,
-        fontSize = 12.sp,
-        modifier = Modifier.padding(bottom = 12.dp)
-      )
+      if (EQHelper.isVirtualizerSupported) {
+        LineSlider(
+          modifier = Modifier
+            .fillMaxWidth()
+            .height(40.dp)
+            .padding(bottom = 12.dp),
+          value = virtualizerStrength,
+          onValueChange = { v ->
+            virtualizerStrength = v
+            EQHelper.virtualizerStrength = v.roundToInt()
+          },
+          valueRange = 0f..1000f,
+          properties = defaultLineSliderProperties.copy(
+            trackHeight = 6.dp,
+            thumbWidth = 16.dp,
+            thumbHeight = 16.dp,
+          ),
+          enabled = EQHelper.isVirtualizerEnabled
+        )
+      } else {
+        Text(
+          text = stringResource(R.string.virtualizer_unavailable_hint),
+          color = theme.textMuted,
+          fontSize = 12.sp,
+          modifier = Modifier.padding(bottom = 12.dp)
+        )
+      }
 
       TextPrimary(
         stringResource(R.string.eq),

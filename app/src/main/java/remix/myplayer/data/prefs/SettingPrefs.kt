@@ -197,6 +197,7 @@ class SettingPrefs @Inject constructor(
   var timerDefaultDuration by PrefsDelegate(sp, PrefKeys.Setting.TIMER_DURATION, -1)
 
   var bassBoostStrength by PrefsDelegate(sp, PrefKeys.Setting.BASS_BOOST_STRENGTH, 0)
+  var virtualizerStrength by PrefsDelegate(sp, PrefKeys.Setting.VIRTUALIZER_STRENGTH, 0)
   var enableEq by PrefsDelegate(sp, PrefKeys.Setting.ENABLE_EQ, false)
 
   var checkMigration16600 by PrefsDelegate(sp, "check_migration_16600", false)

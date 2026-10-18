@@ -27,7 +27,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
@@ -42,8 +41,8 @@ import remix.myplayer.helper.SleepTimer
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_COMMAND
-import remix.myplayer.ui.theme.BrandColors
 import remix.myplayer.ui.theme.LocalTheme
+import remix.myplayer.ui.theme.icon
 import remix.myplayer.ui.widget.common.LineSlider
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
@@ -75,8 +74,9 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
 
   val isSongValid = playbackState.song.valid()
   val accent = theme.secondary
-  val surface = if (theme.isLight) theme.dialogBackground else BrandColors.Surface
-  val controlTint = if (theme.isLight) Color(0xFF323334) else BrandColors.TextPrimary
+  val surface = theme.surface
+  val controlTint = theme.icon()
+  val divider = theme.divider
   val timerRunning by SleepTimer.runningState.collectAsStateWithLifecycle()
   val timerRemainMin = if (timerRunning) {
     ceil(SleepTimer.getMillisUntilFinish() / 60_000.0).toInt().coerceAtLeast(1)
@@ -157,7 +157,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
           properties = defaultLineSliderProperties.copy(
             trackHeight = 3.dp,
             trackProgressColor = accent,
-            trackBackgroundColor = BrandColors.Divider,
+            trackBackgroundColor = divider,
             thumbColor = accent,
             thumbWidth = 10.dp,
             thumbHeight = 10.dp,

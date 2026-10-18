@@ -34,8 +34,6 @@ import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.model.misc.Library
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicServiceRemote.setPlayQueue
-import remix.myplayer.ui.dialog.EqualizerSheet
-import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.nav.DetailScreenRoute
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
@@ -52,14 +50,11 @@ fun LibraryChrome(songs: List<Song>) {
   val nav = LocalNavController.current
   val settingVM = settingViewModel
   val libraryVM = libraryViewModel
-  val eqState = rememberDialogState()
-  EqualizerSheet(eqState)
   val theme = LocalTheme.current
   val surface2 = theme.surface2
   val textPrimary = theme.textPrimary
   val textSecondary = theme.textSecondary
   val textMuted = theme.textMuted
-  val divider = theme.divider
 
   Column(
     modifier = Modifier
@@ -91,15 +86,6 @@ fun LibraryChrome(songs: List<Song>) {
         modifier = Modifier
           .weight(1f)
           .padding(horizontal = 10.dp)
-      )
-      Icon(
-        painter = painterResource(R.drawable.ic_player_eq_24dp),
-        contentDescription = "Equalizer filter",
-        tint = textSecondary,
-        modifier = Modifier
-          .size(40.dp)
-          .padding(8.dp)
-          .clickWithRipple { eqState.show() }
       )
     }
 

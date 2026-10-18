@@ -105,6 +105,21 @@ fun CommonAppBar(
   )
 }
 
+/** Home library: timer only — search lives in [remix.myplayer.ui.widget.library.LibraryChrome]. */
+val homeAppBarActions: List<AppBarAction>
+  @Composable
+  get() {
+    val timerVM = timerViewModel
+    val timerRunning by SleepTimer.runningState.collectAsStateWithLifecycle()
+    val timerIcon = if (timerRunning) R.drawable.ic_timer_on_24dp else R.drawable.ic_timer_white_24dp
+    return listOf(
+      AppBarAction(timerIcon, "Sleep timer") {
+        timerVM.showTimerDialog()
+      }
+    )
+  }
+
+/** Detail / secondary screens: timer + search. */
 val defaultAppBarActions: List<AppBarAction>
   @Composable
   get() {
@@ -114,7 +129,7 @@ val defaultAppBarActions: List<AppBarAction>
     val timerIcon = if (timerRunning) R.drawable.ic_timer_on_24dp else R.drawable.ic_timer_white_24dp
 
     return listOf(
-      AppBarAction(timerIcon, "Timer") {
+      AppBarAction(timerIcon, "Sleep timer") {
         timerVM.showTimerDialog()
       },
       AppBarAction(R.drawable.ic_search_white_24dp, "Search") {

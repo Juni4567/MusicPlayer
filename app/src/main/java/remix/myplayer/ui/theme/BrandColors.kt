@@ -4,26 +4,17 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 /**
- * Mi Music dark palette — near-black surfaces, soft gray text, blue-gray accents.
- * Splash / pattern covers still use the pink→orange brand gradient.
+ * Brand accents and pattern/splash colors only.
+ * UI surfaces, text, and dividers must come from [LocalTheme] / [AppTheme]
+ * so light and dark modes stay readable.
  */
 object BrandColors {
-  val Bg = Color(0xFF121212)
-  val Surface = Color(0xFF1C1C1E)
-  val Surface2 = Color(0xFF2A2A2E)
-  val Surface3 = Color(0xFF34343A)
-  val Control = Color(0xFF3F434C)
-  val Search = Color(0xFF2E2E32)
-  val TextPrimary = Color(0xFFF1F1EF)
-  val TextSecondary = Color(0xFFB4B2B3)
-  val TextMuted = Color(0xFF858588)
-  val TextLabel = Color(0xFF5B5B5D)
-  val Divider = Color(0xFF2F2F33)
   val BrandStart = Color(0xFFE91E8C)
   val BrandEnd = Color(0xFFFF7A45)
   val Accent = Color(0xFF7B8FA1)
   val AccentSoft = Color(0xFF5C6B7A)
   val AccentPurple = Color(0xFF603E88)
+  val Favorite = Color(0xFFE85D75)
 
   /** Default theme primary/secondary for new installs. */
   val DefaultPrimary = Accent

@@ -240,7 +240,7 @@ private fun RowScope.VolumeSeekBar(
       .weight(1f),
     properties = defaultLineSliderProperties.copy(
       trackHeight = 2.dp,
-      trackBackgroundColor = playingTrackBackgroundColor,
+      trackBackgroundColor = LocalTheme.current.control,
       trackProgressColor = swatchColor,
       thumbColor = swatchColor,
       thumbWidth = 2.dp,

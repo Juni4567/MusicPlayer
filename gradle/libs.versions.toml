@@ -40,6 +40,8 @@ benchmarkMacroJunit4 = "1.4.1"
 baselineprofile = "1.4.1"
 profileinstaller = "1.4.1"
 rules = "1.7.0"
+runner = "1.7.0"
+junit4 = "4.13.2"
 smbj = "0.13.0"
 play-feature-delivery = "2.1.0"
 annotation = "1.7.0"
@@ -125,3 +127,5 @@ androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomato
 androidx-benchmark-macro-junit4 = { group = "androidx.benchmark", name = "benchmark-macro-junit4", version.ref = "benchmarkMacroJunit4" }
 androidx-profileinstaller = { group = "androidx.profileinstaller", name = "profileinstaller", version.ref = "profileinstaller" }
 androidx-rules = { group = "androidx.test", name = "rules", version.ref = "rules" }
+androidx-runner = { group = "androidx.test", name = "runner", version.ref = "runner" }
+junit = { group = "junit", name = "junit", version.ref = "junit4" }

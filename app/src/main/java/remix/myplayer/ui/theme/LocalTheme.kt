@@ -116,27 +116,33 @@ data class AppTheme(
   val surface
     @Composable
     @ReadOnlyComposable
-    get() = if (isLight) mainBackground else colorResource(R.color.dark_surface_color)
+    get() = colorResource(if (isLight) R.color.light_surface_color else R.color.dark_surface_color)
 
   val surface2
     @Composable
     @ReadOnlyComposable
-    get() = if (isLight) libraryBackground else colorResource(R.color.dark_surface2_color)
+    get() = colorResource(if (isLight) R.color.light_surface2_color else R.color.dark_surface2_color)
 
   val control
     @Composable
     @ReadOnlyComposable
-    get() = if (isLight) colorResource(R.color.accent_gray_color) else colorResource(R.color.dark_control_color)
+    get() = colorResource(if (isLight) R.color.light_control_color else R.color.dark_control_color)
 
   val textMuted
     @Composable
     @ReadOnlyComposable
-    get() = if (isLight) textSecondary else colorResource(R.color.dark_text_color_muted)
+    get() = colorResource(if (isLight) R.color.light_text_color_muted else R.color.dark_text_color_muted)
 
   val divider
     @Composable
     @ReadOnlyComposable
-    get() = if (isLight) colorResource(R.color.light_divider_color) else colorResource(R.color.dark_divider_color)
+    get() = colorResource(if (isLight) R.color.light_divider_color else R.color.dark_divider_color)
+
+  /** Readable icon/control tint on top of themed surfaces (not raw palette swatches). */
+  val controlIcon
+    @Composable
+    @ReadOnlyComposable
+    get() = if (isLight) textPrimary else textPrimary
 
   val isPrimaryLight: Boolean
     get() = ColorUtil.isColorLight(primary.toArgb())

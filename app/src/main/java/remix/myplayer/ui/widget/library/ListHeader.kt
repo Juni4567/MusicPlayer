@@ -14,8 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -26,7 +24,6 @@ import remix.myplayer.service.Command
 import remix.myplayer.service.MusicServiceRemote.setPlayQueue
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.LocalTheme
-import remix.myplayer.util.ColorUtil
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.ext.clickableWithoutRipple
 
@@ -78,7 +75,7 @@ fun ModeHeader(grid: Boolean, onClick: (mode: Int) -> Unit) {
       },
       painter = painterResource(R.drawable.ic_apps_white_24dp),
       contentDescription = "ModeGrid",
-      tint = Color(if (grid) LocalTheme.current.secondary.toArgb() else ColorUtil.getColor(R.color.default_model_button_color))
+      tint = if (grid) LocalTheme.current.secondary else LocalTheme.current.textMuted
     )
     Icon(
       modifier = Modifier
@@ -88,7 +85,7 @@ fun ModeHeader(grid: Boolean, onClick: (mode: Int) -> Unit) {
         },
       painter = painterResource(R.drawable.ic_format_list_bulleted_white_24dp),
       contentDescription = "ModeList",
-      tint = Color(if (!grid) LocalTheme.current.secondary.toArgb() else ColorUtil.getColor(R.color.default_model_button_color))
+      tint = if (!grid) LocalTheme.current.secondary else LocalTheme.current.textMuted
     )
   }
 }

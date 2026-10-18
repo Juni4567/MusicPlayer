@@ -58,19 +58,28 @@ fun APlayerTheme(
 //        primary = Color(ThemeStore.materialPrimaryColor)
 //    )
   val theme = LocalTheme.current
+  val bgColor = theme.mainBackground
+  val surfaceColor = theme.surface
+  val textColor = theme.textPrimary
   val colorScheme = if (theme.isLight) {
     lightColorScheme(
       primary = theme.primary,
       secondary = theme.secondary,
+      background = bgColor,
+      surface = surfaceColor,
+      onPrimary = theme.primaryReverse,
+      onSecondary = theme.primaryReverse,
+      onBackground = textColor,
+      onSurface = textColor,
     )
   } else {
-    val bgColor = theme.mainBackground
-    val textColor = theme.textPrimary
     darkColorScheme(
       primary = theme.primary,
       secondary = theme.secondary,
       background = bgColor,
-      surface = bgColor,
+      surface = surfaceColor,
+      onPrimary = theme.primaryReverse,
+      onSecondary = theme.primaryReverse,
       onBackground = textColor,
       onSurface = textColor,
     )

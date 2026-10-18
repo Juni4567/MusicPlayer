@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
 import kotlinx.coroutines.delay
@@ -49,22 +48,24 @@ internal fun PlayingSeekbarWithText(
       }
     }
 
-    val playingTrackBackgroundColor = playingTrackBackgroundColor
+    val theme = LocalTheme.current
+    val trackBg = theme.control
+    val progressColor = Color(swatch.rgb)
+    val thumbColor = if (theme.isLight) theme.textPrimary else Color.White
     val baseProperties = defaultLineSliderProperties
-    val sliderProperties = remember(swatch.rgb) {
+    val sliderProperties = remember(swatch.rgb, trackBg, thumbColor) {
       baseProperties.copy(
-        trackBackgroundColor = playingTrackBackgroundColor,
-        trackProgressColor = Color(swatch.rgb),
-        // Thicker track + larger thumb for easier seeking while driving
+        trackBackgroundColor = trackBg,
+        trackProgressColor = progressColor,
         trackHeight = 8.dp,
-        thumbColor = Color.White,
+        thumbColor = thumbColor,
         thumbWidth = 18.dp,
         thumbHeight = 18.dp,
         thumbShape = CircleShape
       )
     }
 
-    val textColor = LocalTheme.current.textMuted
+    val textColor = theme.textMuted
 
     val tabularStyle = remember {
       TextStyle(
@@ -118,15 +119,5 @@ internal fun PlayingSeekbarWithText(
     }
   }
 }
-
-internal val playingTrackBackgroundColor: Color
-  @Composable
-  get() = Color(
-    if (LocalTheme.current.isLight) {
-      "#efeeed"
-    } else {
-      "#343438"
-    }.toColorInt()
-  )
 
 private data class Time(val elapsed: String, val remaining: String)

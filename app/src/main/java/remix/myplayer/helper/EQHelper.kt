@@ -60,17 +60,24 @@ object EQHelper {
       }
     }
 
-//  val isVirtualizerEnabled: Boolean
-//    get() = enable && virtualizer?.strengthSupported == true
-//
-//  var virtualizerStrength: Int
-//    get() = SPUtil.getValue(App.getContext(), NAME, VIRTUALIZER_STRENGTH, 0)
-//    set(strength) {
-//      SPUtil.putValue(App.getContext(), NAME, VIRTUALIZER_STRENGTH, strength)
-//      if (isVirtualizerEnabled) {
-//        virtualizer?.setStrength(strength.toShort())
-//      }
-//    }
+  val isVirtualizerSupported: Boolean
+    get() = virtualizer?.strengthSupported == true
+
+  val isVirtualizerEnabled: Boolean
+    get() = enable && isVirtualizerSupported
+
+  var virtualizerStrength: Int
+    get() = settingPrefs.virtualizerStrength
+    set(strength) {
+      settingPrefs.virtualizerStrength = strength
+      if (isVirtualizerEnabled) {
+        tryRun({
+          virtualizer?.setStrength(strength.toShort())
+        }, {
+          releaseVirtualizer()
+        })
+      }
+    }
 
   fun init(context: Context, sessionId: Int, force: Boolean = false): Boolean {
     Timber.v("init, audioSessionId: $sessionId")
@@ -136,6 +143,19 @@ object EQHelper {
       }, {
         releaseBassBoost()
       })
+
+      tryRun({
+        releaseVirtualizer()
+        virtualizer = Virtualizer(0, sessionId)
+        virtualizer?.also { virtualizer ->
+          virtualizer.enabled = enable && virtualizer.strengthSupported
+          if (virtualizer.enabled) {
+            virtualizer.setStrength(virtualizerStrength.toShort())
+          }
+        }
+      }, {
+        releaseVirtualizer()
+      })
     }
 
     return builtEqualizerInit
@@ -187,6 +207,19 @@ object EQHelper {
       releaseBassBoost()
     })
 
+    tryRun({
+      virtualizer?.release()
+      virtualizer = Virtualizer(0, audioSessionId)
+      virtualizer?.also { virtualizer ->
+        virtualizer.enabled = enable && virtualizer.strengthSupported
+        if (virtualizer.enabled) {
+          virtualizer.setStrength(virtualizerStrength.toShort())
+        }
+      }
+    }, {
+      releaseVirtualizer()
+    })
+
     Timber.v("min: $minLevel max: $maxLevel bandNumber: $bandNumber")
   }
 
@@ -205,6 +238,12 @@ object EQHelper {
 
     tryRun({
       releaseBassBoost()
+    }, {
+
+    })
+
+    tryRun({
+      releaseVirtualizer()
     }, {
 
     })
@@ -276,18 +315,22 @@ object EQHelper {
       releaseBassBoost()
     })
 
-//    try {
-//      virtualizer?.enabled = isVirtualizerEnabled
-//      virtualizer?.setStrength(if (isVirtualizerEnabled) virtualizerStrength.toShort() else 0)
-//    } catch (e: Exception) {
-//      Timber.w(e)
-//    }
-
+    tryRun({
+      virtualizer?.enabled = isVirtualizerEnabled
+      virtualizer?.setStrength(if (isVirtualizerEnabled) virtualizerStrength.toShort() else 0)
+    }, {
+      releaseVirtualizer()
+    })
   }
 
   private fun releaseBassBoost() {
     bassBoost?.release()
     bassBoost = null
+  }
+
+  private fun releaseVirtualizer() {
+    virtualizer?.release()
+    virtualizer = null
   }
 
   private fun releaseEqualizer() {
@@ -301,7 +344,7 @@ object EQHelper {
     }
 
     bassBoostStrength = 0
-//    virtualizerStrength = 0
+    virtualizerStrength = 0
   }
 
   /** Built-in Android Equalizer presets, if the device exposes any. */

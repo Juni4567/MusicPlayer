@@ -28,7 +28,6 @@ import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.model.misc.LyricOrder
 import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.data.prefs.delegate
-import remix.myplayer.helper.EQHelper
 import remix.myplayer.lyric.LyricManager.Companion.ACTION_LYRIC
 import remix.myplayer.lyric.LyricManager.Companion.CHANGE_LYRIC
 import remix.myplayer.lyric.LyricManager.Companion.EXTRA_LYRIC
@@ -37,23 +36,21 @@ import remix.myplayer.lyric.LyricManager.Companion.SHOW_OFFSET_PANEL
 import remix.myplayer.lyric.LyricSearcher
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.DialogState
+import remix.myplayer.ui.dialog.EqualizerSheet
 import remix.myplayer.ui.dialog.NormalDialog
 import remix.myplayer.ui.dialog.SpeedDialog
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.nav.ExtraRestorePlayingScreen
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
-import remix.myplayer.ui.nav.RouteEq
 import remix.myplayer.ui.nav.RouteTagEdit
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.util.ext.ShowLyricTipDialog
 import remix.myplayer.viewmodel.PlayingScreenValue
-import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.tagEditViewModel
-import remix.myplayer.viewmodel.timerViewModel
 
 @Composable
 fun PlayingDropDownMenu(
@@ -65,26 +62,22 @@ fun PlayingDropDownMenu(
     return
   }
   val nav = LocalNavController.current
-  val libraryVM = libraryViewModel
   val settingVM = settingViewModel
   val tagEditVM = tagEditViewModel
   val settingState by settingVM.settingsState.collectAsStateWithLifecycle()
 
+  // Favorite + timer are on the secondary action row; keep overflow for the rest.
   val menuItems =
     listOf(
       R.string.song_edit,
       R.string.song_detail,
-      R.string.collect,
       R.string.add_to_playlist,
-      R.string.sleep_timer,
       R.string.eq,
       R.string.lyric,
       R.string.speed,
       R.string.delete,
     )
   val activity = LocalActivity.current as? BaseActivity
-
-  val timerVM = timerViewModel
 
   val mainVM = mainViewModel
   val scope = rememberCoroutineScope()
@@ -113,7 +106,9 @@ fun PlayingDropDownMenu(
   }
 
   val speedDialogState = rememberDialogState()
+  val eqSheetState = rememberDialogState()
   SpeedDialog(speedDialogState, settingState)
+  EqualizerSheet(eqSheetState)
 
   val lyricDialogState = rememberDialogState()
 
@@ -196,27 +191,8 @@ fun PlayingDropDownMenu(
               settingVM.showAddSongToPlayListDialog(listOf(song.id))
             }
 
-            R.string.collect -> {
-              if (activity == null) {
-                return@DropdownMenuItem
-              }
-              val favorite =
-                libraryVM.playLists.value.firstOrNull { it.isFavorite() } ?: return@DropdownMenuItem
-
-              libraryVM.addSongsToPlayList(listOf(song.id), favorite.name)
-            }
-
-            R.string.sleep_timer -> {
-              timerVM.showTimerDialog()
-            }
-
             R.string.eq -> {
-              if (activity == null) {
-                return@DropdownMenuItem
-              }
-              EQHelper.startEqualizer(activity) {
-                navigateFromPlayingScreen(RouteEq)
-              }
+              eqSheetState.show()
             }
 
             R.string.lyric -> {
