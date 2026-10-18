@@ -6,7 +6,15 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.view.WindowManager
 import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -19,13 +27,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
@@ -34,7 +42,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
-import kotlinx.coroutines.launch
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.lyric.LyricManager
 import remix.myplayer.util.Util.registerLocalReceiver
@@ -65,49 +72,55 @@ private fun Portrait(isVisible: Boolean) {
   ) {
     val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
-    val scope = rememberCoroutineScope()
+    var showLyrics by rememberSaveable { mutableStateOf(false) }
 
     PlayingTopBar(playbackState.song, swatch)
 
-    val pagerState = rememberPagerState { 2 }
-
-    HorizontalPager(
-      pagerState,
-      modifier = Modifier.weight(7f),
-      beyondViewportPageCount = 1
-    ) { page ->
-      when (page) {
-        0 -> {
-          Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-              .fillMaxSize()
-              .clipToBounds()
-          ) {
-            PlayingCover(
-              modifier = Modifier
-                .padding(start = 16.dp, end = 16.dp)
-                .fillMaxWidth()
-                .aspectRatio(1f),
-              song = playbackState.song
-            )
+    Box(
+      contentAlignment = Alignment.Center,
+      modifier = Modifier
+        .weight(7f)
+        .fillMaxWidth()
+        .clipToBounds()
+        .playingCoverGestures(
+          showingLyrics = showLyrics,
+          onShowLyrics = { showLyrics = true },
+          onHideLyrics = { showLyrics = false },
+        )
+    ) {
+      AnimatedContent(
+        targetState = showLyrics,
+        transitionSpec = {
+          if (targetState) {
+            (slideInVertically { it } + fadeIn()) togetherWith
+              (slideOutVertically { -it / 4 } + fadeOut())
+          } else {
+            (slideInVertically { -it / 4 } + fadeIn()) togetherWith
+              (slideOutVertically { it } + fadeOut())
           }
-        }
-
-        else -> {
-          Box(
-            contentAlignment = Alignment.Center,
+        },
+        label = "CoverLyricTransition"
+      ) { lyricsVisible ->
+        if (lyricsVisible) {
+          PlayingLyric(playbackState.song)
+        } else {
+          PlayingCover(
             modifier = Modifier
-              .fillMaxSize()
-              .clipToBounds()
-          ) {
-            PlayingLyric(playbackState.song)
-          }
+              .padding(start = 16.dp, end = 16.dp)
+              .fillMaxWidth()
+              .aspectRatio(1f),
+            song = playbackState.song
+          )
         }
       }
     }
 
-    PlayingIndicator(pagerState, swatch)
+    PlayingModeIndicator(
+      showLyrics = showLyrics,
+      swatch = swatch,
+      onSelectCover = { showLyrics = false },
+      onSelectLyrics = { showLyrics = true },
+    )
 
     PlayingSecondaryActions(playbackState.song, swatch)
 
@@ -130,7 +143,7 @@ private fun Portrait(isVisible: Boolean) {
       )
     }
 
-    KeepPlayingScreenOn(isVisible && pagerState.currentPage == 1)
+    KeepPlayingScreenOn(isVisible && showLyrics)
 
     DisposableEffect(Unit) {
       val receiver = object : BroadcastReceiver() {
@@ -138,9 +151,7 @@ private fun Portrait(isVisible: Boolean) {
           if (intent.action == LyricManager.ACTION_LYRIC) {
             val extra = intent.getIntExtra(LyricManager.EXTRA_LYRIC, -1)
             if (extra == LyricManager.SHOW_OFFSET_PANEL) {
-              scope.launch {
-                pagerState.animateScrollToPage(1)
-              }
+              showLyrics = true
             }
           }
         }
@@ -154,24 +165,40 @@ private fun Portrait(isVisible: Boolean) {
 }
 
 @Composable
-private fun PlayingIndicator(
-  pagerState: PagerState,
-  swatch: Palette.Swatch
+private fun PlayingModeIndicator(
+  showLyrics: Boolean,
+  swatch: Palette.Swatch,
+  onSelectCover: (() -> Unit)? = null,
+  onSelectLyrics: (() -> Unit)? = null,
 ) {
   Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
     val highLightColor = Color(swatch.rgb)
     val normalColor = highLightColor.copy(0.3f)
     Box(
       modifier = Modifier
-        .width(8.dp)
-        .height(2.dp)
-        .background(if (pagerState.currentPage == 0) highLightColor else normalColor)
+        .width(16.dp)
+        .height(12.dp)
+        .clickable(
+          enabled = onSelectCover != null,
+          indication = null,
+          interactionSource = remember { MutableInteractionSource() },
+          onClick = { onSelectCover?.invoke() }
+        )
+        .padding(vertical = 5.dp)
+        .background(if (!showLyrics) highLightColor else normalColor)
     )
     Box(
       modifier = Modifier
-        .width(8.dp)
-        .height(2.dp)
-        .background(if (pagerState.currentPage == 1) highLightColor else normalColor)
+        .width(16.dp)
+        .height(12.dp)
+        .clickable(
+          enabled = onSelectLyrics != null,
+          indication = null,
+          interactionSource = remember { MutableInteractionSource() },
+          onClick = { onSelectLyrics?.invoke() }
+        )
+        .padding(vertical = 5.dp)
+        .background(if (showLyrics) highLightColor else normalColor)
     )
   }
 }
@@ -206,7 +233,12 @@ private fun RegularLandscape(isVisible: Boolean) {
       Box(
         modifier = Modifier
           .weight(1f)
-          .clipToBounds(),
+          .clipToBounds()
+          .playingCoverGestures(
+            showingLyrics = false,
+            onShowLyrics = {},
+            onHideLyrics = {},
+          ),
         contentAlignment = Alignment.Center
       ) {
         PlayingCover(
@@ -263,7 +295,12 @@ private fun CompactLandscape(isVisible: Boolean, useExpandedControls: Boolean) {
         modifier = Modifier
           .weight(1f)
           .fillMaxWidth()
-          .clipToBounds(),
+          .clipToBounds()
+          .playingCoverGestures(
+            showingLyrics = false,
+            onShowLyrics = {},
+            onHideLyrics = {},
+          ),
         contentAlignment = Alignment.Center
       ) {
         PlayingCover(

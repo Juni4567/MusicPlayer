@@ -11,8 +11,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,11 +55,12 @@ internal fun PlayingSeekbarWithText(
       baseProperties.copy(
         trackBackgroundColor = playingTrackBackgroundColor,
         trackProgressColor = Color(swatch.rgb),
-        trackHeight = 2.dp,
-        thumbColor = Color(swatch.rgb),
-        thumbWidth = 2.dp,
-        thumbHeight = 6.dp,
-        thumbShape = RectangleShape
+        // Thicker track + larger thumb for easier seeking while driving
+        trackHeight = 8.dp,
+        thumbColor = Color.White,
+        thumbWidth = 18.dp,
+        thumbHeight = 18.dp,
+        thumbShape = CircleShape
       )
     }
 
@@ -105,7 +106,7 @@ internal fun PlayingSeekbarWithText(
         },
         valueRange = 0f..duration.toFloat(),
         modifier = Modifier
-          .height(12.dp)
+          .height(40.dp)
           .weight(1f),
         properties = sliderProperties
       )

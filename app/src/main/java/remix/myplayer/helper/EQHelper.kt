@@ -15,8 +15,8 @@ import remix.myplayer.R
 import remix.myplayer.data.prefs.SettingPrefsEntryPoint
 import remix.myplayer.data.prefs.delegate
 import remix.myplayer.service.MusicServiceRemote
-import remix.myplayer.util.Util.isIntentAvailable
 import timber.log.Timber
+import kotlin.math.roundToInt
 
 /**
  * created by Remix on 2019-05-06
@@ -79,12 +79,7 @@ object EQHelper {
       return false
     }
 
-    //系统均衡器不可用 才初始化内置的
-    if (isSystemEqualizerAvailable(context)) {
-      return false
-    }
-
-    //是否启用音效设置
+    // Always use the in-app equalizer UI/engine (ignore system EQ panel).
     enable = settingPrefs.enableEq
     // 不需要初始化
     if (!enable && !force) {
@@ -128,6 +123,21 @@ object EQHelper {
       Timber.v("init failed")
     })
 
+    if (builtEqualizerInit) {
+      tryRun({
+        releaseBassBoost()
+        bassBoost = BassBoost(0, sessionId)
+        bassBoost?.also { bassBoost ->
+          bassBoost.enabled = enable && bassBoost.strengthSupported
+          if (bassBoost.enabled) {
+            bassBoost.setStrength(bassBoostStrength.toShort())
+          }
+        }
+      }, {
+        releaseBassBoost()
+      })
+    }
+
     return builtEqualizerInit
   }
 
@@ -138,67 +148,46 @@ object EQHelper {
       return
     }
 
-    if (isSystemEqualizerAvailable(context)) {
-      openSystemAudioEffectSession(context, audioSessionId)
-    } else {
-      Timber.v("open built-in")
-      //是否启用音效设置
-      enable = settingPrefs.enableEq
-      if (!enable) {
-        return
-      }
-      tryRun({
-        //EQ
-        equalizer?.release()
-
-        equalizer = Equalizer(0, audioSessionId)
-        equalizer?.also { equalizer ->
-          equalizer.enabled = enable
-
-          //得到之前存储的每个频率的db值
-          for (i in 0 until bandNumber) {
-            if (enable) {
-              equalizer.setBandLevel(i.toShort(), bandLevels[i])
-            }
-          }
-        }
-      }, {
-        releaseEqualizer()
-      })
-
-      tryRun({
-        //低音增强
-        bassBoost?.release()
-        bassBoost = BassBoost(0, audioSessionId)
-        bassBoost?.also { bassBoost ->
-          bassBoost.enabled = enable && bassBoost.strengthSupported
-          if (bassBoost.enabled) {
-            bassBoost.setStrength(bassBoostStrength.toShort())
-          }
-        }
-      }, {
-        releaseBassBoost()
-      })
-
-
-      //环绕声
-//      virtualizer?.enabled = false
-//      virtualizer?.canVirtualize()
-//
-//      virtualizer = Virtualizer(0, audioSessionId)
-//      virtualizer?.also { virtualizer ->
-//        try {
-//          virtualizer.enabled = enable && virtualizer.strengthSupported
-//          if (virtualizer.enabled) {
-//            virtualizer.setStrength(virtualizerStrength.toShort())
-//          }
-//        } catch (e: Exception) {
-//          Timber.w(e)
-//        }
-//      }
-
-      Timber.v("min: $minLevel max: $maxLevel bandNumber: $bandNumber")
+    Timber.v("open built-in")
+    //是否启用音效设置
+    enable = settingPrefs.enableEq
+    if (!enable) {
+      return
     }
+    tryRun({
+      //EQ
+      equalizer?.release()
+
+      equalizer = Equalizer(0, audioSessionId)
+      equalizer?.also { equalizer ->
+        equalizer.enabled = enable
+
+        //得到之前存储的每个频率的db值
+        for (i in 0 until bandNumber) {
+          if (enable) {
+            equalizer.setBandLevel(i.toShort(), bandLevels[i])
+          }
+        }
+      }
+    }, {
+      releaseEqualizer()
+    })
+
+    tryRun({
+      //低音增强
+      bassBoost?.release()
+      bassBoost = BassBoost(0, audioSessionId)
+      bassBoost?.also { bassBoost ->
+        bassBoost.enabled = enable && bassBoost.strengthSupported
+        if (bassBoost.enabled) {
+          bassBoost.setStrength(bassBoostStrength.toShort())
+        }
+      }
+    }, {
+      releaseBassBoost()
+    })
+
+    Timber.v("min: $minLevel max: $maxLevel bandNumber: $bandNumber")
   }
 
   fun close(context: Context, audioSessionId: Int) {
@@ -315,6 +304,72 @@ object EQHelper {
 //    virtualizerStrength = 0
   }
 
+  /** Built-in Android Equalizer presets, if the device exposes any. */
+  fun systemPresetNames(): List<String> {
+    val eq = equalizer ?: return emptyList()
+    return try {
+      (0 until eq.numberOfPresets).map { index ->
+        eq.getPresetName(index.toShort()).orEmpty().ifBlank { "Preset ${index + 1}" }
+      }
+    } catch (e: Exception) {
+      Timber.w(e)
+      emptyList()
+    }
+  }
+
+  fun useSystemPreset(index: Int): Boolean {
+    val eq = equalizer ?: return false
+    return tryRun({
+      eq.usePreset(index.toShort())
+      syncBandLevelsFromEqualizer()
+    }, {
+      releaseEqualizer()
+    })
+  }
+
+  /**
+   * Applies a software preset defined as relative gains in [-1, 1] across bands
+   * (interpolated when the device band count differs from the preset length).
+   */
+  fun applyRelativeGains(relativeGains: FloatArray) {
+    if (bandNumber <= 0) return
+    val gains = interpolateRelativeGains(relativeGains, bandNumber.toInt())
+    for (i in 0 until bandNumber) {
+      val level = (minLevel + (maxLevel - minLevel) * ((gains[i] + 1f) / 2f)).roundToInt()
+        .coerceIn(minLevel.toInt(), maxLevel.toInt())
+      setBandLevel(i, level)
+    }
+  }
+
+  private fun syncBandLevelsFromEqualizer() {
+    val eq = equalizer ?: return
+    for (i in 0 until bandNumber) {
+      val level = eq.getBandLevel(i.toShort())
+      bandLevels[i] = level
+      var bandLevel by settingPrefs.sp.delegate("band$i", 0)
+      bandLevel = level.toInt()
+    }
+  }
+
+  private fun interpolateRelativeGains(source: FloatArray, targetBands: Int): FloatArray {
+    if (source.isEmpty() || targetBands <= 0) {
+      return FloatArray(targetBands.coerceAtLeast(0))
+    }
+    if (source.size == targetBands) return source.copyOf()
+    if (targetBands == 1) return floatArrayOf(source.average().toFloat())
+
+    val result = FloatArray(targetBands)
+    val lastSrc = source.lastIndex.toFloat()
+    for (i in 0 until targetBands) {
+      val pos = i.toFloat() / (targetBands - 1) * lastSrc
+      val left = pos.toInt().coerceIn(0, source.lastIndex)
+      val right = (left + 1).coerceAtMost(source.lastIndex)
+      val t = pos - left
+      result[i] = source[left] * (1f - t) + source[right] * t
+    }
+    return result
+  }
+
   private fun openSystemAudioEffectSession(context: Context, audioSessionId: Int) {
     val audioEffectsIntent = Intent(AudioEffect.ACTION_OPEN_AUDIO_EFFECT_CONTROL_SESSION)
     audioEffectsIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, audioSessionId)
@@ -343,18 +398,8 @@ object EQHelper {
       ).show()
       return
     }
-    val audioEffectIntent = Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL)
-    audioEffectIntent.putExtra(AudioEffect.EXTRA_AUDIO_SESSION, sessionId)
-    audioEffectIntent.putExtra(AudioEffect.EXTRA_CONTENT_TYPE, AudioEffect.CONTENT_TYPE_MUSIC)
-    if (isSystemEqualizerAvailable(activity)) {
-      activity.startActivityForResult(audioEffectIntent, REQUEST_EQ)
-    } else {
-      navigateToEq()
-    }
-  }
-
-  private fun isSystemEqualizerAvailable(context: Context): Boolean {
-    return isIntentAvailable(context, Intent(AudioEffect.ACTION_DISPLAY_AUDIO_EFFECT_CONTROL_PANEL))
+    // Always open the in-app equalizer (preset chips + thumb-zone bands).
+    navigateToEq()
   }
 
   private fun isValidAudioSessionId(sessionId: Int): Boolean {
@@ -362,17 +407,16 @@ object EQHelper {
       sessionId != AudioManager.AUDIO_SESSION_ID_GENERATE
   }
 
-  private fun tryRun(block: () -> Unit, error: () -> Unit) {
-    try {
+  private fun tryRun(block: () -> Unit, error: () -> Unit): Boolean {
+    return try {
       block()
+      true
     } catch (e: Exception) {
       Timber.w(e)
       error()
+      false
     }
   }
 
-
   const val REQUEST_EQ = 0
-
-
 }
