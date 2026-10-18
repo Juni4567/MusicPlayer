@@ -22,7 +22,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import remix.myplayer.R
-import remix.myplayer.ui.theme.BrandColors
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.viewmodel.settingViewModel
@@ -58,7 +57,12 @@ fun speedPreferenceValue(speed: Float): String = when {
 fun SpeedDialog(state: DialogState, settingState: SettingsState) {
   val settingVM = settingViewModel
   val current = settingState.play.speed.toFloatOrNull() ?: 1.0f
-  val accent = LocalTheme.current.secondary
+  val theme = LocalTheme.current
+  val accent = theme.secondary
+  val onAccent = theme.primaryReverse
+  val textPrimary = theme.textPrimary
+  val surface2 = theme.surface2
+  val divider = theme.divider
 
   MiBottomSheet(
     visible = state.isOpen,
@@ -75,17 +79,17 @@ fun SpeedDialog(state: DialogState, settingState: SettingsState) {
         val label = formatPlaybackSpeed(speed)
         Text(
           text = label,
-          color = if (selected) Color.White else BrandColors.TextPrimary,
+          color = if (selected) onAccent else textPrimary,
           fontSize = 15.sp,
           fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
           textAlign = TextAlign.Center,
           modifier = Modifier
             .heightIn(min = 48.dp)
             .clip(RoundedCornerShape(24.dp))
-            .background(if (selected) accent else BrandColors.Surface2)
+            .background(if (selected) accent else surface2)
             .border(
               width = 1.dp,
-              color = if (selected) Color.Transparent else BrandColors.Divider,
+              color = if (selected) Color.Transparent else divider,
               shape = RoundedCornerShape(24.dp)
             )
             .semantics { contentDescription = "Playback speed $label" }

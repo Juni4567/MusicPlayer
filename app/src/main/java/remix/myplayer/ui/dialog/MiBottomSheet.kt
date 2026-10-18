@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import remix.myplayer.ui.theme.BrandColors
+import remix.myplayer.ui.theme.LocalTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -30,11 +30,14 @@ fun MiBottomSheet(
   if (!visible) return
 
   val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+  val theme = LocalTheme.current
+  val dialogBg = theme.dialogBackground
+  val textPrimaryColor = theme.textPrimary
   ModalBottomSheet(
     onDismissRequest = onDismiss,
     sheetState = sheetState,
-    containerColor = BrandColors.Surface,
-    contentColor = BrandColors.TextPrimary,
+    containerColor = dialogBg,
+    contentColor = textPrimaryColor,
     scrimColor = Color.Black.copy(alpha = 0.55f),
     shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
     dragHandle = null,
@@ -48,7 +51,7 @@ fun MiBottomSheet(
     ) {
       Text(
         text = title,
-        color = BrandColors.TextPrimary,
+        color = textPrimaryColor,
         fontSize = 18.sp,
         fontWeight = FontWeight.SemiBold,
         modifier = Modifier.padding(bottom = 16.dp)

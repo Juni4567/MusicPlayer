@@ -41,7 +41,6 @@ import remix.myplayer.R
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.ui.nav.MessageNotifier
-import remix.myplayer.ui.theme.BrandColors
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.LineSlider
 import remix.myplayer.ui.widget.common.TextPrimary
@@ -123,6 +122,10 @@ fun EqualizerSheet(state: DialogState) {
     onDismiss = { state.dismiss() },
     title = stringResource(R.string.eq),
   ) {
+    val textPrimary = theme.textPrimary
+    val onAccent = theme.primaryReverse
+    val surface2 = theme.surface2
+    val divider = theme.divider
     Column(
       modifier = Modifier
         .fillMaxWidth()
@@ -183,16 +186,16 @@ fun EqualizerSheet(state: DialogState) {
           val selected = selectedPreset == index
           Text(
             text = stringResource(preset.nameRes),
-            color = if (selected) Color.White else BrandColors.TextPrimary,
+            color = if (selected) onAccent else textPrimary,
             fontSize = 13.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier
               .heightIn(min = 40.dp)
               .clip(RoundedCornerShape(20.dp))
-              .background(if (selected) theme.secondary else BrandColors.Surface2)
+              .background(if (selected) theme.secondary else surface2)
               .border(
                 1.dp,
-                if (selected) Color.Transparent else BrandColors.Divider,
+                if (selected) Color.Transparent else divider,
                 RoundedCornerShape(20.dp)
               )
               .clickWithRipple(circle = false, enabled = enableEq) {
@@ -237,7 +240,7 @@ fun EqualizerSheet(state: DialogState) {
       )
       Text(
         text = stringResource(R.string.virtualizer_unavailable_hint),
-        color = BrandColors.TextMuted,
+        color = theme.textMuted,
         fontSize = 12.sp,
         modifier = Modifier.padding(bottom = 12.dp)
       )

@@ -64,7 +64,6 @@ import remix.myplayer.service.MusicService.Companion.EXTRA_POSITION
 import remix.myplayer.service.playback.PlaybackUiState
 import remix.myplayer.ui.dialog.BottomDialog
 import remix.myplayer.ui.nav.MessageNotifier
-import remix.myplayer.ui.theme.BrandColors
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
@@ -235,6 +234,10 @@ private fun PlayQueueDialog(
   val playbackState by playbackVM.playbackUiState.collectAsStateWithLifecycle()
   val songs by playbackVM.playQueueSongs.collectAsStateWithLifecycle()
   val theme = LocalTheme.current
+  val surface = theme.surface
+  val surface2 = theme.surface2
+  val textSecondaryColor = theme.textSecondary
+  val textMutedColor = theme.textMuted
   val mainVM = mainViewModel
   val scope = rememberCoroutineScope()
 
@@ -246,7 +249,7 @@ private fun PlayQueueDialog(
     Column(
       modifier = Modifier
         .fillMaxWidth()
-        .background(BrandColors.Surface)
+        .background(surface)
     ) {
       Row(
         modifier = Modifier
@@ -262,7 +265,7 @@ private fun PlayQueueDialog(
           Image(
             painter = painterResource(R.drawable.icon_player_back),
             contentDescription = "Collapse up next",
-            colorFilter = ColorFilter.tint(BrandColors.TextSecondary),
+            colorFilter = ColorFilter.tint(textSecondaryColor),
             modifier = Modifier.size(22.dp)
           )
         }
@@ -274,7 +277,7 @@ private fun PlayQueueDialog(
           TextPrimary(
             stringResource(R.string.clear_queue),
             fontSize = 14.sp,
-            color = BrandColors.TextSecondary,
+            color = textSecondaryColor,
             modifier = Modifier
               .padding(end = 8.dp)
               .clickWithRipple { playbackVM.clearUpcomingFromQueue() }
@@ -289,7 +292,7 @@ private fun PlayQueueDialog(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .clip(RoundedCornerShape(14.dp))
-            .background(BrandColors.Surface2)
+            .background(surface2)
             .padding(12.dp)
         ) {
           TextSecondary(stringResource(R.string.now_playing), fontSize = 11.sp)
@@ -326,7 +329,7 @@ private fun PlayQueueDialog(
             Image(
               painter = painterResource(R.drawable.ic_player_queue_24dp),
               contentDescription = null,
-              colorFilter = ColorFilter.tint(BrandColors.TextMuted),
+              colorFilter = ColorFilter.tint(textMutedColor),
               modifier = Modifier.size(48.dp)
             )
             TextPrimary(
@@ -373,7 +376,7 @@ private fun PlayQueueDialog(
                 modifier = Modifier
                   .fillMaxWidth()
                   .height(64.dp)
-                  .background(if (isCurrent) BrandColors.Surface2 else BrandColors.Surface)
+                  .background(if (isCurrent) surface2 else surface)
                   .clickWithRipple(false) {
                     sendLocalBroadcast(
                       makeCmdIntent(Command.PLAY_AT)
@@ -414,7 +417,7 @@ private fun PlayQueueDialog(
                     Image(
                       painter = painterResource(R.drawable.ic_queue_remove_24dp),
                       contentDescription = "Remove from queue",
-                      colorFilter = ColorFilter.tint(BrandColors.TextMuted)
+                      colorFilter = ColorFilter.tint(textMutedColor)
                     )
                   }
                 }
@@ -422,7 +425,7 @@ private fun PlayQueueDialog(
                 Icon(
                   painter = painterResource(R.drawable.ic_drag_handle_24dp),
                   contentDescription = "Reorder queue item",
-                  tint = BrandColors.TextMuted,
+                  tint = textMutedColor,
                   modifier = Modifier
                     .size(40.dp)
                     .padding(8.dp)

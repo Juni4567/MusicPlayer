@@ -64,9 +64,7 @@ internal fun PlayingSeekbarWithText(
       )
     }
 
-    val textColor = remember {
-      Color("#6b6b6b".toColorInt())
-    }
+    val textColor = LocalTheme.current.textMuted
 
     val tabularStyle = remember {
       TextStyle(

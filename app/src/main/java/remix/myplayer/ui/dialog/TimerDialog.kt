@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
 import remix.myplayer.helper.SleepTimer
-import remix.myplayer.ui.theme.BrandColors
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.viewmodel.timerViewModel
@@ -50,7 +49,7 @@ fun TimerDialog() {
       val remainMin = ceil(timerState.progress / 60.0).toInt().coerceAtLeast(0)
       Text(
         text = stringResource(R.string.timer_active_remaining, remainMin),
-        color = BrandColors.TextSecondary,
+        color = LocalTheme.current.textSecondary,
         fontSize = 13.sp,
         modifier = Modifier.padding(bottom = 12.dp)
       )
@@ -94,12 +93,15 @@ private fun SheetActionRow(
   accent: androidx.compose.ui.graphics.Color = LocalTheme.current.secondary,
   onClick: () -> Unit,
 ) {
+  val theme = LocalTheme.current
+  val surface2 = theme.surface2
+  val textPrimary = theme.textPrimary
   Row(
     modifier = Modifier
       .fillMaxWidth()
       .heightIn(min = 48.dp)
       .clip(RoundedCornerShape(14.dp))
-      .background(if (highlighted) accent.copy(alpha = 0.18f) else BrandColors.Surface2)
+      .background(if (highlighted) accent.copy(alpha = 0.18f) else surface2)
       .semantics { this.contentDescription = contentDescription }
       .clickWithRipple(circle = false, onClick = onClick)
       .padding(horizontal = 16.dp, vertical = 14.dp),
@@ -107,7 +109,7 @@ private fun SheetActionRow(
   ) {
     Text(
       text = label,
-      color = if (highlighted) accent else BrandColors.TextPrimary,
+      color = if (highlighted) accent else textPrimary,
       fontSize = 15.sp,
       fontWeight = if (highlighted) FontWeight.SemiBold else FontWeight.Normal,
     )

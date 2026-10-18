@@ -14,7 +14,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,6 +35,8 @@ fun CommonAppBar(
   actions: @Composable () -> Unit
 ) {
   val navController = LocalNavController.current
+  val theme = LocalTheme.current
+  val onPrimary = theme.primaryReverse
 
   TopAppBar(
     windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
@@ -43,7 +44,7 @@ fun CommonAppBar(
       if (!title.isNullOrEmpty()) {
         Text(
           title,
-          color = Color.White,
+          color = onPrimary,
           fontSize = 18.sp,
           modifier = Modifier.padding(start = 16.dp)
         )
@@ -61,7 +62,8 @@ fun CommonAppBar(
         }) {
           Icon(
             painter = painterResource(R.drawable.ic_arrow_back_white_24dp),
-            contentDescription = "Back"
+            contentDescription = "Back",
+            tint = onPrimary
           )
         }
       }
@@ -70,10 +72,10 @@ fun CommonAppBar(
       actions()
     },
     colors = TopAppBarDefaults.topAppBarColors(
-      containerColor = LocalTheme.current.primary,
-      scrolledContainerColor = LocalTheme.current.primary,
-      navigationIconContentColor = Color.White,
-      actionIconContentColor = Color.White,
+      containerColor = theme.primary,
+      scrolledContainerColor = theme.primary,
+      navigationIconContentColor = onPrimary,
+      actionIconContentColor = onPrimary,
     ),
   )
 }
