@@ -113,18 +113,12 @@ fun LibraryChrome(songs: List<Song>) {
         label = stringResource(R.string.shortcut_recent),
         contentDescription = "Recent",
         modifier = Modifier.weight(1f),
-        textColor = textPrimary,
-        background = surface2,
-        borderColor = divider,
         onClick = { nav.navigate(RouteHistory) }
       )
       ShortcutChip(
         label = stringResource(R.string.shortcut_favorites),
         contentDescription = "Favorites",
         modifier = Modifier.weight(1f),
-        textColor = textPrimary,
-        background = surface2,
-        borderColor = divider,
         onClick = {
           val favorite = libraryVM.playLists.value.firstOrNull { it.isFavorite() }
           if (favorite != null) {
@@ -138,9 +132,6 @@ fun LibraryChrome(songs: List<Song>) {
         label = stringResource(R.string.shortcut_playlists),
         contentDescription = "Playlists",
         modifier = Modifier.weight(1f),
-        textColor = textPrimary,
-        background = surface2,
-        borderColor = divider,
         onClick = { settingVM.requestLibraryTab(Library.TAG_PLAYLIST) }
       )
     }
@@ -188,22 +179,20 @@ private fun ShortcutChip(
   label: String,
   contentDescription: String,
   modifier: Modifier = Modifier,
-  textColor: androidx.compose.ui.graphics.Color,
-  background: androidx.compose.ui.graphics.Color,
-  borderColor: androidx.compose.ui.graphics.Color,
   onClick: () -> Unit,
 ) {
+  val theme = LocalTheme.current
   Text(
     text = label,
-    color = textColor,
+    color = theme.textPrimary,
     fontSize = 13.sp,
     fontWeight = FontWeight.Medium,
     textAlign = TextAlign.Center,
     modifier = modifier
       .heightIn(min = 40.dp)
       .clip(RoundedCornerShape(20.dp))
-      .background(background)
-      .border(1.dp, borderColor, RoundedCornerShape(20.dp))
+      .background(theme.surface2)
+      .border(1.dp, theme.divider, RoundedCornerShape(20.dp))
       .semantics { this.contentDescription = contentDescription }
       .clickWithRipple(circle = false, onClick = onClick)
       .padding(horizontal = 10.dp, vertical = 10.dp)
