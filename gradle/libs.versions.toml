@@ -45,7 +45,6 @@ junit4 = "4.13.2"
 smbj = "0.13.0"
 play-feature-delivery = "2.1.0"
 annotation = "1.7.0"
-ffmpegKit = "8.1.9"
 
 [plugins]
 application = { id = "com.android.application", version.ref = "agp" }
@@ -106,7 +105,6 @@ xxpermissions = { module = "com.github.getActivity:XXPermissions", version.ref =
 sardine-android = { group = "com.github.thegrizzlylabs", name = "sardine-android", version.ref = "sardineAndroid" }
 smbj = { group = "com.hierynomus", name = "smbj", version.ref = "smbj" }
 timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
-ffmpeg-kit-audio = { module = "dev.ffmpegkit-maintained:ffmpeg-kit-audio", version.ref = "ffmpegKit" }
 
 # compose
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }

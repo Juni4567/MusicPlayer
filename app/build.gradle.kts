@@ -56,11 +56,11 @@ android {
 
     defaultConfig {
         applicationId = "remix.myplayer"
-        minSdk = 24
+        minSdk = 21
         targetSdk = 36
 
-        versionCode = 21700
-        versionName = "2.1.7.0"
+        versionCode = 21800
+        versionName = "2.1.8.0"
 
         vectorDrawables.useSupportLibrary = true
 
@@ -301,7 +301,6 @@ dependencies {
     implementation(libs.media)
     implementation(libs.androidx.media3.exoplayer)
     implementation(files("libs/lib-decoder-ffmpeg-release.aar"))
-    implementation(libs.ffmpeg.kit.audio)
     implementation(libs.palette.ktx)
 
     implementation(libs.material)
