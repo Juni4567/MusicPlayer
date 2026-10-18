@@ -16,6 +16,7 @@ All notable changes to A-Music (fork of APlayer) are documented in this file.
 
 ### Notes
 - APK size increases due to the FFmpegKit audio package
+- `minSdk` raised to **24** (Android 7.0) to match FFmpegKit
 - Remote / cloud songs are not supported
 - Signed for sideload with this fork’s debug keystore
 

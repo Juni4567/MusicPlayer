@@ -56,7 +56,7 @@ android {
 
     defaultConfig {
         applicationId = "remix.myplayer"
-        minSdk = 21
+        minSdk = 24
         targetSdk = 36
 
         versionCode = 21600
