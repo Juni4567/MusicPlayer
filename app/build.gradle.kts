@@ -59,8 +59,8 @@ android {
         minSdk = 21
         targetSdk = 36
 
-        versionCode = 21201
-        versionName = "2.1.2.1"
+        versionCode = 21300
+        versionName = "2.1.3.0"
 
         vectorDrawables.useSupportLibrary = true
 
@@ -262,7 +262,7 @@ androidComponents {
             else -> return@onVariants
         }
         val versionName = android.defaultConfig.versionName.orEmpty()
-        val apkName = "${sortPrefix}-APlayer-v${versionName}-${flavor}-release.apk"
+        val apkName = "${sortPrefix}-A-Music-v${versionName}-${flavor}-release.apk"
         val taskName =
             "rename${variant.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}Apk"
 
