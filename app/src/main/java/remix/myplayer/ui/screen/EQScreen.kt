@@ -366,13 +366,14 @@ private fun EqPresetChip(
   onClick: () -> Unit,
 ) {
   val theme = LocalTheme.current
+  val onAccent = theme.primaryReverse
   val bg = when {
     selected -> theme.secondary
     else -> theme.surface2
   }
   val border = if (selected) Color.Transparent else theme.divider
   val textColor = when {
-    selected -> Color.White
+    selected -> onAccent
     enabled -> theme.textPrimary
     else -> theme.textSecondary
   }

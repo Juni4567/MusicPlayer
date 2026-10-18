@@ -59,6 +59,7 @@ fun SpeedDialog(state: DialogState, settingState: SettingsState) {
   val current = settingState.play.speed.toFloatOrNull() ?: 1.0f
   val theme = LocalTheme.current
   val accent = theme.secondary
+  val onAccent = theme.primaryReverse
   val textPrimary = theme.textPrimary
   val surface2 = theme.surface2
   val divider = theme.divider
@@ -78,7 +79,7 @@ fun SpeedDialog(state: DialogState, settingState: SettingsState) {
         val label = formatPlaybackSpeed(speed)
         Text(
           text = label,
-          color = if (selected) Color.White else textPrimary,
+          color = if (selected) onAccent else textPrimary,
           fontSize = 15.sp,
           fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
           textAlign = TextAlign.Center,

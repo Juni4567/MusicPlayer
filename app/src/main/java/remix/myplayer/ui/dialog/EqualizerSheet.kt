@@ -123,6 +123,7 @@ fun EqualizerSheet(state: DialogState) {
     title = stringResource(R.string.eq),
   ) {
     val textPrimary = theme.textPrimary
+    val onAccent = theme.primaryReverse
     val surface2 = theme.surface2
     val divider = theme.divider
     Column(
@@ -185,7 +186,7 @@ fun EqualizerSheet(state: DialogState) {
           val selected = selectedPreset == index
           Text(
             text = stringResource(preset.nameRes),
-            color = if (selected) Color.White else textPrimary,
+            color = if (selected) onAccent else textPrimary,
             fontSize = 13.sp,
             textAlign = TextAlign.Center,
             modifier = Modifier
