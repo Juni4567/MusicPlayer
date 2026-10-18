@@ -2,6 +2,19 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.1.9.1] — 2026-10-19
+
+### Highlights
+- Launcher icon rebuilt from a clean **SVG** source (sharper note, proper adaptive layers)
+
+### UI
+- Vector source of truth under `app/src/main/art/launcher/`
+- Adaptive icon uses separate gradient background + white-note foreground
+- Regenerated legacy mipmaps (mdpi–xxxhdpi) from the SVG geometry
+
+### Notes
+- Signed for sideload with this fork’s debug keystore. Clear launcher cache if the old icon is still shown.
+
 ## [2.1.9.0] — 2026-10-19
 
 ### Highlights
@@ -149,6 +162,7 @@ All notable changes to A-Music (fork of APlayer) are documented in this file.
 
 - See upstream APlayer release notes
 
+[2.1.9.1]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.9.1
 [2.1.9.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.9.0
 [2.1.8.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.8.0
 [2.1.7.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.7.0

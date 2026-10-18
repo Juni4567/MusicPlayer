@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bgGrad" gradientUnits="userSpaceOnUse" x1="60" y1="980" x2="980" y2="60">
+      <stop offset="0%" stop-color="#D4145A"/>
+      <stop offset="42%" stop-color="#EF4E78"/>
+      <stop offset="100%" stop-color="#FF9B6A"/>
+    </linearGradient>
+    <filter id="grain" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="n"/>
+      <feColorMatrix in="n" type="matrix"
+        values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.055 0" result="g"/>
+      <feBlend in="SourceGraphic" in2="g" mode="soft-light"/>
+    </filter>
+  </defs>
+  <rect width="1024" height="1024" fill="url(#bgGrad)" filter="url(#grain)"/>
+</svg>

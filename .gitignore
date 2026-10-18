@@ -13,3 +13,4 @@
 /.vercel
 /.kotlin
 *.txt
+tools/out/

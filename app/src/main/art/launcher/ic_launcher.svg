@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  A-Music launcher icon - vector source of truth (1024x1024).
+  Pink-orange gradient + white hollow eighth note.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bgGrad" gradientUnits="userSpaceOnUse" x1="60" y1="980" x2="980" y2="60">
+      <stop offset="0%" stop-color="#D4145A"/>
+      <stop offset="42%" stop-color="#EF4E78"/>
+      <stop offset="100%" stop-color="#FF9B6A"/>
+    </linearGradient>
+    <filter id="grain" x="0%" y="0%" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" result="n"/>
+      <feColorMatrix in="n" type="matrix"
+        values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.055 0" result="g"/>
+      <feBlend in="SourceGraphic" in2="g" mode="soft-light"/>
+    </filter>
+    <filter id="noteShadow" x="-35%" y="-35%" width="170%" height="170%">
+      <feDropShadow dx="6" dy="10" stdDeviation="8" flood-color="#5A0E2C" flood-opacity="0.30"/>
+    </filter>
+  </defs>
+
+  <rect width="1024" height="1024" fill="url(#bgGrad)" filter="url(#grain)"/>
+
+  <g filter="url(#noteShadow)" fill="#FFFFFF" fill-rule="evenodd">
+    <path d="
+      M 448 792
+      A 176 176 0 1 1 448.01 792
+      Z
+      M 448 700
+      A 84 84 0 1 0 448.01 700
+      Z
+    "/>
+    <rect x="578" y="236" width="62" height="420" rx="31"/>
+    <path d="
+      M 609 236
+      C 700 234 790 270 832 340
+      C 862 390 868 450 848 505
+      C 836 536 804 548 778 528
+      C 758 512 762 480 786 458
+      C 820 424 820 372 778 336
+      C 742 304 680 280 609 278
+      Z
+    "/>
+  </g>
+</svg>
