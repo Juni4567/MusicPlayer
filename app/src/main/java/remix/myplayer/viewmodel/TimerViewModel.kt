@@ -17,6 +17,7 @@ import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.helper.SleepTimer.Companion.getMillisUntilFinish
 import remix.myplayer.helper.SleepTimer.Companion.isTicking
 import remix.myplayer.helper.SleepTimer.Companion.toggleTimer
+import remix.myplayer.service.playback.MusicStateSource
 import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.nav.MessageNotifier
 import javax.inject.Inject
@@ -32,24 +33,54 @@ class TimerViewModel @Inject constructor(
   val dialogState = _dialogState
 
   fun showTimerDialog() {
-    // 如果有默认设置并且没有开始计时，直接开始计时
-    // 如果有默认设置但已经开始计时，显示该dialog
-    if (_timerState.value.timerStartAuto && _timerState.value.timerDefaultDuration > 0) {
-      if (!isTicking()) {
-        updateState(durationInSec = _timerState.value.timerDefaultDuration)
-        toggle()
-        return
-      }
-    }
-
     if (isTicking()) {
       periodUpdateProgress()
     } else {
       cancelUpdateProgress()
       updateState(durationInSec = 0, progress = 0)
     }
-
     _dialogState.show()
+  }
+
+  fun startPresetMinutes(minutes: Int) {
+    startDurationSeconds(minutes * 60)
+  }
+
+  fun startEndOfCurrentSong() {
+    val progress = MusicStateSource.currentProgressState
+    val remainingMs = (progress.duration - progress.position).coerceAtLeast(1_000L)
+    startDurationSeconds((remainingMs / 1000L).toInt().coerceAtLeast(1))
+  }
+
+  fun cancelActiveTimer() {
+    if (isTicking()) {
+      toggleTimer(0)
+    }
+    cancelUpdateProgress()
+    updateState(
+      durationInSec = 0,
+      progress = 0,
+      positiveButtonText = R.string.start_timer
+    )
+    _dialogState.dismiss()
+  }
+
+  private fun startDurationSeconds(seconds: Int) {
+    if (seconds <= 0) {
+      MessageNotifier.show(R.string.plz_set_correct_time)
+      return
+    }
+    if (isTicking()) {
+      toggleTimer(0)
+    }
+    updateState(
+      durationInSec = seconds,
+      progress = seconds,
+      positiveButtonText = R.string.cancel_timer
+    )
+    toggleTimer(seconds * 1000L)
+    periodUpdateProgress()
+    _dialogState.dismiss()
   }
 
   private var progressJob: Job? = null

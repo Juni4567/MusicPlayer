@@ -40,10 +40,10 @@ internal fun HomeAppBar(
     windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
     scrollBehavior = scrollBehavior,
     colors = TopAppBarDefaults.topAppBarColors(
-      containerColor = LocalTheme.current.primary,
-      scrolledContainerColor = LocalTheme.current.primary,
-      navigationIconContentColor = Color.White,
-      actionIconContentColor = Color.White,
+      containerColor = LocalTheme.current.mainBackground,
+      scrolledContainerColor = LocalTheme.current.mainBackground,
+      navigationIconContentColor = LocalTheme.current.textPrimary,
+      actionIconContentColor = LocalTheme.current.textPrimary,
     ),
     title = {},
     navigationIcon = {

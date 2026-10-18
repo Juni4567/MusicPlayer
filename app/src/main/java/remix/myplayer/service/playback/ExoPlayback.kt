@@ -293,6 +293,14 @@ class ExoPlayback(
     }
   }
 
+  override fun moveSong(from: Int, to: Int) {
+    checkMainThread()
+    if (from == to) return
+    if (from in 0 until player.mediaItemCount && to in 0 until player.mediaItemCount) {
+      player.moveMediaItem(from, to)
+    }
+  }
+
   override fun replaceSong(song: Song) {
     checkMainThread()
 

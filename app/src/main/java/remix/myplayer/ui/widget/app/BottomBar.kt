@@ -7,14 +7,16 @@ import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,6 +26,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
@@ -31,16 +34,20 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import remix.myplayer.R
+import remix.myplayer.helper.SleepTimer
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
 import remix.myplayer.service.MusicService.Companion.EXTRA_COMMAND
+import remix.myplayer.ui.theme.BrandColors
 import remix.myplayer.ui.theme.LocalTheme
+import remix.myplayer.ui.widget.common.LineSlider
 import remix.myplayer.ui.widget.common.TextPrimary
 import remix.myplayer.ui.widget.common.TextSecondary
+import remix.myplayer.ui.widget.common.defaultLineSliderProperties
 import remix.myplayer.ui.widget.library.GlideCover
 import remix.myplayer.util.Util
 import remix.myplayer.util.ext.clickableWithoutRipple
@@ -49,6 +56,8 @@ import remix.myplayer.viewmodel.PlayingScreenValue
 import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.playbackViewModel
 import kotlin.math.absoluteValue
+import kotlin.math.ceil
+import kotlin.math.roundToLong
 
 private const val triggerThreshold = 10
 
@@ -57,26 +66,31 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
   val mainVM = mainViewModel
   val scope = rememberCoroutineScope()
   val playbackState by vm.playbackUiState.collectAsStateWithLifecycle()
+  val seekBarUiState by vm.seekBarUiState.collectAsStateWithLifecycle()
+  val theme = LocalTheme.current
   val interactionSource = remember { MutableInteractionSource() }
 
   var hasTriggerAct by remember { mutableStateOf(false) }
   var hasTriggerOp by remember { mutableStateOf(false) }
 
-  val baseModifier = modifier
-    .fillMaxWidth()
-    .height(72.dp)
-    .background(LocalTheme.current.dialogBackground)
-
   val isSongValid = playbackState.song.valid()
-  val interactionModifiers = if (isSongValid) {
+  val accent = theme.secondary
+  val surface = if (theme.isLight) theme.dialogBackground else BrandColors.Surface
+  val controlTint = if (theme.isLight) Color(0xFF323334) else BrandColors.TextPrimary
+  val timerRunning by SleepTimer.runningState.collectAsStateWithLifecycle()
+  val timerRemainMin = if (timerRunning) {
+    ceil(SleepTimer.getMillisUntilFinish() / 60_000.0).toInt().coerceAtLeast(1)
+  } else {
+    0
+  }
+
+  val expandGestures = if (isSongValid) {
     Modifier
-      // 点击跳转播放页
       .clickableWithoutRipple(interactionSource) {
         scope.launch {
           mainVM.playingScreenState.animateTo(PlayingScreenValue.Expanded)
         }
       }
-      // 垂直滑动跳转播放页
       .pointerInput(Unit) {
         detectVerticalDragGestures(
           onDragStart = { hasTriggerAct = false }
@@ -89,7 +103,6 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
           }
         }
       }
-      // 水平滑动切换歌曲
       .pointerInput(Unit) {
         detectHorizontalDragGestures(
           onDragStart = { hasTriggerOp = false }
@@ -107,66 +120,142 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
         }
       }
   } else {
-    // 歌曲无效时，不响应任何操作
     Modifier
   }
 
-  Row(
-    modifier = baseModifier
-      .semantics{ contentDescription = "BottomBar" }
-      .then(interactionModifiers),
-    verticalAlignment = Alignment.CenterVertically,
+  Column(
+    modifier = modifier
+      .fillMaxWidth()
+      .semantics { contentDescription = "BottomBar" }
+      .clip(RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp))
+      .background(surface)
   ) {
-    GlideCover(
-      model = playbackState.song,
-      modifier = Modifier
-        .padding(start = 12.dp)
-        .size(48.dp)
-    )
-    Column(
-      verticalArrangement = Arrangement.Center,
-      modifier = Modifier
-        .weight(1f)
-        .fillMaxHeight()
-        .padding(horizontal = 8.dp)
-    ) {
-      TextPrimary(playbackState.song.showName, fontSize = 16.sp)
-      Spacer(modifier = Modifier.height(2.dp))
-      TextSecondary(text = playbackState.song.artist, fontSize = 14.sp)
+    if (isSongValid) {
+      ProgressAware { progress, duration ->
+        val value = if (seekBarUiState.interacting && seekBarUiState.uiProgress != null) {
+          seekBarUiState.uiProgress!!.toFloat()
+        } else {
+          progress.toFloat()
+        }
+        LineSlider(
+          value = value,
+          onValueChange = { v ->
+            vm.setSeekbarUiState(v.roundToLong(), true)
+          },
+          onValueChangeFinished = {
+            vm.setProgress(vm.seekBarUiState.value.uiProgress ?: progress)
+            scope.launch {
+              delay(400)
+              vm.setSeekbarUiState(null, false)
+            }
+          },
+          valueRange = 0f..(duration.toFloat().coerceAtLeast(1f)),
+          modifier = Modifier
+            .fillMaxWidth()
+            .height(20.dp)
+            .padding(horizontal = 4.dp),
+          properties = defaultLineSliderProperties.copy(
+            trackHeight = 3.dp,
+            trackProgressColor = accent,
+            trackBackgroundColor = BrandColors.Divider,
+            thumbColor = accent,
+            thumbWidth = 10.dp,
+            thumbHeight = 10.dp,
+            thumbShape = CircleShape,
+          ),
+        )
+      }
+    } else {
+      Spacer(modifier = Modifier.height(3.dp))
     }
 
     Row(
-      modifier = Modifier.padding(end = 16.dp),
-      verticalAlignment = Alignment.CenterVertically
+      modifier = Modifier
+        .fillMaxWidth()
+        .height(64.dp)
+        .then(expandGestures),
+      verticalAlignment = Alignment.CenterVertically,
     ) {
-      val buttonColor =
-        Color((if (LocalTheme.current.isLight) "#323334" else "#FFFFFF").toColorInt())
-      Icon(
-        modifier = modifier
-          .clickableWithoutRipple(interactionSource) {
-            Util.sendLocalBroadcast(
-              Intent(MusicService.ACTION_CMD)
-                .putExtra(EXTRA_COMMAND, Command.PLAY_PAUSE)
+      GlideCover(
+        model = playbackState.song,
+        circle = false,
+        modifier = Modifier
+          .padding(start = 12.dp)
+          .size(48.dp)
+          .clip(RoundedCornerShape(10.dp))
+      )
+
+      Column(
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+          .weight(1f)
+          .padding(horizontal = 12.dp)
+      ) {
+        TextPrimary(playbackState.song.showName, fontSize = 15.sp)
+        Spacer(modifier = Modifier.height(2.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+          TextSecondary(
+            text = playbackState.song.artist.ifEmpty { "—" },
+            fontSize = 12.sp,
+            modifier = Modifier.weight(1f, fill = false)
+          )
+          if (timerRunning) {
+            TextPrimary(
+              text = " · ${timerRemainMin}m",
+              fontSize = 11.sp,
+              color = accent
             )
           }
-          .padding(end = 16.dp),
-        painter = painterResource(
-          if (playbackState.isPlaying) R.drawable.ic_pause_black_24dp else R.drawable.ic_play_arrow_black_24dp
-        ),
-        contentDescription = "PlayPause",
-        tint = buttonColor
-      )
-      Icon(
-        modifier = Modifier.clickableWithoutRipple(interactionSource) {
-          Util.sendLocalBroadcast(
-            Intent(MusicService.ACTION_CMD)
-              .putExtra(EXTRA_COMMAND, Command.SKIP_TO_NEXT)
+        }
+      }
+
+      Row(
+        modifier = Modifier.padding(end = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+      ) {
+        Box(
+          contentAlignment = Alignment.Center,
+          modifier = Modifier
+            .size(48.dp)
+            .clip(CircleShape)
+            .background(accent.copy(alpha = 0.16f))
+            .semantics { contentDescription = "Play or pause" }
+            .clickableWithoutRipple(interactionSource) {
+              Util.sendLocalBroadcast(
+                Intent(MusicService.ACTION_CMD)
+                  .putExtra(EXTRA_COMMAND, Command.PLAY_PAUSE)
+              )
+            }
+        ) {
+          Icon(
+            painter = painterResource(
+              if (playbackState.isPlaying) {
+                R.drawable.ic_pause_black_24dp
+              } else {
+                R.drawable.ic_play_arrow_black_24dp
+              }
+            ),
+            contentDescription = null,
+            tint = accent,
+            modifier = Modifier.size(24.dp)
           )
-        },
-        painter = painterResource(R.drawable.ic_player_next_24dp),
-        contentDescription = "Next",
-        tint = buttonColor
-      )
+        }
+        Icon(
+          modifier = Modifier
+            .size(48.dp)
+            .padding(12.dp)
+            .clickableWithoutRipple(interactionSource) {
+              Util.sendLocalBroadcast(
+                Intent(MusicService.ACTION_CMD)
+                  .putExtra(EXTRA_COMMAND, Command.SKIP_TO_NEXT)
+              )
+            },
+          painter = painterResource(R.drawable.ic_player_next_24dp),
+          contentDescription = "Next track",
+          tint = controlTint
+        )
+      }
     }
   }
 }

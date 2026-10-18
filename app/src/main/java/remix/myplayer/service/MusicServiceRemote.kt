@@ -93,6 +93,10 @@ object MusicServiceRemote {
 
   fun insertToQueue(songs: List<Song>): Int? = service?.insertToQueue(songs)
 
+  fun moveInQueue(from: Int, to: Int) {
+    service?.moveInQueue(from, to)
+  }
+
   fun getAudioSessionId(): Int? {
     return service?.playback?.audioSessionId
   }

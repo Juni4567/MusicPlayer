@@ -101,7 +101,7 @@ internal fun PlayingCover(modifier: Modifier, song: Song) {
     val imageModifier = Modifier
       .fillMaxSize()
 //      .shadow(elevation = 8.dp, shape = RoundedCornerShape(8.dp))
-      .clip(RoundedCornerShape(8.dp))
+      .clip(RoundedCornerShape(20.dp))
     val contentModifier = when (coverAnimationStyle) {
       PlayingCoverAnimationStyle.PAGE_TURN -> {
         horizontalFlip3DModifier(
@@ -137,7 +137,7 @@ internal fun PlayingCover(modifier: Modifier, song: Song) {
         loading = placeholder(R.drawable.transparent_placeholder),
         modifier = Modifier
           .fillMaxSize()
-          .clip(RoundedCornerShape(8.dp))
+          .clip(RoundedCornerShape(20.dp))
       ) { builder ->
         builder.addBitmapListener { bitmap ->
           playbackVM.updateSwatch(bitmap)

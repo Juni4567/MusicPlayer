@@ -88,6 +88,14 @@ android {
                 "x86_64"
             )
         }
+
+        // NDK r27: opt into 16 KB ELF alignment for Play / Android 15+ devices.
+        // https://developer.android.com/guide/practices/page-sizes
+        externalNativeBuild {
+            cmake {
+                arguments += listOf("-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON")
+            }
+        }
     }
 
     androidResources {

@@ -28,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
@@ -38,7 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -202,6 +202,16 @@ private fun HomeContent(
 ) {
   val scope = rememberCoroutineScope()
   val scrollToCurrentEvent = remember { MutableSharedFlow<Unit>() }
+  val settingVM = settingViewModel
+
+  LaunchedEffect(libraries) {
+    settingVM.pendingLibraryTag.collect { tag ->
+      val index = libraries.indexOfFirst { it.tag == tag }
+      if (index >= 0) {
+        pagerState.animateScrollToPage(index)
+      }
+    }
+  }
 
   val layoutDirection = LocalLayoutDirection.current
 
@@ -222,11 +232,11 @@ private fun HomeContent(
           TabRowDefaults.SecondaryIndicator(
             modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
             height = 3.dp,
-            color = LocalTheme.current.primaryReverse
+            color = LocalTheme.current.secondary
           )
         },
         edgePadding = 0.dp,
-        containerColor = LocalTheme.current.primary
+        containerColor = LocalTheme.current.mainBackground
       ) {
         libraries.forEachIndexed { index, library ->
           val theme = LocalTheme.current
@@ -246,10 +256,8 @@ private fun HomeContent(
               scope.launch { pagerState.animateScrollToPage(index) }
             },
             text = { Text(stringResource(library.stringRes), maxLines = 1) },
-            selectedContentColor = theme.primaryReverse,
-            unselectedContentColor = colorResource(
-              if (theme.isPrimaryCloseToWhite) R.color.dark_normal_tab_text_color else R.color.light_normal_tab_text_color
-            )
+            selectedContentColor = theme.textPrimary,
+            unselectedContentColor = theme.textSecondary
           )
         }
       }

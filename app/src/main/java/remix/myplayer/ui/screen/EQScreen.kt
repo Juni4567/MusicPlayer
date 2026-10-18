@@ -74,10 +74,11 @@ private data class SoftEqPreset(
 /** Software fallbacks used when the device exposes no built-in EQ presets. */
 private val SoftEqPresets = listOf(
   SoftEqPreset(R.string.eq_preset_flat, floatArrayOf(0f, 0f, 0f, 0f, 0f)),
-  SoftEqPreset(R.string.eq_preset_pop, floatArrayOf(-0.15f, 0.25f, 0.35f, 0.2f, -0.1f)),
   SoftEqPreset(R.string.eq_preset_rock, floatArrayOf(0.45f, 0.25f, -0.1f, 0.2f, 0.4f)),
-  SoftEqPreset(R.string.eq_preset_jazz, floatArrayOf(0.3f, 0.1f, -0.15f, 0.15f, 0.35f)),
+  SoftEqPreset(R.string.eq_preset_pop, floatArrayOf(-0.15f, 0.25f, 0.35f, 0.2f, -0.1f)),
   SoftEqPreset(R.string.eq_preset_classical, floatArrayOf(0.4f, 0.25f, -0.2f, 0.25f, 0.35f)),
+  SoftEqPreset(R.string.eq_preset_vocal, floatArrayOf(-0.2f, 0.1f, 0.45f, 0.35f, 0.1f)),
+  SoftEqPreset(R.string.eq_preset_jazz, floatArrayOf(0.3f, 0.1f, -0.15f, 0.15f, 0.35f)),
   SoftEqPreset(R.string.eq_preset_dance, floatArrayOf(0.5f, 0.35f, 0.05f, -0.1f, 0.25f)),
   SoftEqPreset(R.string.eq_preset_bass, floatArrayOf(0.7f, 0.45f, 0.1f, -0.15f, -0.2f)),
   SoftEqPreset(R.string.eq_preset_treble, floatArrayOf(-0.25f, -0.1f, 0.15f, 0.45f, 0.65f)),

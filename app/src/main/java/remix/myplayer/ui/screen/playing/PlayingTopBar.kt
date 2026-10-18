@@ -31,11 +31,14 @@ import androidx.palette.graphics.Palette
 import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
+import remix.myplayer.helper.SleepTimer
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.popupButton
 import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.viewmodel.PlayingScreenValue
 import remix.myplayer.viewmodel.mainViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlin.math.ceil
 
 @Composable
 @Stable
@@ -46,6 +49,12 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
   val titleColor = if (theme.isLight) Color(swatch.titleTextColor) else theme.textPrimary
   val bodyColor = if (theme.isLight) Color(swatch.bodyTextColor) else theme.textSecondary
   val tintColor = if (theme.isLight) titleColor else theme.popupButton()
+  val timerRunning by SleepTimer.runningState.collectAsStateWithLifecycle()
+  val timerRemainMin = if (timerRunning) {
+    ceil(SleepTimer.getMillisUntilFinish() / 60_000.0).toInt().coerceAtLeast(1)
+  } else {
+    0
+  }
 
   Row(modifier = Modifier.heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
     Box(
@@ -96,7 +105,13 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
         fontSize = 16.sp,
         maxLines = 1
       )
-      Text(detail, color = bodyColor, fontSize = 14.sp, maxLines = 1, textAlign = TextAlign.Center)
+      Text(
+        if (timerRunning) "$detail · ${timerRemainMin}m" else detail,
+        color = bodyColor,
+        fontSize = 14.sp,
+        maxLines = 1,
+        textAlign = TextAlign.Center
+      )
     }
 
     var expanded by remember { mutableStateOf(false) }

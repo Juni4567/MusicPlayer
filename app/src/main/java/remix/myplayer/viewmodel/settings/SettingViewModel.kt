@@ -11,7 +11,9 @@ import com.bumptech.glide.Glide
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -172,6 +174,14 @@ class SettingViewModel @Inject constructor(
 
   fun changeLibrary(library: Library) {
     _currentLibrary.value = library
+  }
+
+  private val _pendingLibraryTag = MutableSharedFlow<Int>(extraBufferCapacity = 1)
+  val pendingLibraryTag = _pendingLibraryTag.asSharedFlow()
+
+  /** Requests the home pager to scroll to the library tab with [tag]. */
+  fun requestLibraryTab(tag: Int) {
+    _pendingLibraryTag.tryEmit(tag)
   }
 
   // -------- Common 分组 ----------

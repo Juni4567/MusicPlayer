@@ -47,6 +47,13 @@ target_link_libraries( # Specifies the target library.
                        ${log-lib}
                        "-Wl,--build-id=none")
 
+# 16 KB page-size devices (Android 15+): align ELF LOAD segments.
+# Required with NDK r27; r28+ enables this by default.
+# See https://developer.android.com/guide/practices/page-sizes
+target_link_options(blur PRIVATE
+        "-Wl,-z,max-page-size=16384"
+        "-Wl,-z,common-page-size=16384")
+
 # NDK clang can embed host-specific compiler-build metadata in the ELF
 # .comment section (for example, different BOLT/MLGO settings between
 # macOS and Linux host toolchains). The section is not used at runtime,

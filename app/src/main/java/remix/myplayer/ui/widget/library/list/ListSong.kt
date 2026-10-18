@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -20,12 +21,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import remix.myplayer.data.model.audio.APlayerModel
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.highLightText
 import remix.myplayer.ui.widget.common.TextPrimary
+import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.library.GlideCover
 import remix.myplayer.ui.widget.popup.SongPopupButton
 
@@ -97,7 +100,12 @@ fun ListSong(
           .weight(1f)
           .padding(start = 16.dp, end = 8.dp)
       ) {
-        TextPrimary(song.showName)
+        TextPrimary(song.showName, fontSize = 15.sp)
+        Spacer(modifier = Modifier.height(2.dp))
+        TextSecondary(
+          text = song.artist.ifEmpty { "—" },
+          fontSize = 12.sp
+        )
       }
 
       SongPopupButton(

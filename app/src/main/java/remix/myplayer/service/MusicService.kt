@@ -813,6 +813,16 @@ class MusicService : BaseService(),
     return newSongs.size
   }
 
+  fun moveInQueue(from: Int, to: Int) {
+    if (from == to) return
+    val size = playback.getPlaylist().size
+    if (from !in 0 until size || to !in 0 until size) return
+    playback.moveSong(from, to)
+    launch { playQueueStore.save(playback.getPlaylist()) }
+    updateMediaSessionQueue()
+    pushPlaybackUiState()
+  }
+
   /**
    * 播放下一首
    */

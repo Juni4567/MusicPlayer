@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
@@ -25,12 +26,14 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -50,6 +53,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
+import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
@@ -72,7 +76,11 @@ import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.util.ext.CenterInBox
 import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.util.ext.isPortraitOrientation
+import remix.myplayer.viewmodel.PlayingScreenValue
+import remix.myplayer.viewmodel.mainViewModel
 import remix.myplayer.viewmodel.playbackViewModel
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 private val itemRes = mapOf(
   MODE_LOOP to Pair(R.drawable.ic_player_repeat_24dp, R.string.model_normal),
@@ -227,64 +235,91 @@ private fun PlayQueueDialog(
   val playbackState by playbackVM.playbackUiState.collectAsStateWithLifecycle()
   val songs by playbackVM.playQueueSongs.collectAsStateWithLifecycle()
   val theme = LocalTheme.current
+  val mainVM = mainViewModel
+  val scope = rememberCoroutineScope()
 
   BottomDialog(
     visible = visible,
     onDismissRequest = onDismissRequest,
-    maxHeightFraction = 0.72f
+    maxHeightFraction = 0.78f
   ) {
     Column(
       modifier = Modifier
         .fillMaxWidth()
         .background(BrandColors.Surface)
     ) {
-      CenterInBox(
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(top = 10.dp, bottom = 4.dp)
-      ) {
-        Box(
-          modifier = Modifier
-            .size(width = 36.dp, height = 4.dp)
-            .clip(RoundedCornerShape(2.dp))
-            .background(BrandColors.TextMuted.copy(alpha = 0.6f))
-        )
-      }
-
       Row(
         modifier = Modifier
           .fillMaxWidth()
-          .padding(horizontal = 16.dp, vertical = 8.dp),
+          .padding(horizontal = 8.dp, vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
       ) {
+        CenterInBox(
+          modifier = Modifier
+            .size(48.dp)
+            .clickWithRipple { onDismissRequest() }
+        ) {
+          Image(
+            painter = painterResource(R.drawable.icon_player_back),
+            contentDescription = "Collapse up next",
+            colorFilter = ColorFilter.tint(BrandColors.TextSecondary),
+            modifier = Modifier.size(22.dp)
+          )
+        }
         Column(modifier = Modifier.weight(1f)) {
-          TextPrimary(
-            stringResource(R.string.up_next),
-            fontSize = 18.sp
-          )
-          TextSecondary(
-            stringResource(R.string.up_next_count, songs.size),
-            fontSize = 12.sp
-          )
+          TextPrimary(stringResource(R.string.up_next), fontSize = 18.sp)
+          TextSecondary(stringResource(R.string.up_next_count, songs.size), fontSize = 12.sp)
         }
         if (songs.size > 1) {
           TextPrimary(
             stringResource(R.string.clear_queue),
             fontSize = 14.sp,
             color = BrandColors.TextSecondary,
-            modifier = Modifier.clickWithRipple {
-              playbackVM.clearUpcomingFromQueue()
-            }
+            modifier = Modifier
+              .padding(end = 8.dp)
+              .clickWithRipple { playbackVM.clearUpcomingFromQueue() }
           )
         }
       }
 
+      val currentSong = musicState.song
+      if (currentSong.valid()) {
+        Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clip(RoundedCornerShape(14.dp))
+            .background(BrandColors.Surface2)
+            .padding(12.dp)
+        ) {
+          TextSecondary(stringResource(R.string.now_playing), fontSize = 11.sp)
+          Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(top = 8.dp)
+          ) {
+            GlideCover(
+              model = currentSong,
+              circle = false,
+              modifier = Modifier.size(48.dp)
+            )
+            Column(modifier = Modifier.padding(start = 12.dp).weight(1f)) {
+              TextPrimary(currentSong.showName, fontSize = 15.sp)
+              TextSecondary(currentSong.artist.ifEmpty { "—" }, fontSize = 12.sp)
+            }
+          }
+        }
+      }
+
       val lazyState = rememberLazyListState()
+      val reorderableState = rememberReorderableLazyListState(lazyState) { from, to ->
+        playbackVM.moveInQueue(from.index, to.index)
+      }
+
       if (songs.isEmpty()) {
         CenterInBox(
           modifier = Modifier
             .fillMaxWidth()
-            .height(160.dp)
+            .height(200.dp)
             .padding(horizontal = 24.dp)
         ) {
           Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -292,7 +327,7 @@ private fun PlayQueueDialog(
               painter = painterResource(R.drawable.ic_player_queue_24dp),
               contentDescription = null,
               colorFilter = ColorFilter.tint(BrandColors.TextMuted),
-              modifier = Modifier.size(40.dp)
+              modifier = Modifier.size(48.dp)
             )
             TextPrimary(
               stringResource(R.string.nothing_queued_next),
@@ -307,6 +342,22 @@ private fun PlayQueueDialog(
               maxLine = 2,
               modifier = Modifier.padding(top = 6.dp)
             )
+            TextPrimary(
+              stringResource(R.string.go_to_library),
+              fontSize = 14.sp,
+              color = theme.secondary,
+              modifier = Modifier
+                .padding(top = 16.dp)
+                .clip(RoundedCornerShape(20.dp))
+                .background(theme.secondary.copy(alpha = 0.16f))
+                .clickWithRipple(circle = false) {
+                  onDismissRequest()
+                  scope.launch {
+                    mainVM.playingScreenState.animateTo(PlayingScreenValue.Hidden)
+                  }
+                }
+                .padding(horizontal = 18.dp, vertical = 10.dp)
+            )
           }
         }
       } else {
@@ -316,12 +367,13 @@ private fun PlayQueueDialog(
         ) {
           itemsIndexed(songs, key = { _, song -> song.id }) { pos, song ->
             val isCurrent = song.id == musicState.song.id
-            Column {
+            ReorderableItem(reorderableState, key = song.id) {
               Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                   .fillMaxWidth()
                   .height(64.dp)
+                  .background(if (isCurrent) BrandColors.Surface2 else BrandColors.Surface)
                   .clickWithRipple(false) {
                     sendLocalBroadcast(
                       makeCmdIntent(Command.PLAY_AT)
@@ -329,7 +381,7 @@ private fun PlayQueueDialog(
                     )
                     onDismissRequest()
                   }
-                  .padding(horizontal = 16.dp)
+                  .padding(horizontal = 12.dp)
               ) {
                 if (song.valid()) {
                   GlideCover(
@@ -338,59 +390,48 @@ private fun PlayQueueDialog(
                     modifier = Modifier.size(44.dp)
                   )
                 }
-                TextPrimary(
-                  if (!song.valid()) {
-                    stringResource(R.string.song_lose_effect)
-                  } else {
-                    song.showName
-                  },
-                  color = if (isCurrent) theme.secondary else theme.textPrimary,
+                Column(
                   modifier = Modifier
                     .padding(horizontal = 12.dp)
                     .weight(1f)
-                )
+                ) {
+                  TextPrimary(
+                    if (!song.valid()) stringResource(R.string.song_lose_effect) else song.showName,
+                    color = if (isCurrent) theme.secondary else theme.textPrimary,
+                    fontSize = 14.sp
+                  )
+                  if (song.valid()) {
+                    TextSecondary(song.artist.ifEmpty { "—" }, fontSize = 12.sp)
+                  }
+                }
 
-                if (song.valid()) {
+                if (song.valid() && !isCurrent) {
                   CenterInBox(
                     modifier = Modifier
-                      .clickWithRipple {
-                        playbackVM.removeFromQueue(song.id)
-                      }
-                      .padding(8.dp)
+                      .size(40.dp)
+                      .clickWithRipple { playbackVM.removeFromQueue(song.id) }
                   ) {
                     Image(
                       painter = painterResource(R.drawable.ic_queue_remove_24dp),
-                      contentDescription = "PlayQueueDelete",
+                      contentDescription = "Remove from queue",
                       colorFilter = ColorFilter.tint(BrandColors.TextMuted)
                     )
                   }
                 }
+
+                Icon(
+                  painter = painterResource(R.drawable.ic_drag_handle_24dp),
+                  contentDescription = "Reorder queue item",
+                  tint = BrandColors.TextMuted,
+                  modifier = Modifier
+                    .size(40.dp)
+                    .padding(8.dp)
+                    .draggableHandle()
+                )
               }
-              Box(
-                modifier = Modifier
-                  .fillMaxWidth()
-                  .height(1.dp)
-                  .padding(horizontal = 16.dp)
-                  .background(BrandColors.Divider)
-              )
             }
           }
         }
-      }
-
-      // Thumb-zone dismiss
-      CenterInBox(
-        modifier = Modifier
-          .fillMaxWidth()
-          .height(56.dp)
-          .clickWithRipple { onDismissRequest() }
-      ) {
-        TextPrimary(
-          stringResource(R.string.close),
-          fontSize = 15.sp,
-          color = BrandColors.TextSecondary,
-          textAlign = TextAlign.Center
-        )
       }
 
       LaunchedEffect(visible) {

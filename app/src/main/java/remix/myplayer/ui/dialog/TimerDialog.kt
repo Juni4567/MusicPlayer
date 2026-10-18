@@ -1,212 +1,115 @@
 package remix.myplayer.ui.dialog
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredHeight
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Switch
-import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
-import remix.myplayer.ui.nav.MessageNotifier
+import remix.myplayer.helper.SleepTimer
+import remix.myplayer.ui.theme.BrandColors
 import remix.myplayer.ui.theme.LocalTheme
-import remix.myplayer.ui.widget.app.CircleSeekBar
-import remix.myplayer.ui.widget.common.TextPrimary
-import remix.myplayer.ui.widget.common.TextSecondary
-import remix.myplayer.util.ext.clickableWithoutRipple
-import remix.myplayer.util.ext.isPortraitOrientation
+import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.viewmodel.timerViewModel
+import kotlin.math.ceil
+
+private val TimerPresetsMinutes = listOf(10, 20, 30, 45, 60)
 
 @Composable
 fun TimerDialog() {
-  val context = LocalContext.current
   val timerVM = timerViewModel
   val timerState by timerVM.timerState.collectAsStateWithLifecycle()
+  val running by SleepTimer.runningState.collectAsStateWithLifecycle()
+  val accent = LocalTheme.current.secondary
 
-  val tipDialogState = rememberDialogState(false)
-  NormalDialog(
-    dialogState = tipDialogState,
-    titleRes = R.string.timer_default_info_title,
-    contentRes = R.string.timer_default_info_content,
-    positiveRes = R.string.close,
-    onPositive = {
-    }
-  )
-
-  val minuteText by remember {
-    derivedStateOf {
-      (timerState.progress / 60).toString().padStart(2, '0')
-    }
-  }
-  val secondText by remember {
-    derivedStateOf {
-      (timerState.progress % 60).toString().padStart(2, '0')
-    }
-  }
-
-  NormalDialog(
-    dialogState = timerVM.dialogState,
-    titleRes = R.string.timer,
-    titleAlignment = Alignment.CenterHorizontally,
-    onPositive = {
-      timerVM.toggle()
-    },
-    positiveRes = timerState.positiveButtonText,
-    custom = {
-      LazyColumn(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-          .weight(1f, false)
-      ) {
-        item {
-          Box(
-            modifier = Modifier
-              .padding(
-                top = if (context.isPortraitOrientation()) 24.dp else 8.dp,
-                bottom = 36.dp
-              )
-              .fillMaxWidth(),
-            contentAlignment = Alignment.Center
-          ) {
-            CircleSeekBar(Modifier.size(180.dp), progress = timerState.progress) { current, max ->
-              val durationInSec = current / 60 * 60
-              timerVM.updateState(durationInSec = durationInSec, progress = durationInSec)
-            }
-
-            @Composable
-            fun TextWithLine(text: String) {
-              Box(
-                modifier = Modifier
-                  .background(Color.Transparent, RoundedCornerShape(1.dp))
-                  .border(1.dp, LocalTheme.current.textSecondary)
-                  .padding(1.dp),
-                contentAlignment = Alignment.Center
-              ) {
-                TextPrimary(text, modifier = Modifier, fontSize = 24.sp)
-                Spacer(
-                  modifier = Modifier
-                    .matchParentSize()
-                    .requiredHeight(1.dp)
-                    .background(LocalTheme.current.dialogBackground)
-                    .align(Alignment.Center)
-                )
-              }
-            }
-
-            Row(
-              modifier = Modifier
-                .wrapContentSize(), verticalAlignment = Alignment.CenterVertically
-            ) {
-              TextWithLine(minuteText)
-              TextSecondary(":", modifier = Modifier.padding(horizontal = 4.dp), fontSize = 20.sp)
-              TextWithLine(secondText)
-            }
-          }
-        }
-
-        item {
-          Row(
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(end = 20.dp)
-          ) {
-            Icon(
-              modifier = Modifier
-                .padding(end = 4.dp)
-                .clickableWithoutRipple {
-                  tipDialogState.show()
-                },
-              painter = painterResource(R.drawable.ic_info_24dp),
-              contentDescription = "TimerTip"
-            )
-
-            TextPrimary(
-              stringResource(R.string.as_default),
-              modifier = Modifier.padding(end = 8.dp)
-            )
-
-            Switch(
-              checked = timerState.timerStartAuto,
-              colors = SwitchDefaults.colors().copy(
-                checkedTrackColor = LocalTheme.current.secondary,
-                uncheckedTrackColor = Color.Transparent
-              ),
-              onCheckedChange = { isChecked ->
-                if (isChecked) {
-                  if (timerState.durationInSec > 0) {
-                    MessageNotifier.show(R.string.set_success)
-                    timerVM.updateState(
-                      timerStartAuto = true,
-                      timerDefaultDuration = timerState.durationInSec
-                    )
-                  } else {
-                    MessageNotifier.show(R.string.plz_set_correct_time)
-                  }
-                } else {
-                  MessageNotifier.show(R.string.cancel_success)
-                  timerVM.updateState(timerStartAuto = false, timerDefaultDuration = -1)
-                }
-
-              },
-              modifier = Modifier.scale(0.9f)
-            )
-          }
-        }
-
-        item {
-          Row(
-            horizontalArrangement = Arrangement.End,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(bottom = 16.dp, end = 20.dp)
-          ) {
-            TextPrimary(
-              stringResource(R.string.timer_pending_close),
-              modifier = Modifier.padding(end = 8.dp)
-            )
-            Switch(
-              checked = timerState.exitAfterTimerFinish,
-              colors = SwitchDefaults.colors().copy(
-                checkedTrackColor = LocalTheme.current.secondary,
-                uncheckedTrackColor = Color.Transparent
-              ),
-              onCheckedChange = {
-                timerVM.updateState(exitAfterTimerFinish = it)
-              },
-              modifier = Modifier.scale(0.8f)
-            )
-          }
-        }
-      }
-    },
+  MiBottomSheet(
+    visible = timerVM.dialogState.isOpen,
     onDismiss = {
       timerVM.cancelUpdateProgress()
+      timerVM.dialogState.dismiss()
+    },
+    title = stringResource(R.string.sleep_timer),
+  ) {
+    if (running) {
+      val remainMin = ceil(timerState.progress / 60.0).toInt().coerceAtLeast(0)
+      Text(
+        text = stringResource(R.string.timer_active_remaining, remainMin),
+        color = BrandColors.TextSecondary,
+        fontSize = 13.sp,
+        modifier = Modifier.padding(bottom = 12.dp)
+      )
     }
-  )
+
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+      TimerPresetsMinutes.forEach { minutes ->
+        SheetActionRow(
+          label = stringResource(R.string.timer_minutes, minutes),
+          contentDescription = "Sleep timer $minutes minutes",
+          highlighted = false,
+          onClick = { timerVM.startPresetMinutes(minutes) }
+        )
+      }
+
+      SheetActionRow(
+        label = stringResource(R.string.timer_end_of_song),
+        contentDescription = "End of current song",
+        highlighted = false,
+        onClick = { timerVM.startEndOfCurrentSong() }
+      )
+
+      if (running) {
+        SheetActionRow(
+          label = stringResource(R.string.cancel_timer),
+          contentDescription = "Cancel sleep timer",
+          highlighted = true,
+          accent = accent,
+          onClick = { timerVM.cancelActiveTimer() }
+        )
+      }
+    }
+  }
+}
+
+@Composable
+private fun SheetActionRow(
+  label: String,
+  contentDescription: String,
+  highlighted: Boolean,
+  accent: androidx.compose.ui.graphics.Color = LocalTheme.current.secondary,
+  onClick: () -> Unit,
+) {
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .heightIn(min = 48.dp)
+      .clip(RoundedCornerShape(14.dp))
+      .background(if (highlighted) accent.copy(alpha = 0.18f) else BrandColors.Surface2)
+      .semantics { this.contentDescription = contentDescription }
+      .clickWithRipple(circle = false, onClick = onClick)
+      .padding(horizontal = 16.dp, vertical = 14.dp),
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Text(
+      text = label,
+      color = if (highlighted) accent else BrandColors.TextPrimary,
+      fontSize = 15.sp,
+      fontWeight = if (highlighted) FontWeight.SemiBold else FontWeight.Normal,
+    )
+  }
 }

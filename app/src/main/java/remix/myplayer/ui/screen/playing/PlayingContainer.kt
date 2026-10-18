@@ -46,7 +46,15 @@ fun PlayingContainer(content: @Composable () -> Unit) {
 
   if (!theme.isLight) {
     val background = theme.mainBackground
-    val brush = Brush.verticalGradient(colors = listOf(background, background))
+    val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
+    val artTint = Color(swatch.rgb).copy(alpha = 0.28f)
+    val brush = Brush.verticalGradient(
+      colors = listOf(
+        androidx.compose.ui.graphics.lerp(background, artTint, 0.55f),
+        background,
+        background
+      )
+    )
     Container(brush = brush, content = content)
     return
   }
