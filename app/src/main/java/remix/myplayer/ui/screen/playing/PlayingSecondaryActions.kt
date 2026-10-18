@@ -9,29 +9,32 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
+import remix.myplayer.service.Command
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.EqualizerSheet
 import remix.myplayer.ui.dialog.SpeedDialog
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RouteTagEdit
+import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.Util
+import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.util.ext.clickWithRipple
-import remix.myplayer.viewmodel.libraryViewModel
+import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.tagEditViewModel
 import remix.myplayer.viewmodel.timerViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.compose.runtime.getValue
 
 @Composable
 internal fun PlayingSecondaryActions(
@@ -41,10 +44,11 @@ internal fun PlayingSecondaryActions(
   val tint = Color(swatch.rgb)
   val activity = LocalActivity.current as? BaseActivity
   val nav = LocalNavController.current
-  val libraryVM = libraryViewModel
   val timerVM = timerViewModel
   val tagEditVM = tagEditViewModel
   val settingState by settingViewModel.settingsState.collectAsStateWithLifecycle()
+  val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
+  val isFavorite = playbackState.isFavorite
 
   val speedDialogState = rememberDialogState()
   val eqSheetState = rememberDialogState()
@@ -59,13 +63,15 @@ internal fun PlayingSecondaryActions(
     verticalAlignment = Alignment.CenterVertically
   ) {
     SecondaryActionIcon(
-      iconRes = R.drawable.ic_player_favorite_24dp,
-      contentDescription = "Favorite",
-      tint = tint,
+      iconRes = if (isFavorite) {
+        R.drawable.ic_player_favorite_filled_24dp
+      } else {
+        R.drawable.ic_player_favorite_24dp
+      },
+      contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
+      tint = if (isFavorite) Color(0xFFE85D75) else tint,
       onClick = {
-        val favorite =
-          libraryVM.playLists.value.firstOrNull { it.isFavorite() } ?: return@SecondaryActionIcon
-        libraryVM.addSongsToPlayList(listOf(song.id), favorite.name)
+        sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.LOVE))
       }
     )
     SecondaryActionIcon(
