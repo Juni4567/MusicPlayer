@@ -2,6 +2,23 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.1.6.0] — 2026-10-19
+
+### Highlights
+- **Audio trim** for local tracks: waveform editor with start/end handles, selection preview, and save
+
+### Audio editing
+- Stream-copy trim via FFmpegKit when possible (no quality loss); light re-encode fallback for unsupported copy cases
+- **Save as new** (default): writes `{name}_trim.{ext}` beside the original and refreshes the library
+- **Replace original** (opt-in): requests MediaStore write access, then overwrites the file safely
+- Scissors on Now Playing open trim; tag edit stays in the overflow menu
+- Song popup includes **Trim** for local songs
+
+### Notes
+- APK size increases due to the FFmpegKit audio package
+- Remote / cloud songs are not supported
+- Signed for sideload with this fork’s debug keystore
+
 ## [2.1.5.1] — 2026-10-18
 
 ### Fixes
@@ -90,6 +107,7 @@ All notable changes to A-Music (fork of APlayer) are documented in this file.
 
 - See upstream APlayer release notes
 
+[2.1.6.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.6.0
 [2.1.5.1]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.5.1
 [2.1.5.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.5.0
 [2.1.4.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.4.0

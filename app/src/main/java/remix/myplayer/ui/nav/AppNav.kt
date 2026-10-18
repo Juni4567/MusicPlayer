@@ -45,6 +45,7 @@ import remix.myplayer.misc.cache.DiskCache
 import remix.myplayer.ui.AppScaffold
 import remix.myplayer.ui.dialog.DialogContainer
 import remix.myplayer.ui.screen.AboutScreen
+import remix.myplayer.ui.screen.AudioTrimScreen
 import remix.myplayer.ui.screen.CustomSortScreen
 import remix.myplayer.ui.screen.EQScreen
 import remix.myplayer.ui.screen.LastAddedScreen
@@ -78,6 +79,7 @@ const val RouteLastAdded = "last_added"
 const val RouteHistory = "history"
 const val RouteSearch = "search"
 const val RouteTagEdit = "tag_edit"
+const val RouteAudioTrim = "audio_trim"
 const val RouteCustomCoverCrop = "custom_cover_crop"
 const val RouteTagEditCrop = "tag_edit_crop"
 const val RouteEq = "eq"
@@ -174,6 +176,10 @@ fun AppNav() {
 
             normalAnimatedScreen(RouteTagEdit) {
               TagEditScreen(it)
+            }
+
+            normalAnimatedScreen(RouteAudioTrim) {
+              AudioTrimScreen(it)
             }
 
             composable<WebDav>(

@@ -59,8 +59,8 @@ android {
         minSdk = 21
         targetSdk = 36
 
-        versionCode = 21501
-        versionName = "2.1.5.1"
+        versionCode = 21600
+        versionName = "2.1.6.0"
 
         vectorDrawables.useSupportLibrary = true
 
@@ -301,6 +301,7 @@ dependencies {
     implementation(libs.media)
     implementation(libs.androidx.media3.exoplayer)
     implementation(files("libs/lib-decoder-ffmpeg-release.aar"))
+    implementation(libs.ffmpeg.kit.audio)
     implementation(libs.palette.ktx)
 
     implementation(libs.material)

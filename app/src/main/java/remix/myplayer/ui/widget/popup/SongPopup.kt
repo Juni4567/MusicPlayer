@@ -27,6 +27,7 @@ import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService.Companion.EXTRA_SONG
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.nav.LocalNavController
+import remix.myplayer.ui.nav.RouteAudioTrim
 import remix.myplayer.ui.nav.RouteCustomCoverCrop
 import remix.myplayer.ui.nav.RouteTagEdit
 import remix.myplayer.ui.theme.LocalTheme
@@ -35,6 +36,7 @@ import remix.myplayer.util.Constants
 import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.Util
 import remix.myplayer.util.ext.clickWithRipple
+import remix.myplayer.viewmodel.audioTrimViewModel
 import remix.myplayer.viewmodel.libraryViewModel
 import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
@@ -76,21 +78,24 @@ private fun SongDropdownMenu(
   onDismissRequest: () -> Unit
 ) {
   val menuItems =
-    listOf(
-      R.string.add_to_next_song,
-      R.string.add_to_play_queue,
-      R.string.add_to_playlist,
-      R.string.song_detail,
-      R.string.song_edit,
-//      R.string.set_album_cover,
-      R.string.collect,
-      R.string.share,
-      R.string.ring,
-      R.string.delete
-    )
+    buildList {
+      add(R.string.add_to_next_song)
+      add(R.string.add_to_play_queue)
+      add(R.string.add_to_playlist)
+      add(R.string.song_detail)
+      add(R.string.song_edit)
+      if (song.isLocal()) {
+        add(R.string.song_trim)
+      }
+      add(R.string.collect)
+      add(R.string.share)
+      add(R.string.ring)
+      add(R.string.delete)
+    }
   val activity = LocalActivity.current as? BaseActivity
   val settingVM = settingViewModel
   val tagEditVM = tagEditViewModel
+  val audioTrimVM = audioTrimViewModel
   val playbackVM = playbackViewModel
   val libraryVM = libraryViewModel
   val nav = LocalNavController.current
@@ -137,6 +142,13 @@ private fun SongDropdownMenu(
               if (song.isLocal()) {
                 tagEditVM.startTagEdit(song)
                 nav.navigate(RouteTagEdit)
+              }
+            }
+
+            R.string.song_trim -> {
+              if (song.isLocal()) {
+                audioTrimVM.startTrim(song)
+                nav.navigate(RouteAudioTrim)
               }
             }
 

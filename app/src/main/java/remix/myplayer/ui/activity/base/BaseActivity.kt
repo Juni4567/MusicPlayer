@@ -20,6 +20,8 @@ import remix.myplayer.R
 import remix.myplayer.helper.AudioTagWriter
 import remix.myplayer.helper.AudioTagWriter.PendingWriteRequest
 import remix.myplayer.helper.LanguageHelper.setLocal
+import remix.myplayer.helper.trim.AudioTrimWriter
+import remix.myplayer.helper.trim.AudioTrimWriter.PendingTrimOverwrite
 import remix.myplayer.service.MusicService
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.util.PermissionUtil
@@ -61,7 +63,28 @@ open class BaseActivity : ComponentActivity(), CoroutineScope by MainScope() {
       }
     }
 
+  val trimWriteLauncher =
+    registerForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) {
+      Timber.v("trimWriteLauncher resultCode: ${it.resultCode} data: ${it.data}")
+      val request = pendingTrimOverwrite
+      pendingTrimOverwrite = null
+      if (it.resultCode != RESULT_OK || request == null) {
+        request?.trimmedFile?.delete()
+        MessageNotifier.show(R.string.trim_error_permission)
+        return@registerForActivityResult
+      }
+      lifecycleScope.launch {
+        try {
+          AudioTrimWriter.completeOverwrite(this@BaseActivity, request)
+        } catch (e: Exception) {
+          request.trimmedFile.delete()
+          MessageNotifier.show(R.string.trim_error_generic, e.message ?: e.toString())
+        }
+      }
+    }
+
   var pendingWriteRequest: PendingWriteRequest? = null
+  var pendingTrimOverwrite: PendingTrimOverwrite? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     hasPermission = PermissionUtil.hasNecessaryPermission()
