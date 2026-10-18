@@ -25,6 +25,10 @@ class ReplayGainAudioProcessor : BaseAudioProcessor() {
   @Volatile
   private var targetGainLinear = 1f
 
+  /** Extra linear gain for volume boost (1.0 = 100%, 2.0 = 200%). */
+  @Volatile
+  private var volumeBoostLinear = 1f
+
   private var currentGainLinear = 1f
   private var rampAlpha = 0f
 
@@ -55,6 +59,13 @@ class ReplayGainAudioProcessor : BaseAudioProcessor() {
       gainLinear
     }
     targetGainLinear = limited
+  }
+
+  /**
+   * Player volume is clamped to 0..1 by Media3; boost above 100% is applied here instead.
+   */
+  fun setVolumeBoost(boost: Float) {
+    volumeBoostLinear = boost.coerceIn(1f, 2f)
   }
 
   override fun onConfigure(inputAudioFormat: AudioFormat): AudioFormat {
@@ -96,15 +107,18 @@ class ReplayGainAudioProcessor : BaseAudioProcessor() {
   private fun nextGain(): Float {
     val target = targetGainLinear
     val current = currentGainLinear
-    if (current == target) {
-      return current
+    val rg = if (current == target) {
+      current
+    } else {
+      val next = if (rampAlpha > 0f) current + (target - current) * rampAlpha else target
+      if (abs(target - next) < 1e-6f) {
+        currentGainLinear = target
+        target
+      } else {
+        currentGainLinear = next
+        next
+      }
     }
-    val next = if (rampAlpha > 0f) current + (target - current) * rampAlpha else target
-    if (abs(target - next) < 1e-6f) {
-      currentGainLinear = target
-      return target
-    }
-    currentGainLinear = next
-    return next
+    return rg * volumeBoostLinear
   }
 }

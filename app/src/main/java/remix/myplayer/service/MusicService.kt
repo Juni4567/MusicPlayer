@@ -237,7 +237,7 @@ class MusicService : BaseService(),
    * 音量控制
    */
   private val volumeController: VolumeController by lazy {
-    VolumeController(this)
+    VolumeController(this, replayGainController)
   }
 
   /**

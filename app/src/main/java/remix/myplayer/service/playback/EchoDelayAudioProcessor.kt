@@ -11,43 +11,31 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 /**
- * Simple feedback delay (echo) applied in the PCM domain.
+ * Feedback delay (echo) in the PCM domain.
  *
- * Works for both 16-bit and float PCM. When [enabled] is false the processor
- * is a pass-through so there is no CPU cost from the delay line.
+ * Always fully consumes [queueInput] buffers (Media3 requirement). Effect
+ * parameters may be updated from the main thread; processing snapshots them
+ * under a lock so the audio thread never sees a torn delay line.
  */
 @OptIn(UnstableApi::class)
 class EchoDelayAudioProcessor : BaseAudioProcessor() {
 
+  private val lock = Any()
+
   @Volatile
   private var enabled = false
 
-  @Volatile
   private var delayMs = 200f
-
-  @Volatile
   private var feedback = 0.35f
-
-  @Volatile
   private var wet = 0.4f
-
-  @Volatile
   private var dry = 0.85f
 
   private var delayBuffer: FloatArray = FloatArray(0)
   private var writeFrame = 0
   private var delayFrames = 0
   private var channelCount = 0
+  private var sampleRate = 0
 
-  /**
-   * Configure the echo effect.
-   *
-   * @param enabled whether wet signal is mixed in
-   * @param delayMs delay time in milliseconds (clamped)
-   * @param feedback regeneration amount 0..0.85
-   * @param wet wet mix 0..1
-   * @param dry dry mix 0..1
-   */
   fun setEffect(
     enabled: Boolean,
     delayMs: Float = this.delayMs,
@@ -55,17 +43,19 @@ class EchoDelayAudioProcessor : BaseAudioProcessor() {
     wet: Float = this.wet,
     dry: Float = this.dry,
   ) {
-    this.enabled = enabled
-    this.delayMs = delayMs.coerceIn(MIN_DELAY_MS, MAX_DELAY_MS)
-    this.feedback = feedback.coerceIn(0f, MAX_FEEDBACK)
-    this.wet = wet.coerceIn(0f, 1f)
-    this.dry = dry.coerceIn(0f, 1f)
-    // Delay length may change while configured — rebuild on next process if needed.
-    if (outputAudioFormat != AudioFormat.NOT_SET) {
-      ensureBuffer(outputAudioFormat.sampleRate, outputAudioFormat.channelCount)
-    }
-    if (!enabled) {
-      clearBuffer()
+    synchronized(lock) {
+      this.enabled = enabled
+      this.delayMs = delayMs.coerceIn(MIN_DELAY_MS, MAX_DELAY_MS)
+      this.feedback = feedback.coerceIn(0f, MAX_FEEDBACK)
+      this.wet = wet.coerceIn(0f, 1f)
+      this.dry = dry.coerceIn(0f, 1f)
+      if (sampleRate > 0 && channelCount > 0) {
+        rebuildBufferLocked(sampleRate, channelCount)
+      }
+      if (!enabled) {
+        delayBuffer.fill(0f)
+        writeFrame = 0
+      }
     }
   }
 
@@ -76,7 +66,11 @@ class EchoDelayAudioProcessor : BaseAudioProcessor() {
   override fun onConfigure(inputAudioFormat: AudioFormat): AudioFormat {
     return when (inputAudioFormat.encoding) {
       C.ENCODING_PCM_16BIT, C.ENCODING_PCM_FLOAT -> {
-        ensureBuffer(inputAudioFormat.sampleRate, inputAudioFormat.channelCount)
+        synchronized(lock) {
+          sampleRate = inputAudioFormat.sampleRate
+          channelCount = inputAudioFormat.channelCount
+          rebuildBufferLocked(sampleRate, channelCount)
+        }
         inputAudioFormat
       }
       else -> throw AudioProcessor.UnhandledAudioFormatException(inputAudioFormat)
@@ -84,22 +78,39 @@ class EchoDelayAudioProcessor : BaseAudioProcessor() {
   }
 
   override fun queueInput(inputBuffer: ByteBuffer) {
-    if (!enabled || delayFrames <= 0 || delayBuffer.isEmpty()) {
-      // Pass-through without touching the delay line.
-      val output = replaceOutputBuffer(inputBuffer.remaining())
+    val remaining = inputBuffer.remaining()
+    if (remaining == 0) {
+      replaceOutputBuffer(0).flip()
+      return
+    }
+    val output = replaceOutputBuffer(remaining)
+
+    val active: Boolean
+    val channels: Int
+    val frames: Int
+    val buf: FloatArray
+    var w: Int
+    val fb: Float
+    val wetMix: Float
+    val dryMix: Float
+
+    synchronized(lock) {
+      active = enabled && delayFrames > 0 && delayBuffer.isNotEmpty() && channelCount > 0
+      channels = channelCount
+      frames = delayFrames
+      buf = delayBuffer
+      w = writeFrame
+      fb = feedback
+      wetMix = wet
+      dryMix = dry
+    }
+
+    if (!active || channels <= 0) {
+      // Full passthrough — always empty the input buffer.
       output.put(inputBuffer)
       output.flip()
       return
     }
-
-    val output = replaceOutputBuffer(inputBuffer.remaining())
-    val channels = channelCount
-    val frames = delayFrames
-    val buf = delayBuffer
-    var w = writeFrame
-    val fb = feedback
-    val wetMix = wet
-    val dryMix = dry
 
     when (inputAudioFormat.encoding) {
       C.ENCODING_PCM_FLOAT -> {
@@ -109,12 +120,15 @@ class EchoDelayAudioProcessor : BaseAudioProcessor() {
             val idx = w * channels + ch
             val input = inputBuffer.float
             val delayed = buf[idx]
-            val out = dryMix * input + wetMix * delayed
+            output.putFloat((dryMix * input + wetMix * delayed).coerceIn(-1f, 1f))
             buf[idx] = input + fb * delayed
-            output.putFloat(out.coerceIn(-1f, 1f))
           }
           w++
           if (w >= frames) w = 0
+        }
+        // Consume any trailing incomplete frame as dry passthrough.
+        while (inputBuffer.hasRemaining()) {
+          output.putFloat(inputBuffer.float)
         }
       }
       C.ENCODING_PCM_16BIT -> {
@@ -124,46 +138,59 @@ class EchoDelayAudioProcessor : BaseAudioProcessor() {
             val idx = w * channels + ch
             val input = inputBuffer.short / 32768f
             val delayed = buf[idx]
-            val out = dryMix * input + wetMix * delayed
+            val out = (dryMix * input + wetMix * delayed).coerceIn(-1f, 1f)
+            output.putShort((out * 32767f).toInt().toShort())
             buf[idx] = input + fb * delayed
-            output.putShort((out.coerceIn(-1f, 1f) * 32767f).toInt().toShort())
           }
           w++
           if (w >= frames) w = 0
         }
+        while (inputBuffer.hasRemaining()) {
+          output.putShort(inputBuffer.short)
+        }
       }
-      else -> throw IllegalStateException("Unexpected encoding: ${inputAudioFormat.encoding}")
+      else -> {
+        output.put(inputBuffer)
+      }
     }
-    writeFrame = w
+
+    synchronized(lock) {
+      // Only commit write cursor if the buffer instance is unchanged.
+      if (buf === delayBuffer && frames == delayFrames && channels == channelCount) {
+        writeFrame = w
+      }
+    }
     output.flip()
   }
 
   override fun onFlush() {
-    clearBuffer()
+    synchronized(lock) {
+      delayBuffer.fill(0f)
+      writeFrame = 0
+    }
   }
 
   override fun onReset() {
-    clearBuffer()
-    delayBuffer = FloatArray(0)
-    delayFrames = 0
-    channelCount = 0
-    writeFrame = 0
+    synchronized(lock) {
+      delayBuffer = FloatArray(0)
+      delayFrames = 0
+      channelCount = 0
+      sampleRate = 0
+      writeFrame = 0
+      enabled = false
+    }
   }
 
-  private fun ensureBuffer(sampleRate: Int, channels: Int) {
-    if (sampleRate <= 0 || channels <= 0) return
-    val frames = max(1, (delayMs / 1000f * sampleRate).roundToInt())
+  private fun rebuildBufferLocked(rate: Int, channels: Int) {
+    if (rate <= 0 || channels <= 0) return
+    val frames = max(1, (delayMs / 1000f * rate).roundToInt())
     if (frames == delayFrames && channels == channelCount && delayBuffer.size == frames * channels) {
       return
     }
     delayFrames = frames
     channelCount = channels
+    sampleRate = rate
     delayBuffer = FloatArray(frames * channels)
-    writeFrame = 0
-  }
-
-  private fun clearBuffer() {
-    delayBuffer.fill(0f)
     writeFrame = 0
   }
 
@@ -174,10 +201,7 @@ class EchoDelayAudioProcessor : BaseAudioProcessor() {
   }
 }
 
-/**
- * Maps UI echo preset indices to DSP delay parameters.
- * Index 0 = off / none (unused when enabled).
- */
+/** Maps UI echo preset indices to DSP delay parameters. */
 object EchoPresets {
   data class Params(
     val delayMs: Float,
@@ -186,10 +210,9 @@ object EchoPresets {
     val dry: Float,
   )
 
-  /** Presets aligned with [remix.myplayer.ui.dialog.EchoPresetNameRes] indices 1..6. */
   private val byIndex = arrayOf(
-    Params(0f, 0f, 0f, 1f),           // 0 Off
-    Params(120f, 0.28f, 0.38f, 0.9f), // 1 Small
+    Params(0f, 0f, 0f, 1f),            // 0 Off
+    Params(120f, 0.28f, 0.38f, 0.9f),  // 1 Small
     Params(200f, 0.35f, 0.42f, 0.88f), // 2 Medium
     Params(300f, 0.42f, 0.48f, 0.85f), // 3 Large
     Params(400f, 0.48f, 0.52f, 0.82f), // 4 Hall
@@ -197,8 +220,6 @@ object EchoPresets {
     Params(250f, 0.58f, 0.5f, 0.85f),  // 6 Plate
   )
 
-  fun paramsFor(presetIndex: Int): Params {
-    val index = presetIndex.coerceIn(0, byIndex.lastIndex)
-    return byIndex[index]
-  }
+  fun paramsFor(presetIndex: Int): Params =
+    byIndex[presetIndex.coerceIn(0, byIndex.lastIndex)]
 }

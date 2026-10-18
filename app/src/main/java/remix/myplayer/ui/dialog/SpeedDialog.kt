@@ -149,8 +149,11 @@ fun SpeedDialog(state: DialogState, settingState: SettingsState) {
         onValueChange = { v ->
           val normalized = SettingPrefs.normalizeVolumeBoost(v)
           volumeBoost = normalized
-          // Live preview without hammering SharedPreferences on every frame.
-          MusicServiceRemote.service?.playback?.setVolume(normalized)
+          // Live preview via DSP gain (Media3 clamps Player.setVolume to 1.0).
+          MusicServiceRemote.service
+            ?.replayGainController
+            ?.processor
+            ?.setVolumeBoost(normalized)
         },
         onValueChangeFinished = {
           settingVM.setVolumeBoost(volumeBoost)
