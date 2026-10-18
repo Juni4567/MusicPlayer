@@ -373,6 +373,22 @@ class MusicService : BaseService(),
         playback.speed = settingPrefs.speedValue
         pushPlaybackUiState()
       }
+      // 音调
+      PrefKeys.Setting.PITCH -> {
+        playback.pitch = settingPrefs.pitchValue
+        pushPlaybackUiState()
+      }
+      // 音量增益 (最高 200%)
+      PrefKeys.Setting.VOLUME_BOOST -> {
+        if (isPlaying) {
+          volumeController.restoreFullVolume()
+        }
+      }
+      // 回声
+      PrefKeys.Setting.ENABLE_ECHO,
+      PrefKeys.Setting.ECHO_PRESET -> {
+        EQHelper.applyEcho(this, playback.audioSessionId)
+      }
       // 回放增益
       PrefKeys.Setting.REPLAY_GAIN_ENABLED,
       PrefKeys.Setting.REPLAY_GAIN_MODE,
@@ -553,6 +569,9 @@ class MusicService : BaseService(),
   private fun setUpPlayback() {
     playback = ExoPlayback(this, settingPrefs.decoderMode, audioFocusManager, replayGainController)
     playback.attach(this)
+    playback.speed = settingPrefs.speedValue
+    playback.pitch = settingPrefs.pitchValue
+    volumeController.restoreFullVolume()
     pushProgressUiState()
     updateProgressTicker()
 
@@ -856,7 +875,7 @@ class MusicService : BaseService(),
     if (crossFade && settingPrefs.crossFade) {
       volumeController.fadeIn()
     } else {
-      volumeController.directTo(1f)
+      volumeController.restoreFullVolume()
     }
   }
 
@@ -1341,7 +1360,7 @@ class MusicService : BaseService(),
       wasPlaying = false
       lastCommand = Command.PLAY_PAUSE
     }
-    volumeController.directTo(1f)
+    volumeController.restoreFullVolume()
   }
 
   override fun onFocusLost() {

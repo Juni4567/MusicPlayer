@@ -251,7 +251,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
                   .putExtra(EXTRA_COMMAND, Command.SKIP_TO_NEXT)
               )
             },
-          painter = painterResource(R.drawable.ic_player_next_24dp),
+          painter = painterResource(R.drawable.play_btn_next),
           contentDescription = "Next track",
           tint = controlTint
         )

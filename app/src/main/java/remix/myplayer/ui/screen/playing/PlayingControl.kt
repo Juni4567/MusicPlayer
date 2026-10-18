@@ -81,9 +81,9 @@ import sh.calvin.reorderable.ReorderableItem
 import sh.calvin.reorderable.rememberReorderableLazyListState
 
 private val itemRes = mapOf(
-  MODE_LOOP to Pair(R.drawable.ic_player_repeat_24dp, R.string.model_normal),
-  MODE_SHUFFLE to Pair(R.drawable.ic_player_shuffle_24dp, R.string.model_random),
-  MODE_REPEAT to Pair(R.drawable.ic_player_repeat_one_24dp, R.string.model_repeat)
+  MODE_LOOP to Pair(R.drawable.play_btn_loop, R.string.model_normal),
+  MODE_SHUFFLE to Pair(R.drawable.play_btn_shuffle, R.string.model_random),
+  MODE_REPEAT to Pair(R.drawable.play_btn_loop_one, R.string.model_repeat)
 )
 
 @Composable
@@ -138,7 +138,7 @@ internal fun PlayingControl(
     ) {
       Image(
         modifier = iconModifier,
-        painter = painterResource(R.drawable.ic_player_prev_24dp),
+        painter = painterResource(R.drawable.play_btn_pre),
         contentDescription = "PlayingPrev",
         colorFilter = ColorFilter.tint(swatchColor)
       )
@@ -192,7 +192,7 @@ internal fun PlayingControl(
     ) {
       Image(
         modifier = iconModifier,
-        painter = painterResource(R.drawable.ic_player_next_24dp),
+        painter = painterResource(R.drawable.play_btn_next),
         contentDescription = "PlayingNext",
         colorFilter = ColorFilter.tint(swatchColor)
       )
@@ -213,7 +213,7 @@ internal fun PlayingControl(
     ) {
       Image(
         modifier = iconModifier,
-        painter = painterResource(R.drawable.ic_player_queue_24dp),
+        painter = painterResource(R.drawable.play_btn_normal_list),
         contentDescription = "PlayingPlayQueue",
         colorFilter = ColorFilter.tint(swatchColor.copy(alpha = 0.85f))
       )
@@ -324,7 +324,7 @@ private fun PlayQueueDialog(
         ) {
           Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Image(
-              painter = painterResource(R.drawable.ic_player_queue_24dp),
+              painter = painterResource(R.drawable.play_btn_normal_list),
               contentDescription = null,
               colorFilter = ColorFilter.tint(textMutedColor),
               modifier = Modifier.size(48.dp)

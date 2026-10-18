@@ -54,6 +54,13 @@ class ExoPlayback(
       player.playbackParameters = PlaybackParameters(value, current.pitch)
     }
 
+  override var pitch: Float
+    get() = player.playbackParameters.pitch
+    set(value) {
+      val current = player.playbackParameters
+      player.playbackParameters = PlaybackParameters(current.speed, value)
+    }
+
   override val isPlaying: Boolean
     get() = player.isPlaying
 

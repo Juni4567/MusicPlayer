@@ -9,6 +9,9 @@ interface Playback {
   /** 播放速度 */
   var speed: Float
 
+  /** 音调 (1.0 = normal) */
+  var pitch: Float
+
   /** 是否正在播放 */
   val isPlaying: Boolean
 

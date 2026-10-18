@@ -93,6 +93,10 @@ class SettingViewModel @Inject constructor(
       crossFade = settingPrefs.crossFade,
       autoPlay = settingPrefs.autoPlay,
       speed = settingPrefs.speed,
+      pitch = settingPrefs.pitch,
+      volumeBoost = settingPrefs.volumeBoostValue,
+      enableEcho = settingPrefs.enableEcho,
+      echoPreset = settingPrefs.echoPreset,
       listLoop = settingPrefs.listLoop,
       searchPlaybackAction = settingPrefs.searchPlaybackAction,
       replayGainEnabled = settingPrefs.replayGainEnabled,
@@ -262,6 +266,27 @@ class SettingViewModel @Inject constructor(
   fun setSpeed(speed: String) {
     settingPrefs.speed = speed
     _settingsState.update { it.copy(play = it.play.copy(speed = speed)) }
+  }
+
+  fun setPitch(pitch: String) {
+    settingPrefs.pitch = pitch
+    _settingsState.update { it.copy(play = it.play.copy(pitch = pitch)) }
+  }
+
+  fun setVolumeBoost(boost: Float) {
+    val normalized = SettingPrefs.normalizeVolumeBoost(boost)
+    settingPrefs.volumeBoost = normalized
+    _settingsState.update { it.copy(play = it.play.copy(volumeBoost = normalized)) }
+  }
+
+  fun setEchoEnabled(enabled: Boolean) {
+    settingPrefs.enableEcho = enabled
+    _settingsState.update { it.copy(play = it.play.copy(enableEcho = enabled)) }
+  }
+
+  fun setEchoPreset(preset: Int) {
+    settingPrefs.echoPreset = preset
+    _settingsState.update { it.copy(play = it.play.copy(echoPreset = preset)) }
   }
 
   fun setReplayGain(enabled: Boolean, mode: Int) {

@@ -131,6 +131,10 @@ class SettingPrefs @Inject constructor(
   var autoPlay by PrefsDelegate(sp, PrefKeys.Setting.AUTO_PLAY, NEVER)
   var crossFade by PrefsDelegate(sp, PrefKeys.Setting.CROSS_FADE, false)
   var speed by PrefsDelegate(sp, PrefKeys.Setting.SPEED, "1.0")
+  var pitch by PrefsDelegate(sp, PrefKeys.Setting.PITCH, "1.0")
+  var volumeBoost by PrefsDelegate(sp, PrefKeys.Setting.VOLUME_BOOST, 1.0f)
+  var enableEcho by PrefsDelegate(sp, PrefKeys.Setting.ENABLE_ECHO, false)
+  var echoPreset by PrefsDelegate(sp, PrefKeys.Setting.ECHO_PRESET, 0)
   var replayGainEnabled by PrefsDelegate(sp, PrefKeys.Setting.REPLAY_GAIN_ENABLED, false)
   var replayGainMode by PrefsDelegate(sp, PrefKeys.Setting.REPLAY_GAIN_MODE, REPLAY_GAIN_MODE_TRACK)
   var replayGainPeakProtection by PrefsDelegate(
@@ -144,7 +148,9 @@ class SettingPrefs @Inject constructor(
     PrefKeys.Setting.REPLAY_GAIN_MISSING_GAIN,
     0f
   )
-  val speedValue get() = speed.toFloat()
+  val speedValue get() = speed.toFloatOrNull() ?: 1.0f
+  val pitchValue get() = pitch.toFloatOrNull()?.coerceIn(0.5f, 2.0f) ?: 1.0f
+  val volumeBoostValue get() = normalizeVolumeBoost(volumeBoost)
   var playModel by PrefsDelegate(sp, PrefKeys.Setting.PLAY_MODEL, MODE_LOOP)
   var listLoop by PrefsDelegate(sp, PrefKeys.Setting.LIST_LOOP, true)
   var searchPlaybackAction by PrefsDelegate(
@@ -284,6 +290,15 @@ class SettingPrefs @Inject constructor(
     fun normalizeReplayGainGainDb(gainDb: Float): Float {
       val snapped = (gainDb / REPLAY_GAIN_GAIN_STEP_DB).roundToInt() * REPLAY_GAIN_GAIN_STEP_DB
       return snapped.coerceIn(REPLAY_GAIN_GAIN_MIN_DB, REPLAY_GAIN_GAIN_MAX_DB)
+    }
+
+    const val VOLUME_BOOST_MIN = 1.0f
+    const val VOLUME_BOOST_MAX = 2.0f
+    const val VOLUME_BOOST_STEP = 0.05f
+
+    fun normalizeVolumeBoost(boost: Float): Float {
+      val snapped = (boost / VOLUME_BOOST_STEP).roundToInt() * VOLUME_BOOST_STEP
+      return snapped.coerceIn(VOLUME_BOOST_MIN, VOLUME_BOOST_MAX)
     }
   }
 }

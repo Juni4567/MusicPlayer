@@ -7,6 +7,7 @@ import android.media.AudioManager
 import android.media.audiofx.AudioEffect
 import android.media.audiofx.BassBoost
 import android.media.audiofx.Equalizer
+import android.media.audiofx.PresetReverb
 import android.media.audiofx.Virtualizer
 import android.widget.Toast
 import dagger.hilt.android.EntryPointAccessors
@@ -30,8 +31,20 @@ object EQHelper {
   private var equalizer: Equalizer? = null
   private var bassBoost: BassBoost? = null
   private var virtualizer: Virtualizer? = null
+  private var presetReverb: PresetReverb? = null
 
   private val bandLevels = ArrayList<Short>()
+
+  /** Android PresetReverb presets exposed in the UI (index matches stored preference). */
+  val echoPresets: List<Short> = listOf(
+    PresetReverb.PRESET_NONE,
+    PresetReverb.PRESET_SMALLROOM,
+    PresetReverb.PRESET_MEDIUMROOM,
+    PresetReverb.PRESET_LARGEROOM,
+    PresetReverb.PRESET_MEDIUMHALL,
+    PresetReverb.PRESET_LARGEHALL,
+    PresetReverb.PRESET_PLATE,
+  )
 
   var bandNumber: Short = 0
   var maxLevel: Short = 0
@@ -78,6 +91,15 @@ object EQHelper {
         })
       }
     }
+
+  val enableEcho: Boolean
+    get() = settingPrefs.enableEcho
+
+  val echoPreset: Int
+    get() = settingPrefs.echoPreset.coerceIn(0, echoPresets.lastIndex)
+
+  val isEchoActive: Boolean
+    get() = enableEcho && echoPreset > 0 && presetReverb != null
 
   fun init(context: Context, sessionId: Int, force: Boolean = false): Boolean {
     Timber.v("init, audioSessionId: $sessionId")
@@ -158,6 +180,8 @@ object EQHelper {
       })
     }
 
+    applyEcho(context, sessionId)
+
     return builtEqualizerInit
   }
 
@@ -220,6 +244,8 @@ object EQHelper {
       releaseVirtualizer()
     })
 
+    applyEcho(context, audioSessionId)
+
     Timber.v("min: $minLevel max: $maxLevel bandNumber: $bandNumber")
   }
 
@@ -248,6 +274,12 @@ object EQHelper {
 
     })
 
+    tryRun({
+      releaseEcho()
+    }, {
+
+    })
+
     closeSystemAudioEffectSession(context, audioSessionId)
   }
 
@@ -256,6 +288,7 @@ object EQHelper {
       return
     }
     if (currentAudioSessionId == audioSessionId) {
+      applyEcho(context, audioSessionId)
       return
     }
 
@@ -264,9 +297,35 @@ object EQHelper {
     }
 
     Timber.v("updateAudioSession, from: $currentAudioSessionId to: $audioSessionId")
+    currentAudioSessionId = audioSessionId
     init(context, audioSessionId)
     open(context, audioSessionId)
+    // Echo is independent of the EQ master switch.
+    applyEcho(context, audioSessionId)
+  }
+
+  /**
+   * Applies or releases session echo (PresetReverb) independently of the EQ master switch.
+   */
+  fun applyEcho(context: Context, audioSessionId: Int) {
+    if (!isValidAudioSessionId(audioSessionId)) {
+      releaseEcho()
+      return
+    }
     currentAudioSessionId = audioSessionId
+    if (!enableEcho || echoPreset <= 0) {
+      releaseEcho()
+      return
+    }
+    tryRun({
+      releaseEcho()
+      presetReverb = PresetReverb(0, audioSessionId).also { reverb ->
+        reverb.preset = echoPresets[echoPreset]
+        reverb.enabled = true
+      }
+    }, {
+      releaseEcho()
+    })
   }
 
   fun releaseCurrentAudioSession(context: Context) {
@@ -345,6 +404,16 @@ object EQHelper {
 
     bassBoostStrength = 0
     virtualizerStrength = 0
+  }
+
+  private fun releaseEcho() {
+    try {
+      presetReverb?.enabled = false
+      presetReverb?.release()
+    } catch (e: Exception) {
+      Timber.w(e)
+    }
+    presetReverb = null
   }
 
   /** Built-in Android Equalizer presets, if the device exposes any. */

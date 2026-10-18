@@ -2,6 +2,27 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.1.4.0] — 2026-10-18
+
+### Highlights
+- Playback sheet on the Now Playing screen: **speed**, **pitch**, **echo**, and **volume boost up to 200%**
+- Restored original upstream heart, shuffle, and repeat icons (and matching control icons)
+
+### Playback & audio
+- Volume boost slider (100%–200%) with live preview; persisted across sessions
+- Pitch control (0.75–1.5) via ExoPlayer `PlaybackParameters`
+- Echo on/off with Small / Medium / Large / Hall / Large hall / Plate presets (`PresetReverb`)
+- Speed control remains on the main player secondary action row
+
+### UI
+- Favorite uses upstream like icons (`widget_btn_like_*`)
+- Play mode / prev / next / queue use upstream `play_btn_*` assets again
+- Mini-player next button uses the same upstream next icon
+
+### Notes
+- Volume boost amplifies above system volume and may distort very loud tracks
+- Signed for sideload with this fork’s debug keystore. Uninstall an upstream-signed build first if signatures conflict
+
 ## [2.1.3.0] — 2026-10-18
 
 ### Highlights
@@ -42,5 +63,6 @@ All notable changes to A-Music (fork of APlayer) are documented in this file.
 
 - See upstream APlayer release notes
 
+[2.1.4.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.4.0
 [2.1.3.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.3.0
 [2.1.2.1]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.2.1

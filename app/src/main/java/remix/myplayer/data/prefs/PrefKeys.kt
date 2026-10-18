@@ -134,6 +134,18 @@ object PrefKeys {
     /** 倍速播放 */
     const val SPEED = "speed"
 
+    /** 音调 */
+    const val PITCH = "pitch"
+
+    /** 播放器音量增益 (1.0 = 100%, 2.0 = 200%) */
+    const val VOLUME_BOOST = "volume_boost"
+
+    /** 回声开关 */
+    const val ENABLE_ECHO = "enable_echo"
+
+    /** 回声预设 (PresetReverb) */
+    const val ECHO_PRESET = "echo_preset"
+
     /** 回放增益开关 */
     const val REPLAY_GAIN_ENABLED = "replay_gain_enabled"
 

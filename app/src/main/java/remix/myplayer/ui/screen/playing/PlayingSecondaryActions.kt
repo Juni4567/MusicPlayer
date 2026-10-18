@@ -23,10 +23,10 @@ import remix.myplayer.data.model.audio.Song
 import remix.myplayer.service.Command
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.EqualizerSheet
+import remix.myplayer.ui.dialog.SpeedDialog
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.RouteTagEdit
-import remix.myplayer.ui.theme.BrandColors
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.popupButton
 import remix.myplayer.util.MusicUtil
@@ -34,10 +34,11 @@ import remix.myplayer.util.Util
 import remix.myplayer.util.Util.sendLocalBroadcast
 import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.viewmodel.playbackViewModel
+import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.tagEditViewModel
 import remix.myplayer.viewmodel.timerViewModel
 
-/** Now Playing secondary row: favorite, edit, timer, share, equalizer. */
+/** Now Playing secondary row: favorite, edit, timer, speed, share, equalizer. */
 @Composable
 internal fun PlayingSecondaryActions(
   song: Song,
@@ -48,28 +49,32 @@ internal fun PlayingSecondaryActions(
   val nav = LocalNavController.current
   val timerVM = timerViewModel
   val tagEditVM = tagEditViewModel
+  val settingState by settingViewModel.settingsState.collectAsStateWithLifecycle()
   val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
   val isFavorite = playbackState.isFavorite
   val tint = theme.popupButton()
   val canEditTags = song.isLocal()
   val eqSheetState = rememberDialogState()
+  val speedDialogState = rememberDialogState()
   EqualizerSheet(eqSheetState)
+  SpeedDialog(speedDialogState, settingState)
 
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(horizontal = 28.dp),
+      .padding(horizontal = 20.dp),
     horizontalArrangement = Arrangement.SpaceEvenly,
     verticalAlignment = Alignment.CenterVertically
   ) {
     SecondaryActionIcon(
       iconRes = if (isFavorite) {
-        R.drawable.ic_player_favorite_filled_24dp
+        R.drawable.widget_btn_like_prs
       } else {
-        R.drawable.ic_player_favorite_24dp
+        R.drawable.widget_btn_like_nor
       },
       contentDescription = if (isFavorite) "Remove from favorites" else "Add to favorites",
-      tint = if (isFavorite) BrandColors.Favorite else tint.copy(alpha = 0.92f),
+      // Pressed asset is already red; only tint the outline/nor state.
+      tint = if (isFavorite) null else tint.copy(alpha = 0.92f),
       onClick = {
         sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.LOVE))
       }
@@ -89,6 +94,12 @@ internal fun PlayingSecondaryActions(
       contentDescription = "Sleep timer",
       tint = tint.copy(alpha = 0.92f),
       onClick = { timerVM.showTimerDialog() }
+    )
+    SecondaryActionIcon(
+      iconRes = R.drawable.ic_player_speed_24dp,
+      contentDescription = "Playback speed",
+      tint = tint.copy(alpha = 0.92f),
+      onClick = { speedDialogState.show() }
     )
     SecondaryActionIcon(
       iconRes = R.drawable.ic_share_24dp,
@@ -114,13 +125,13 @@ internal fun PlayingSecondaryActions(
 private fun SecondaryActionIcon(
   iconRes: Int,
   contentDescription: String,
-  tint: Color,
+  tint: Color?,
   onClick: () -> Unit,
 ) {
   Image(
     painter = painterResource(iconRes),
     contentDescription = contentDescription,
-    colorFilter = ColorFilter.tint(tint),
+    colorFilter = tint?.let { ColorFilter.tint(it) },
     modifier = Modifier
       .size(48.dp)
       .padding(12.dp)
