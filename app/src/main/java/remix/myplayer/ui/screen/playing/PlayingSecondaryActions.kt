@@ -22,6 +22,8 @@ import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.service.Command
 import remix.myplayer.ui.activity.base.BaseActivity
+import remix.myplayer.ui.dialog.EqualizerSheet
+import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.nav.LocalNavController
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.nav.RouteTagEdit
@@ -36,10 +38,7 @@ import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.tagEditViewModel
 import remix.myplayer.viewmodel.timerViewModel
 
-/**
- * Primary Now Playing actions only.
- * Speed / EQ live in the overflow menu to avoid duplicate CTAs.
- */
+/** Now Playing secondary row: favorite, edit, timer, share, equalizer. */
 @Composable
 internal fun PlayingSecondaryActions(
   song: Song,
@@ -54,6 +53,8 @@ internal fun PlayingSecondaryActions(
   val isFavorite = playbackState.isFavorite
   val tint = theme.popupButton()
   val canEditTags = song.isLocal()
+  val eqSheetState = rememberDialogState()
+  EqualizerSheet(eqSheetState)
 
   Row(
     modifier = Modifier
@@ -103,6 +104,12 @@ internal fun PlayingSecondaryActions(
           Intent.createChooser(Util.createShareSongFileIntent(song, activity), null)
         )
       }
+    )
+    SecondaryActionIcon(
+      iconRes = R.drawable.ic_player_eq_24dp,
+      contentDescription = "Equalizer",
+      tint = tint.copy(alpha = 0.92f),
+      onClick = { eqSheetState.show() }
     )
   }
 }
