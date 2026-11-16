@@ -2,6 +2,20 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.9.9] — 2026-11-17
+
+### Highlights
+- **Hybrid Mood Presets with Playback & Equalizer Fusion**: Mood presets now simultaneously orchestrate playback dynamics (speed, pitch, spatial echo) and fine-tuned 5-band hardware Equalizer profiles (custom dB gains, Bass Boost +800, 3D Virtualizer +850). Added audiophile acoustic configurations including *Bass Slam*, *Spatial 3D*, *Vocal Pure*, *Slowed & Reverb*, *Nightcore*, *Lo-Fi*, *Vaporwave*, *Turbo Club*, *Warm Acoustic*, *Dreamy*, and *Cardio*. Selecting *Normal* instantly resets both playback and audio effects to pure flat default.
+- **Beat-Reactive Cover Animation**: Animate cover artwork rhythmically with music playback via a subtle, dynamic pulsating scale effect. Fully configurable in Settings with a dedicated toggle (default: enabled).
+- **Redesigned Modern "Up Next" / Play Queue**: Completely revamped the Up Next queue sheet into an elegant, modern card-based interface featuring a top drag pill, accent-bordered "NOW PLAYING" hero card, track count badge, sleek rounded queue cards with active playing indicators, seamless reordering handles, and circular delete buttons.
+- **Glossy iOS-Style Vector App Icon**: Designed a brand-new adaptive app icon in the app's signature color palette, featuring a glowing white eighth musical note centered on a vibrant blue-to-pink gradient background with subtle concentric soundwave rings, specular glass highlight curvature, and delicate light sparkles.
+- **Center-on-Playing Floating Button**: Added a modern floating action button (`ic_my_location`) in the Songs screen that smoothly scrolls and centers the list on the currently playing track with one tap.
+- **Dynamic Search Placeholder Track Count**: Updated the library search placeholder to dynamically reflect the total number of audio files (`"Search in %d audio files"`).
+- **Comprehensive Metadata Sanitization**: Cleaned all `<unknown>` artifacts, bracketed tags, and file download suffixes across song titles, artists, and albums in song lists, grid items, detail views, miniplayer, queue, and player top bar.
+- **8 Rich Procedural Generative Fallback Covers**: Upgraded deterministic procedural artwork with 8 stunning vector generative styles for songs without embedded album art, including *Celestial Constellations & Twinkling Stars*, *Concentric Soundwave Rings*, *Isometric Vector Grid*, *Cosmic Glowing Orbs*, *Crystal Shards*, *Harmonic Sine Waves*, and *Radial Starlight Rays*.
+- **Modernized & Categorized Settings**: Streamlined settings categories with modern Material 3 rounded cards, circular tinted icon containers, descriptive subtitles, and a direct Equalizer shortcut in the Playback section.
+- **Dual Release Builds**: Official release includes standard `A-Music-V2.9.9.apk` and pure `A-Music-V2.9.9-FOSS.apk` builds.
+
 ## [2.9.8] — 2026-11-16
 
 ### Highlights

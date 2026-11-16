@@ -117,7 +117,7 @@ fun ListSong(
         )
         Spacer(modifier = Modifier.height(2.dp))
         TextSecondary(
-          text = song.artist.ifEmpty { "—" },
+          text = song.cleanArtist.ifEmpty { "—" },
           fontSize = 12.sp
         )
       }

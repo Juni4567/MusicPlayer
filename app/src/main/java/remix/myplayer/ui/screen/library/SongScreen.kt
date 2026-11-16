@@ -1,14 +1,22 @@
 package remix.myplayer.ui.screen.library
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -16,18 +24,24 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.launch
 import remix.myplayer.R
 import remix.myplayer.service.Command
 import remix.myplayer.service.MusicService
@@ -36,6 +50,7 @@ import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.library.LibraryChrome
 import remix.myplayer.ui.widget.library.list.ListSong
 import remix.myplayer.util.MusicUtil
+import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.util.ext.verticalScrollbar
 import remix.myplayer.viewmodel.MultiSelectState
 import remix.myplayer.viewmodel.libraryViewModel
@@ -56,6 +71,8 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
   val keyboardController = LocalSoftwareKeyboardController.current
   val popupEnabled = !multiSelectState.isShowInLibrary()
   val theme = LocalTheme.current
+  val coroutineScope = rememberCoroutineScope()
+  val density = LocalDensity.current
 
   var searchQuery by remember { mutableStateOf("") }
   val filteredSongs = remember(songs, searchQuery) {
@@ -69,6 +86,10 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
           song.album.lowercase().contains(q)
       }
     }
+  }
+
+  val playingIndex by remember(filteredSongs, playbackState.song.id) {
+    derivedStateOf { filteredSongs.indexOfFirst { it.id == playbackState.song.id } }
   }
 
   // Dismiss keyboard and clear search focus when scrolling the song list
@@ -122,50 +143,88 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
         )
       }
     } else {
-      LazyColumn(
-        state = listState,
-        contentPadding = PaddingValues(bottom = 16.dp),
-        modifier = Modifier
-          .weight(1f)
-          .verticalScrollbar(listState)
-      ) {
-        itemsIndexed(filteredSongs, key = { _, song ->
-          song.id
-        }) { pos, song ->
-          val selected = selectedIds.contains(song.getKey())
-          val isPlayingSong = playbackState.song.id == song.id
+      Box(modifier = Modifier.weight(1f)) {
+        LazyColumn(
+          state = listState,
+          contentPadding = PaddingValues(bottom = 76.dp),
+          modifier = Modifier
+            .fillMaxSize()
+            .verticalScrollbar(listState)
+        ) {
+          itemsIndexed(filteredSongs, key = { _, song ->
+            song.id
+          }) { pos, song ->
+            val selected = selectedIds.contains(song.getKey())
+            val isPlayingSong = playbackState.song.id == song.id
 
-          ListSong(
-            modifier = Modifier.height(56.dp),
-            song = song,
-            modelParent = song,
-            selected = selected,
-            playing = isPlayingSong,
-            popupEnabled = popupEnabled,
-            onClickSong = {
-              focusManager.clearFocus()
-              keyboardController?.hide()
+            ListSong(
+              modifier = Modifier.height(56.dp),
+              song = song,
+              modelParent = song,
+              selected = selected,
+              playing = isPlayingSong,
+              popupEnabled = popupEnabled,
+              onClickSong = {
+                focusManager.clearFocus()
+                keyboardController?.hide()
 
-              if (filteredSongs.isEmpty()) {
-                return@ListSong
+                if (filteredSongs.isEmpty()) {
+                  return@ListSong
+                }
+
+                if (multiSelectState.where == MultiSelectState.Where.Song) {
+                  mainVM.updateMultiSelectModel(song)
+                  return@ListSong
+                }
+
+                setPlayQueue(
+                  filteredSongs, MusicUtil.makeCmdIntent(Command.PLAY_AT)
+                    .putExtra(MusicService.EXTRA_POSITION, pos)
+                )
+              },
+              onLongClickSong = {
+                focusManager.clearFocus()
+                keyboardController?.hide()
+                mainVM.showMultiSelect(context, MultiSelectState.Where.Song, song)
               }
+            )
+          }
+        }
 
-              if (multiSelectState.where == MultiSelectState.Where.Song) {
-                mainVM.updateMultiSelectModel(song)
-                return@ListSong
-              }
-
-              setPlayQueue(
-                filteredSongs, MusicUtil.makeCmdIntent(Command.PLAY_AT)
-                  .putExtra(MusicService.EXTRA_POSITION, pos)
-              )
-            },
-            onLongClickSong = {
-              focusManager.clearFocus()
-              keyboardController?.hide()
-              mainVM.showMultiSelect(context, MultiSelectState.Where.Song, song)
-            }
-          )
+        // Floating Action Button to scroll & center currently playing song
+        androidx.compose.animation.AnimatedVisibility(
+          visible = playingIndex >= 0 && playbackState.song.valid(),
+          enter = fadeIn() + scaleIn(),
+          exit = fadeOut() + scaleOut(),
+          modifier = Modifier
+            .align(Alignment.BottomEnd)
+            .padding(end = 18.dp, bottom = 20.dp)
+        ) {
+          Box(
+            modifier = Modifier
+              .size(46.dp)
+              .shadow(elevation = 6.dp, shape = CircleShape)
+              .clip(CircleShape)
+              .background(theme.secondary)
+              .clickWithRipple(circle = true) {
+                if (playingIndex >= 0) {
+                  val viewportHeight = listState.layoutInfo.viewportSize.height
+                  val itemHeightPx = with(density) { 56.dp.roundToPx() }
+                  val centerOffset = -((viewportHeight - itemHeightPx) / 2).coerceAtLeast(0)
+                  coroutineScope.launch {
+                    listState.animateScrollToItem(playingIndex, centerOffset)
+                  }
+                }
+              },
+            contentAlignment = Alignment.Center
+          ) {
+            Icon(
+              painter = painterResource(R.drawable.ic_my_location_24dp),
+              contentDescription = stringResource(R.string.scroll_to_playing),
+              tint = theme.primaryReverse,
+              modifier = Modifier.size(22.dp)
+            )
+          }
         }
       }
     }

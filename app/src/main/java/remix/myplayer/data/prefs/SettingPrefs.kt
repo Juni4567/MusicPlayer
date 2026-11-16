@@ -180,6 +180,11 @@ class SettingPrefs @Inject constructor(
     BOTTOM_SHOW_BOTH
   )
   var keepScreenOn by PrefsDelegate(sp, PrefKeys.Setting.SCREEN_ALWAYS_ON, false)
+  var beatReactiveCoverAnimation by PrefsDelegate(
+    sp,
+    "beat_reactive_cover_animation",
+    true
+  )
 
   var ignoreMediaStore by PrefsDelegate(sp, PrefKeys.Setting.IGNORE_MEDIA_STORE, false)
   var autoDownloadCover by PrefsDelegate(

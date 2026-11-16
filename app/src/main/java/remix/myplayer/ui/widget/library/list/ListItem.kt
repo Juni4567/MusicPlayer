@@ -68,9 +68,9 @@ fun ListItem(
         .padding(start = 12.dp, end = 6.dp),
       verticalArrangement = Arrangement.Center
     ) {
-      TextPrimary(text = text1, fontSize = 14.5.sp, fontWeight = FontWeight.Medium)
+      TextPrimary(text = remix.myplayer.util.Util.sanitizeMeta(text1).ifEmpty { text1 }, fontSize = 14.5.sp, fontWeight = FontWeight.Medium)
       Spacer(modifier = Modifier.height(2.dp))
-      TextSecondary(text = text2, fontSize = 12.sp)
+      TextSecondary(text = remix.myplayer.util.Util.sanitizeMeta(text2).ifEmpty { "—" }, fontSize = 12.sp)
     }
 
     LibraryItemPopupButton(model = model, enabled = popupEnabled)

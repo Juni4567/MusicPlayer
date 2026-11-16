@@ -78,10 +78,9 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
       fun cleanMeta(value: String): String {
-        val trimmed = value.trim()
+        val sanitized = remix.myplayer.util.Util.sanitizeMeta(value)
+        val trimmed = sanitized.trim()
         if (trimmed.isEmpty() ||
-          trimmed.equals("<unknown>", ignoreCase = true) ||
-          trimmed.equals("unknown", ignoreCase = true) ||
           trimmed.equals("download", ignoreCase = true) ||
           trimmed.equals("downloads", ignoreCase = true)
         ) {

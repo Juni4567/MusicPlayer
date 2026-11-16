@@ -4,6 +4,7 @@ import android.content.Intent
 import android.view.ViewGroup
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -12,8 +13,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,12 +24,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -46,6 +51,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -237,49 +243,97 @@ private fun PlayQueueDialog(
   val surface2 = theme.surface2
   val textSecondaryColor = theme.textSecondary
   val textMutedColor = theme.textMuted
+  val accent = theme.secondary
   val mainVM = mainViewModel
   val scope = rememberCoroutineScope()
 
   BottomDialog(
     visible = visible,
     onDismissRequest = onDismissRequest,
-    maxHeightFraction = 0.78f
+    maxHeightFraction = 0.82f
   ) {
     Column(
       modifier = Modifier
         .fillMaxWidth()
         .background(surface)
+        .padding(bottom = 12.dp)
     ) {
+      // Top drag handle indicator
+      Box(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(top = 10.dp, bottom = 4.dp),
+        contentAlignment = Alignment.Center
+      ) {
+        Box(
+          modifier = Modifier
+            .width(36.dp)
+            .height(4.dp)
+            .clip(CircleShape)
+            .background(theme.divider.copy(alpha = 0.5f))
+        )
+      }
+
+      // Sleek Header
       Row(
         modifier = Modifier
           .fillMaxWidth()
-          .padding(horizontal = 8.dp, vertical = 4.dp),
+          .padding(horizontal = 14.dp, vertical = 6.dp),
         verticalAlignment = Alignment.CenterVertically
       ) {
         CenterInBox(
           modifier = Modifier
-            .size(48.dp)
+            .size(40.dp)
+            .clip(CircleShape)
+            .background(surface2)
             .clickWithRipple { onDismissRequest() }
         ) {
           Image(
             painter = painterResource(R.drawable.icon_player_back),
             contentDescription = "Collapse up next",
             colorFilter = ColorFilter.tint(textSecondaryColor),
-            modifier = Modifier.size(22.dp)
+            modifier = Modifier.size(20.dp)
           )
         }
-        Column(modifier = Modifier.weight(1f)) {
-          TextPrimary(stringResource(R.string.up_next), fontSize = 18.sp)
-          TextSecondary(stringResource(R.string.up_next_count, songs.size), fontSize = 12.sp)
-        }
-        if (songs.size > 1) {
+
+        Spacer(modifier = Modifier.width(10.dp))
+
+        Row(
+          modifier = Modifier.weight(1f),
+          verticalAlignment = Alignment.CenterVertically,
+          horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
           TextPrimary(
-            stringResource(R.string.clear_queue),
-            fontSize = 14.sp,
+            text = stringResource(R.string.up_next),
+            fontSize = 17.sp,
+            fontWeight = FontWeight.SemiBold
+          )
+          Box(
+            modifier = Modifier
+              .clip(RoundedCornerShape(10.dp))
+              .background(accent.copy(alpha = 0.16f))
+              .padding(horizontal = 8.dp, vertical = 2.dp)
+          ) {
+            Text(
+              text = stringResource(R.string.songs_count_tracks, songs.size),
+              color = accent,
+              fontSize = 11.5.sp,
+              fontWeight = FontWeight.SemiBold
+            )
+          }
+        }
+
+        if (songs.size > 1) {
+          Text(
+            text = stringResource(R.string.clear_queue),
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium,
             color = textSecondaryColor,
             modifier = Modifier
-              .padding(end = 8.dp)
+              .clip(RoundedCornerShape(8.dp))
+              .background(surface2)
               .clickWithRipple { playbackVM.clearUpcomingFromQueue() }
+              .padding(horizontal = 10.dp, vertical = 6.dp)
           )
         }
       }
@@ -289,12 +343,31 @@ private fun PlayQueueDialog(
         Column(
           modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 14.dp, vertical = 6.dp)
             .clip(RoundedCornerShape(14.dp))
-            .background(surface2)
+            .background(accent.copy(alpha = 0.10f))
+            .border(1.dp, accent.copy(alpha = 0.40f), RoundedCornerShape(14.dp))
             .padding(12.dp)
         ) {
-          TextSecondary(stringResource(R.string.now_playing), fontSize = 11.sp)
+          Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(6.dp)
+          ) {
+            Box(
+              modifier = Modifier
+                .size(6.dp)
+                .clip(CircleShape)
+                .background(accent)
+            )
+            Text(
+              text = stringResource(R.string.now_playing_badge),
+              color = accent,
+              fontSize = 10.5.sp,
+              fontWeight = FontWeight.Bold,
+              letterSpacing = 0.8.sp
+            )
+          }
+
           Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(top = 8.dp)
@@ -302,11 +375,25 @@ private fun PlayQueueDialog(
             GlideCover(
               model = currentSong,
               circle = false,
-              modifier = Modifier.size(48.dp)
+              modifier = Modifier
+                .size(46.dp)
+                .clip(RoundedCornerShape(10.dp))
             )
-            Column(modifier = Modifier.padding(start = 12.dp).weight(1f)) {
-              TextPrimary(currentSong.showName, fontSize = 15.sp)
-              TextSecondary(currentSong.artist.ifEmpty { "—" }, fontSize = 12.sp)
+            Column(
+              modifier = Modifier
+                .padding(start = 12.dp)
+                .weight(1f)
+            ) {
+              TextPrimary(
+                text = currentSong.showName,
+                fontSize = 14.5.sp,
+                fontWeight = FontWeight.SemiBold
+              )
+              Spacer(modifier = Modifier.height(2.dp))
+              TextSecondary(
+                text = currentSong.cleanArtist.ifEmpty { "—" },
+                fontSize = 12.sp
+              )
             }
           }
         }
@@ -365,17 +452,23 @@ private fun PlayQueueDialog(
       } else {
         LazyColumn(
           state = lazyState,
-          modifier = Modifier.heightIn(max = 400.dp)
+          contentPadding = PaddingValues(top = 4.dp, bottom = 16.dp),
+          modifier = Modifier.heightIn(max = 420.dp)
         ) {
           itemsIndexed(songs, key = { _, song -> song.id }) { pos, song ->
             val isCurrent = song.id == musicState.song.id
             ReorderableItem(reorderableState, key = song.id) {
+              val cardBg = if (isCurrent) accent.copy(alpha = 0.14f) else surface2.copy(alpha = 0.65f)
+              val cardBorder = if (isCurrent) accent else theme.divider.copy(alpha = 0.35f)
+
               Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                   .fillMaxWidth()
-                  .height(54.dp)
-                  .background(if (isCurrent) surface2 else surface)
+                  .padding(horizontal = 14.dp, vertical = 3.dp)
+                  .clip(RoundedCornerShape(12.dp))
+                  .background(cardBg)
+                  .border(0.8.dp, cardBorder, RoundedCornerShape(12.dp))
                   .clickWithRipple(false) {
                     sendLocalBroadcast(
                       makeCmdIntent(Command.PLAY_AT)
@@ -383,42 +476,61 @@ private fun PlayQueueDialog(
                     )
                     onDismissRequest()
                   }
-                  .padding(horizontal = 12.dp)
+                  .padding(horizontal = 10.dp, vertical = 8.dp)
               ) {
                 if (song.valid()) {
                   GlideCover(
                     model = song,
                     circle = false,
                     modifier = Modifier
-                      .size(40.dp)
+                      .size(42.dp)
                       .clip(RoundedCornerShape(8.dp))
                   )
                 }
+
                 Column(
                   modifier = Modifier
                     .padding(horizontal = 10.dp)
                     .weight(1f)
                 ) {
-                  TextPrimary(
-                    if (!song.valid()) stringResource(R.string.song_lose_effect) else song.showName,
-                    color = if (isCurrent) theme.secondary else theme.textPrimary,
-                    fontSize = 14.sp
-                  )
+                  Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (isCurrent) {
+                      Box(
+                        modifier = Modifier
+                          .padding(end = 6.dp)
+                          .size(5.dp)
+                          .clip(CircleShape)
+                          .background(accent)
+                      )
+                    }
+                    TextPrimary(
+                      if (!song.valid()) stringResource(R.string.song_lose_effect) else song.showName,
+                      color = if (isCurrent) accent else theme.textPrimary,
+                      fontSize = 14.sp,
+                      fontWeight = if (isCurrent) FontWeight.SemiBold else FontWeight.Medium
+                    )
+                  }
                   if (song.valid()) {
-                    TextSecondary(song.artist.ifEmpty { "—" }, fontSize = 12.sp)
+                    Spacer(modifier = Modifier.height(2.dp))
+                    TextSecondary(
+                      text = song.cleanArtist.ifEmpty { "—" },
+                      fontSize = 11.5.sp
+                    )
                   }
                 }
 
                 if (song.valid() && !isCurrent) {
                   CenterInBox(
                     modifier = Modifier
-                      .size(40.dp)
+                      .size(36.dp)
+                      .clip(CircleShape)
                       .clickWithRipple { playbackVM.removeFromQueue(song.id) }
                   ) {
                     Image(
                       painter = painterResource(R.drawable.ic_queue_remove_24dp),
                       contentDescription = "Remove from queue",
-                      colorFilter = ColorFilter.tint(textMutedColor)
+                      colorFilter = ColorFilter.tint(textMutedColor),
+                      modifier = Modifier.size(18.dp)
                     )
                   }
                 }
@@ -426,10 +538,10 @@ private fun PlayQueueDialog(
                 Icon(
                   painter = painterResource(R.drawable.ic_drag_handle_24dp),
                   contentDescription = "Reorder queue item",
-                  tint = textMutedColor,
+                  tint = if (isCurrent) accent else textMutedColor,
                   modifier = Modifier
-                    .size(40.dp)
-                    .padding(8.dp)
+                    .size(36.dp)
+                    .padding(6.dp)
                     .draggableHandle()
                 )
               }

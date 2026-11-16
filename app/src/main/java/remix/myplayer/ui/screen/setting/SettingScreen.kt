@@ -3,17 +3,36 @@ package remix.myplayer.ui.screen.setting
 import androidx.activity.compose.LocalActivity
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.BuildConfig
 import remix.myplayer.R
 import remix.myplayer.helper.EQHelper
@@ -58,7 +77,11 @@ import remix.myplayer.ui.screen.setting.logic.playingscreen.PlayingScreenBackgro
 import remix.myplayer.ui.screen.setting.logic.playingscreen.PlayingScreenBottomLogic
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.widget.common.CommonAppBar
+import remix.myplayer.ui.widget.common.TextPrimary
+import remix.myplayer.ui.widget.common.TextSecondary
+import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.viewmodel.mainViewModel
+import remix.myplayer.viewmodel.settingViewModel
 
 @Composable
 fun SettingScreen() {
@@ -68,6 +91,7 @@ fun SettingScreen() {
     containerColor = LocalTheme.current.mainBackground,
   ) { contentPadding ->
     LazyColumn(
+      contentPadding = PaddingValues(top = 10.dp, bottom = 24.dp),
       modifier = Modifier.padding(contentPadding)
     ) {
       item {
@@ -97,6 +121,7 @@ fun SettingDetailScreen(categoryKey: String) {
     containerColor = LocalTheme.current.mainBackground,
   ) { contentPadding ->
     LazyColumn(
+      contentPadding = PaddingValues(top = 8.dp, bottom = 24.dp),
       modifier = Modifier.padding(contentPadding)
     ) {
       item {
@@ -123,20 +148,59 @@ private fun SettingCategoryPreference(
   @StringRes descriptionRes: Int,
   onClick: () -> Unit,
 ) {
+  val theme = LocalTheme.current
   val title = stringResource(titleRes)
-  Preference(
-    onClick = onClick,
-    title = stringResource(titleRes),
-    content = stringResource(descriptionRes),
-    leading = {
+  val desc = stringResource(descriptionRes)
+
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(horizontal = 14.dp, vertical = 5.dp)
+      .clip(RoundedCornerShape(14.dp))
+      .background(theme.surface2)
+      .border(0.8.dp, theme.divider.copy(alpha = 0.35f), RoundedCornerShape(14.dp))
+      .clickWithRipple(circle = false, onClick = onClick)
+      .padding(horizontal = 14.dp, vertical = 14.dp),
+    verticalAlignment = Alignment.CenterVertically
+  ) {
+    Box(
+      modifier = Modifier
+        .size(42.dp)
+        .clip(CircleShape)
+        .background(theme.secondary.copy(alpha = 0.14f)),
+      contentAlignment = Alignment.Center
+    ) {
       Icon(
-        modifier = Modifier.padding(end = 24.dp),
         painter = painterResource(iconRes),
         contentDescription = title,
-        tint = LocalTheme.current.primary
+        tint = theme.secondary,
+        modifier = Modifier.size(22.dp)
       )
     }
-  )
+
+    Spacer(modifier = Modifier.width(14.dp))
+
+    Column(modifier = Modifier.weight(1f)) {
+      TextPrimary(
+        text = title,
+        fontSize = 15.sp,
+        fontWeight = FontWeight.SemiBold
+      )
+      Spacer(modifier = Modifier.height(2.dp))
+      TextSecondary(
+        text = desc,
+        fontSize = 12.5.sp,
+        maxLine = 2
+      )
+    }
+
+    Icon(
+      painter = painterResource(R.drawable.ic_navigate_next_white_24dp),
+      contentDescription = null,
+      tint = theme.textMuted,
+      modifier = Modifier.size(20.dp)
+    )
+  }
 }
 
 private fun settingDetailRoute(categoryRoute: String): String {
@@ -206,6 +270,15 @@ private fun CommonPreferenceItems() {
 
 @Composable
 private fun PlayPreferenceItems() {
+  val activity = LocalActivity.current
+  val nav = LocalNavController.current
+
+  ArrowPreference(R.string.eq_setting) {
+    EQHelper.startEqualizer(activity ?: return@ArrowPreference) {
+      nav.navigate(RouteEq)
+    }
+  }
+
   IgnoreAudioFocusLogic()
 
   BreakPointLogic()
@@ -232,7 +305,6 @@ private fun ColorPreferenceItems() {
   SecondaryColorLogic()
 
   ColoredNaviBarLogic()
-
 }
 
 @Composable
@@ -251,6 +323,17 @@ private fun PlayingScreenPreferenceItems() {
 
 @Composable
 private fun CoverPreferenceItems() {
+  val settingVM = settingViewModel
+  val settingState by settingVM.settingsState.collectAsStateWithLifecycle()
+
+  SwitchPreference(
+    title = stringResource(R.string.beat_reactive_cover),
+    content = stringResource(R.string.beat_reactive_cover_desc),
+    checked = settingState.cover.beatAnimationEnabled
+  ) {
+    settingVM.setBeatAnimationEnabled(it)
+  }
+
   PlayingCoverAnimationLogic()
 
   IgnoreMediaStoreLogic()

@@ -210,7 +210,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
         Spacer(modifier = Modifier.height(2.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
           TextSecondary(
-            text = playbackState.song.artist.ifEmpty { "—" },
+            text = playbackState.song.cleanArtist.ifEmpty { "—" },
             fontSize = 12.sp,
             modifier = Modifier.weight(1f, fill = false)
           )

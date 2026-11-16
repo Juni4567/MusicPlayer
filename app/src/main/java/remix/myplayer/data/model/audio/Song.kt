@@ -9,6 +9,7 @@ import dagger.hilt.android.EntryPointAccessors
 import okhttp3.Credentials
 import remix.myplayer.App
 import remix.myplayer.data.prefs.SettingPrefsEntryPoint
+import remix.myplayer.util.Util
 import timber.log.Timber
 import java.io.Serial
 import java.util.concurrent.atomic.AtomicInteger
@@ -117,7 +118,16 @@ sealed class Song(
     get() = ContentUris.withAppendedId("content://media/external/audio/albumart/".toUri(), albumId)
 
   val showName: String
-    get() = if (!settingPrefs.showDisplayName) title else displayName
+    get() {
+      val raw = if (!settingPrefs.showDisplayName) title else displayName
+      return Util.sanitizeMeta(raw).ifEmpty { raw }
+    }
+
+  val cleanArtist: String
+    get() = Util.sanitizeMeta(artist)
+
+  val cleanAlbum: String
+    get() = Util.sanitizeMeta(album)
 
   override fun getKey(): String {
     return id.toString()

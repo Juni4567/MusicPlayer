@@ -317,27 +317,36 @@ object Util {
    * @param type 处理类型 0:歌曲名 1:歌手名 2:专辑名 3:文件名
    * @return
    */
+  /**
+   * Cleans and sanitizes metadata strings by stripping '<unknown>' artifacts, leading/trailing hyphens,
+   * and providing clean fallbacks.
+   */
+  fun sanitizeMeta(raw: String?, fallback: String = ""): String {
+    if (raw == null) return fallback
+    var s = raw.trim()
+    if (s.equals("<unknown>", ignoreCase = true) || s.equals("unknown", ignoreCase = true)) {
+      return fallback
+    }
+    if (s.contains("<unknown>", ignoreCase = true)) {
+      s = s.replace(Regex("(?i)<unknown>\\s*[-–—]?\\s*"), "")
+        .replace(Regex("(?i)\\s*[-–—]?\\s*<unknown>"), "")
+        .replace(Regex("(?i)<unknown>"), "")
+        .trim()
+    }
+    return s.ifEmpty { fallback }
+  }
+
   fun processInfo(origin: String?, type: Int): String {
-    return if (type == TYPE_SONG) {
-      if (origin == null || origin == "") {
-        context.getString(R.string.unknown_song)
-      } else {
-//                return origin.lastIndexOf(".") > 0 ? origin.substring(0, origin.lastIndexOf(".")) : origin;
-        origin
+    val clean = sanitizeMeta(origin)
+    return when (type) {
+      TYPE_SONG -> clean.ifEmpty { context.getString(R.string.unknown_song) }
+      TYPE_DISPLAYNAME -> {
+        val s = if (clean.lastIndexOf(".") > 0) clean.substring(0, clean.lastIndexOf(".")) else clean
+        s.ifEmpty { context.getString(R.string.unknown_song) }
       }
-    } else if (type == TYPE_DISPLAYNAME) {
-      if (origin == null || origin == "") {
-        context.getString(R.string.unknown_song)
-      } else {
-        if (origin.lastIndexOf(".") > 0) origin.substring(0, origin.lastIndexOf(".")) else origin
-      }
-    } else {
-      if (origin == null || origin == "") {
-        context
-          .getString(if (type == TYPE_ARTIST) R.string.unknown_artist else R.string.unknown_album)
-      } else {
-        origin
-      }
+      TYPE_ARTIST -> clean.ifEmpty { context.getString(R.string.unknown_artist) }
+      TYPE_ALBUM -> clean.ifEmpty { context.getString(R.string.unknown_album) }
+      else -> clean
     }
   }
 

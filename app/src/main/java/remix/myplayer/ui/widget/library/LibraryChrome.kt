@@ -79,8 +79,13 @@ fun LibraryChrome(
       Spacer(modifier = Modifier.width(6.dp))
       Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
         if (searchQuery.isEmpty()) {
+          val placeholderText = if (songs.isNotEmpty()) {
+            stringResource(R.string.search_in_audio_files, songs.size)
+          } else {
+            stringResource(R.string.search_your_library)
+          }
           Text(
-            text = stringResource(R.string.search_your_library),
+            text = placeholderText,
             color = textMuted,
             fontSize = 13.5.sp,
             maxLines = 1

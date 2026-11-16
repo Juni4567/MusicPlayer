@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+  <!-- Subtle concentric soundwave rings centered around music core -->
+  <!-- Inner soundwave ring -->
+  <path
+      android:pathData="M52,30 A22,22 0 1,1 51.99,30"
+      android:strokeWidth="1.2"
+      android:strokeColor="#40FFFFFF" />
+
+  <!-- Middle soundwave ring -->
+  <path
+      android:pathData="M52,21 A31,31 0 1,1 51.99,21"
+      android:strokeWidth="1.2"
+      android:strokeColor="#26FFFFFF" />
+
+  <!-- Outer soundwave ring -->
+  <path
+      android:pathData="M52,12 A40,40 0 1,1 51.99,12"
+      android:strokeWidth="1.2"
+      android:strokeColor="#18FFFFFF" />
+
+  <!-- Light Sparkle 1 (Top-Left) -->
+  <path
+      android:pathData="M28,24 C28,27 25,28 22,28 C25,28 28,29 28,32 C28,29 31,28 34,28 C31,28 28,27 28,24 Z"
+      android:fillColor="#B3FFFFFF" />
+  <path
+      android:pathData="M28,28 m-1,0 a1,1 0 1,0 2,0 a1,1 0 1,0 -2,0"
+      android:fillColor="#FFFFFFFF" />
+
+  <!-- Light Sparkle 2 (Top-Right) -->
+  <path
+      android:pathData="M78,28 C78,31 75,32 72,32 C75,32 78,33 78,36 C78,33 81,32 84,32 C81,32 78,31 78,28 Z"
+      android:fillColor="#CCFFFFFF" />
+  <path
+      android:pathData="M78,32 m-1.5,0 a1.5,1.5 0 1,0 3,0 a1.5,1.5 0 1,0 -3,0"
+      android:fillColor="#FFFFFFFF" />
+
+  <!-- Light Sparkle 3 (Bottom-Right) -->
+  <path
+      android:pathData="M76,74 C76,76 74,77 72,77 C74,77 76,78 76,80 C76,78 78,77 80,77 C78,77 76,76 76,74 Z"
+      android:fillColor="#99FFFFFF" />
+
+  <!-- Light Sparkle 4 (Bottom-Left) -->
+  <path
+      android:pathData="M26,76 C26,77.5 24.5,78.5 23,78.5 C24.5,78.5 26,79.5 26,81 C26,79.5 27.5,78.5 29,78.5 C27.5,78.5 26,77.5 26,76 Z"
+      android:fillColor="#80FFFFFF" />
+
+  <!-- Soft ambient white glow behind the note -->
+  <path
+      android:pathData="M42,52 C48,52 54,56 54,63 C54,70 48,74 42,74 C36,74 30,70 30,63 C30,56 36,52 42,52 Z"
+      android:fillColor="#26FFFFFF" />
+  <path
+      android:pathData="M48,32 L56,32 L56,64 L48,64 Z"
+      android:fillColor="#26FFFFFF" />
+  <path
+      android:pathData="M54,32 C64,33 73,39 74,47 C74,53 69,57 63,55 C68,51 67,45 60,41 C57,39 54,40 54,40 Z"
+      android:fillColor="#26FFFFFF" />
+
+  <!-- Glowing White Eighth Musical Note (Stem, Notehead, Flag) -->
+  <!-- Notehead (angled acoustic oval) -->
+  <path
+      android:pathData="M43,55 C48.5,55 53,58.8 53,63.5 C53,68.2 48.5,72 43,72 C37.5,72 33,68.2 33,63.5 C33,58.8 37.5,55 43,55 Z"
+      android:fillColor="#FFFFFFFF" />
+
+  <!-- Notehead glossy inner highlight -->
+  <path
+      android:pathData="M42,57 C45.5,57 48.5,59.5 48.5,62.5 C48.5,63.5 47,64.5 44,64 C41,63.5 37.5,61.5 38.5,59 C39.5,57.5 40.5,57 42,57 Z"
+      android:fillColor="#4DFFFFFF" />
+
+  <!-- Note stem -->
+  <path
+      android:pathData="M49.5,34 L53.5,34 L53.5,63.5 L49.5,63.5 Z"
+      android:fillColor="#FFFFFFFF" />
+
+  <!-- Note flag (curving right and swooping downward) -->
+  <path
+      android:pathData="M53.5,34 C62.5,35 70.5,40.5 71.5,47.5 C71.5,52 67.5,55.5 62.5,53.5 C67,50 65.5,44 59,40.5 C56.5,39 53.5,39.5 53.5,39.5 Z"
+      android:fillColor="#FFFFFFFF" />
+
+  <!-- Glossy specular gleam on the top curve of flag -->
+  <path
+      android:pathData="M53.5,34 C61,35 68,39 70,45 C67.5,41 62,37.5 55,36.5 Z"
+      android:fillColor="#66FFFFFF" />
+</vector>

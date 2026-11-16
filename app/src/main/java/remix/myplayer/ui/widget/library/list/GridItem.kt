@@ -76,10 +76,10 @@ fun GridItem(
           .weight(1f),
         verticalArrangement = Arrangement.Center
       ) {
-        TextPrimary(text = text1, fontSize = 13.5.sp, fontWeight = FontWeight.Medium)
+        TextPrimary(text = remix.myplayer.util.Util.sanitizeMeta(text1).ifEmpty { text1 }, fontSize = 13.5.sp, fontWeight = FontWeight.Medium)
         if (text2 != null) {
           Spacer(modifier = Modifier.height(1.dp))
-          TextSecondary(text = text2, fontSize = 11.5.sp)
+          TextSecondary(text = remix.myplayer.util.Util.sanitizeMeta(text2).ifEmpty { "—" }, fontSize = 11.5.sp)
         }
       }
 

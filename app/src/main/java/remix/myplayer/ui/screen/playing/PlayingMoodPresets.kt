@@ -1,5 +1,6 @@
 package remix.myplayer.ui.screen.playing
 
+import android.media.AudioManager
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +29,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.palette.graphics.Palette
+import remix.myplayer.App
 import remix.myplayer.R
+import remix.myplayer.helper.EQHelper
 import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.util.ext.clickWithRipple
@@ -38,30 +41,154 @@ import kotlin.math.abs
 data class MoodPreset(
   val nameRes: Int,
   val icon: String,
-  val speed: Float,
-  val pitch: Float,
+  val speed: Float = 1.0f,
+  val pitch: Float = 1.0f,
   val echoEnabled: Boolean = false,
   val echoPreset: Int = 0,
+  val eqEnabled: Boolean = false,
+  val eqGains: List<Float>? = null,
+  val bassBoost: Int = 0,
+  val virtualizer: Int = 0,
 )
 
 val NormalMoodPreset = MoodPreset(
-  R.string.mood_reset,
-  "↺",
-  1.00f,
-  1.00f,
-  echoEnabled = false
+  nameRes = R.string.mood_reset,
+  icon = "↺",
+  speed = 1.00f,
+  pitch = 1.00f,
+  echoEnabled = false,
+  eqEnabled = false
 )
 
 val OtherMoodPresets = listOf(
-  MoodPreset(R.string.mood_slowed_reverb, "🌙", 0.85f, 0.92f, echoEnabled = true, echoPreset = 3 /* Plateau */),
-  MoodPreset(R.string.mood_nightcore, "⚡", 1.20f, 1.15f, echoEnabled = false),
-  MoodPreset(R.string.mood_vaporwave, "📼", 0.80f, 0.85f, echoEnabled = true, echoPreset = 5 /* Plate */),
-  MoodPreset(R.string.mood_cardio, "🏃", 1.10f, 1.00f, echoEnabled = false),
-  MoodPreset(R.string.mood_lofi, "🎧", 0.90f, 1.00f, echoEnabled = false),
-  MoodPreset(R.string.mood_warm, "☕", 0.95f, 0.98f, echoEnabled = true, echoPreset = 1),
-  MoodPreset(R.string.mood_dreamy, "✨", 0.88f, 0.94f, echoEnabled = true, echoPreset = 4),
-  MoodPreset(R.string.mood_deep, "🌌", 0.92f, 0.88f, echoEnabled = false),
-  MoodPreset(R.string.mood_turbo, "🚀", 1.25f, 1.05f, echoEnabled = false),
+  MoodPreset(
+    nameRes = R.string.mood_bass_slam,
+    icon = "💥",
+    speed = 1.00f,
+    pitch = 1.00f,
+    eqEnabled = true,
+    eqGains = listOf(0.70f, 0.45f, -0.05f, 0.10f, 0.25f),
+    bassBoost = 800,
+    virtualizer = 200
+  ),
+  MoodPreset(
+    nameRes = R.string.mood_spatial,
+    icon = "🌌",
+    speed = 1.00f,
+    pitch = 1.00f,
+    echoEnabled = true,
+    echoPreset = 1,
+    eqEnabled = true,
+    eqGains = listOf(0.20f, 0.10f, 0.15f, 0.35f, 0.50f),
+    bassBoost = 300,
+    virtualizer = 850
+  ),
+  MoodPreset(
+    nameRes = R.string.mood_vocal,
+    icon = "🎤",
+    speed = 1.00f,
+    pitch = 1.00f,
+    eqEnabled = true,
+    eqGains = listOf(-0.15f, -0.10f, 0.45f, 0.50f, 0.30f),
+    bassBoost = 0,
+    virtualizer = 250
+  ),
+  MoodPreset(
+    nameRes = R.string.mood_slowed_reverb,
+    icon = "🌙",
+    speed = 0.85f,
+    pitch = 0.90f,
+    echoEnabled = true,
+    echoPreset = 3 /* Plateau */,
+    eqEnabled = true,
+    eqGains = listOf(0.50f, 0.30f, -0.10f, 0.15f, 0.20f),
+    bassBoost = 600,
+    virtualizer = 500
+  ),
+  MoodPreset(
+    nameRes = R.string.mood_nightcore,
+    icon = "⚡",
+    speed = 1.20f,
+    pitch = 1.15f,
+    eqEnabled = true,
+    eqGains = listOf(0.30f, 0.20f, 0.05f, 0.40f, 0.60f),
+    bassBoost = 400,
+    virtualizer = 300
+  ),
+  MoodPreset(
+    nameRes = R.string.mood_lofi,
+    icon = "🎧",
+    speed = 0.92f,
+    pitch = 0.98f,
+    eqEnabled = true,
+    eqGains = listOf(0.40f, 0.30f, 0.10f, -0.20f, -0.35f),
+    bassBoost = 350,
+    virtualizer = 150
+  ),
+  MoodPreset(
+    nameRes = R.string.mood_vaporwave,
+    icon = "📼",
+    speed = 0.82f,
+    pitch = 0.84f,
+    echoEnabled = true,
+    echoPreset = 5 /* Plate */,
+    eqEnabled = true,
+    eqGains = listOf(0.35f, 0.20f, 0.00f, 0.10f, -0.10f),
+    bassBoost = 450,
+    virtualizer = 400
+  ),
+  MoodPreset(
+    nameRes = R.string.mood_turbo,
+    icon = "🚀",
+    speed = 1.08f,
+    pitch = 1.02f,
+    eqEnabled = true,
+    eqGains = listOf(0.65f, 0.40f, -0.15f, 0.30f, 0.55f),
+    bassBoost = 750,
+    virtualizer = 450
+  ),
+  MoodPreset(
+    nameRes = R.string.mood_warm,
+    icon = "☕",
+    speed = 0.98f,
+    pitch = 1.00f,
+    eqEnabled = true,
+    eqGains = listOf(0.25f, 0.35f, 0.25f, 0.10f, 0.05f),
+    bassBoost = 200,
+    virtualizer = 150
+  ),
+  MoodPreset(
+    nameRes = R.string.mood_dreamy,
+    icon = "✨",
+    speed = 0.90f,
+    pitch = 0.95f,
+    echoEnabled = true,
+    echoPreset = 4,
+    eqEnabled = true,
+    eqGains = listOf(0.15f, 0.05f, 0.10f, 0.45f, 0.65f),
+    bassBoost = 200,
+    virtualizer = 700
+  ),
+  MoodPreset(
+    nameRes = R.string.mood_deep,
+    icon = "🌊",
+    speed = 0.94f,
+    pitch = 0.90f,
+    eqEnabled = true,
+    eqGains = listOf(0.75f, 0.40f, -0.10f, 0.00f, 0.10f),
+    bassBoost = 850,
+    virtualizer = 350
+  ),
+  MoodPreset(
+    nameRes = R.string.mood_cardio,
+    icon = "🏃",
+    speed = 1.12f,
+    pitch = 1.00f,
+    eqEnabled = true,
+    eqGains = listOf(0.55f, 0.50f, 0.00f, 0.20f, 0.35f),
+    bassBoost = 600,
+    virtualizer = 200
+  ),
 )
 
 @Composable
@@ -87,11 +214,26 @@ internal fun PlayingMoodPresets(
     if (preset.echoEnabled) {
       settingVM.setEchoPreset(preset.echoPreset)
     }
+
+    val sessionId = MusicServiceRemote.service?.playback?.audioSessionId
+    if (sessionId != null && sessionId != AudioManager.AUDIO_SESSION_ID_GENERATE) {
+      EQHelper.init(App.context, sessionId, force = true)
+    }
+
+    if (preset.eqEnabled && preset.eqGains != null) {
+      EQHelper.updateEnable(true)
+      EQHelper.applyRelativeGains(preset.eqGains.toFloatArray())
+      EQHelper.bassBoostStrength = preset.bassBoost
+      EQHelper.virtualizerStrength = preset.virtualizer
+    } else {
+      EQHelper.reset()
+      EQHelper.updateEnable(false)
+    }
   }
 
   val isNormalSelected = abs(currentSpeed - NormalMoodPreset.speed) < 0.02f &&
     abs(currentPitch - NormalMoodPreset.pitch) < 0.02f &&
-    !echoEnabled
+    !echoEnabled && !EQHelper.enable
 
   Row(
     modifier = modifier.fillMaxWidth(),
@@ -146,7 +288,8 @@ internal fun PlayingMoodPresets(
       items(OtherMoodPresets, key = { it.nameRes }) { preset ->
         val isSelected = abs(currentSpeed - preset.speed) < 0.02f &&
           abs(currentPitch - preset.pitch) < 0.02f &&
-          (!preset.echoEnabled || echoEnabled)
+          (!preset.echoEnabled || echoEnabled) &&
+          (preset.eqEnabled == EQHelper.enable)
 
         val chipBg = if (isSelected) accent.copy(alpha = 0.22f) else theme.surface2
         val chipBorder = if (isSelected) accent else theme.divider.copy(alpha = 0.45f)

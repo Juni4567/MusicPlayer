@@ -25,18 +25,24 @@ object BrandColors {
 
   fun patternColors(seed: Long): List<Color> {
     val palette = listOf(
-      BrandStart,
-      Accent,
-      BrandEnd,
-      AccentPurple,
-      Color(0xFFFF5C8A),
-      Color(0xFFFF9A5C),
+      Color(0xFFE91E8C), // Vivid Pink
+      Color(0xFF6366F1), // Electric Indigo
+      Color(0xFF2563EB), // Royal Blue
+      Color(0xFF06B6D4), // Cyan
+      Color(0xFF10B981), // Emerald
+      Color(0xFFF59E0B), // Warm Gold
+      Color(0xFFFF7A45), // Sunset Orange
+      Color(0xFF8B5CF6), // Purple
+      Color(0xFFEC4899), // Deep Rose
+      Color(0xFF14B8A6), // Teal
+      Color(0xFF3B82F6), // Blue
+      Color(0xFFA855F7), // Neon Violet
     )
     val start = ((seed ushr 1) % palette.size).toInt()
     return listOf(
       palette[start],
-      palette[(start + 2) % palette.size],
-      palette[(start + 4) % palette.size],
+      palette[(start + 3) % palette.size],
+      palette[(start + 6) % palette.size],
     )
   }
 }

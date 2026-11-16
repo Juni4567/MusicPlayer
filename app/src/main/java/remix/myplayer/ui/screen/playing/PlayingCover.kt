@@ -2,19 +2,28 @@ package remix.myplayer.ui.screen.playing
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.bumptech.glide.integration.compose.placeholder
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.prefs.SettingPrefs
@@ -80,9 +89,28 @@ enum class PlayingCoverAnimationStyle(val prefValue: String) {
 @Composable
 internal fun PlayingCover(modifier: Modifier, song: Song) {
   val playbackVM = playbackViewModel
+  val playbackUiState by playbackVM.playbackUiState.collectAsStateWithLifecycle()
   val settingState by settingViewModel.settingsState.collectAsStateWithLifecycle()
   val coverAnimationStyle = settingState.cover.coverAnimationStyle
   val coverAnimationSpeed = normalizeCoverAnimationSpeed(settingState.cover.coverAnimationSpeed)
+  val isPlaying = playbackUiState.isPlaying
+  val beatAnimationEnabled = settingState.cover.beatAnimationEnabled
+
+  val infiniteTransition = rememberInfiniteTransition(label = "CoverBeatTransition")
+  val beatScale by if (isPlaying && beatAnimationEnabled) {
+    infiniteTransition.animateFloat(
+      initialValue = 1.0f,
+      targetValue = 1.032f,
+      animationSpec = infiniteRepeatable(
+        animation = tween(durationMillis = 540, easing = FastOutSlowInEasing),
+        repeatMode = RepeatMode.Reverse
+      ),
+      label = "BeatScale"
+    )
+  } else {
+    remember { mutableFloatStateOf(1.0f) }
+  }
+
   Timber.v("coverAnimationStyle: $coverAnimationStyle")
   val isPrevious = MusicStateSource.currentPlaybackUiState.lastOp == Command.SKIP_TO_PREVIOUS
 
@@ -98,10 +126,20 @@ internal fun PlayingCover(modifier: Modifier, song: Song) {
     },
     label = "CoverAnimation"
   ) { currentSong ->
+    val beatModifier = if (isPlaying && beatAnimationEnabled) {
+      Modifier.graphicsLayer {
+        scaleX = beatScale
+        scaleY = beatScale
+      }
+    } else {
+      Modifier
+    }
+
     val imageModifier = Modifier
       .fillMaxSize()
-//      .shadow(elevation = 8.dp, shape = RoundedCornerShape(8.dp))
+      .then(beatModifier)
       .clip(RoundedCornerShape(20.dp))
+
     val contentModifier = when (coverAnimationStyle) {
       PlayingCoverAnimationStyle.PAGE_TURN -> {
         horizontalFlip3DModifier(
