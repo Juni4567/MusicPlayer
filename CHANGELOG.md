@@ -2,6 +2,13 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.9.8] — 2026-11-16
+
+### Highlights
+- **Search Keyboard & Focus Management**: Fixed an issue where the search field persistently retained focus, causing the software keyboard to randomly re-open after searching or starting playback. Focus and the keyboard are now proactively cleared upon playing a track, scrolling through the songs list, pressing the keyboard's Search action, tapping Clear (✕), tapping Shuffle, or swiping library tabs.
+- **Seamless Live Search Dismissal**: Integrated `ImeAction.Search` with keyboard action callbacks into the inline search field for a fluid, natural typing and search experience.
+- **Dual Release Builds**: Official release includes standard `A-Music-V2.9.8.apk` and pure `A-Music-V2.9.8-FOSS.apk` builds.
+
 ## [2.9.7] — 2026-11-16
 
 ### Highlights
