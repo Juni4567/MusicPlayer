@@ -27,6 +27,12 @@ import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
 
 
+import androidx.compose.material3.Text
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+import remix.myplayer.R
+
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun HomeAppBar(
@@ -35,17 +41,25 @@ internal fun HomeAppBar(
 ) {
   val library by settingViewModel.currentLibrary.collectAsStateWithLifecycle()
   val scope = rememberCoroutineScope()
+  val theme = LocalTheme.current
 
   TopAppBar(
     windowInsets = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top),
     scrollBehavior = scrollBehavior,
     colors = TopAppBarDefaults.topAppBarColors(
-      containerColor = LocalTheme.current.mainBackground,
-      scrolledContainerColor = LocalTheme.current.mainBackground,
-      navigationIconContentColor = LocalTheme.current.textPrimary,
-      actionIconContentColor = LocalTheme.current.textPrimary,
+      containerColor = theme.mainBackground,
+      scrolledContainerColor = theme.mainBackground,
+      navigationIconContentColor = theme.textPrimary,
+      actionIconContentColor = theme.textPrimary,
     ),
-    title = {},
+    title = {
+      Text(
+        text = stringResource(R.string.app_name),
+        fontSize = 18.sp,
+        fontWeight = FontWeight.SemiBold,
+        color = theme.textPrimary
+      )
+    },
     navigationIcon = {
       IconButton(onClick = { scope.launch { drawerState.open() } }) {
         Icon(Icons.Filled.Menu, contentDescription = "Menu")

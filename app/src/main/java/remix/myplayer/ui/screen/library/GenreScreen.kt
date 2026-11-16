@@ -77,7 +77,7 @@ fun GenreScreen() {
           genre.id
         }) { _, genre ->
           ListItem(
-            modifier = Modifier.height(64.dp),
+            modifier = Modifier.height(56.dp),
             model = genre,
             text1 = genre.genre,
             selected = selectedIds.contains(genre.getKey()),

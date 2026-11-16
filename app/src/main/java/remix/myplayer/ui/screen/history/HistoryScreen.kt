@@ -63,7 +63,7 @@ fun HistoryScreen() {
           val isPlayingSong = playbackState.song.id == song.id
 
           ListSong(
-            modifier = Modifier.height(64.dp),
+            modifier = Modifier.height(56.dp),
             song = song,
             modelParent = song,
             selected = false,

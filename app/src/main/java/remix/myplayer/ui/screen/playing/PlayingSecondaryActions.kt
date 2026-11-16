@@ -120,8 +120,8 @@ private fun SecondaryActionIcon(
     contentDescription = contentDescription,
     colorFilter = tint?.let { ColorFilter.tint(it) },
     modifier = Modifier
-      .size(48.dp)
-      .padding(12.dp)
+      .size(44.dp)
+      .padding(10.dp)
       .clickWithRipple { onClick() }
   )
 }

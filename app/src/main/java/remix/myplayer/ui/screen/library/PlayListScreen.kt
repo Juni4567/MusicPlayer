@@ -77,7 +77,7 @@ fun PlayListScreen() {
           pl.id
         }) { _, pl ->
           ListItem(
-            modifier = Modifier.height(64.dp),
+            modifier = Modifier.height(56.dp),
             model = pl,
             text1 = pl.name,
             text2 = pluralStringResource(R.plurals.song_num, pl.audioIds.size, pl.audioIds.size),

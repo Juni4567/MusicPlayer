@@ -24,6 +24,11 @@ import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.library.GlideCover
 import remix.myplayer.ui.widget.popup.LibraryItemPopupButton
 
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+
 @Composable
 fun ListItem(
   modifier: Modifier = Modifier,
@@ -49,8 +54,9 @@ fun ListItem(
   ) {
     GlideCover(
       modifier = Modifier
-        .padding(start = 8.dp)
-        .size(42.dp),
+        .padding(start = 12.dp)
+        .size(42.dp)
+        .clip(RoundedCornerShape(8.dp)),
       model = model,
       circle = false
     )
@@ -59,12 +65,12 @@ fun ListItem(
       modifier = Modifier
         .weight(1f)
         .fillMaxHeight()
-        .padding(horizontal = 8.dp),
+        .padding(start = 12.dp, end = 6.dp),
       verticalArrangement = Arrangement.Center
     ) {
-      TextPrimary(text = text1)
-      Spacer(modifier = Modifier.height(6.dp))
-      TextSecondary(text = text2)
+      TextPrimary(text = text1, fontSize = 14.5.sp, fontWeight = FontWeight.Medium)
+      Spacer(modifier = Modifier.height(2.dp))
+      TextSecondary(text = text2, fontSize = 12.sp)
     }
 
     LibraryItemPopupButton(model = model, enabled = popupEnabled)

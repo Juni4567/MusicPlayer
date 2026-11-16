@@ -26,6 +26,10 @@ import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.library.GlideCover
 import remix.myplayer.ui.widget.popup.LibraryItemPopupButton
 
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
+
 @Composable
 fun GridItem(
   model: APlayerModel,
@@ -39,8 +43,9 @@ fun GridItem(
   val theme = LocalTheme.current
   Column(
     modifier = Modifier
-      .padding(start = 3.dp, top = 4.dp, end = 3.dp, bottom = 4.dp)
+      .padding(start = 3.dp, top = 3.dp, end = 3.dp, bottom = 4.dp)
       .fillMaxWidth()
+      .clip(RoundedCornerShape(10.dp))
       .combinedClickable(
         interactionSource = remember { MutableInteractionSource() },
         indication = ripple(color = theme.ripple),
@@ -53,26 +58,28 @@ fun GridItem(
       modifier = Modifier
         .fillMaxWidth()
         .aspectRatio(1f)
-        .clip(RoundedCornerShape(2.dp)),
+        .clip(RoundedCornerShape(10.dp)),
       model = model,
       circle = false
     )
 
     Row(
       modifier = Modifier
-        .height(58.dp),
+        .fillMaxWidth()
+        .height(48.dp),
       verticalAlignment = Alignment.CenterVertically
     ) {
       Column(
         modifier = Modifier
-          .padding(start = 10.dp)
+          .padding(start = 8.dp, end = 2.dp)
           .fillMaxHeight()
           .weight(1f),
         verticalArrangement = Arrangement.Center
       ) {
-        TextPrimary(text = text1)
+        TextPrimary(text = text1, fontSize = 13.5.sp, fontWeight = FontWeight.Medium)
         if (text2 != null) {
-          TextSecondary(text2)
+          Spacer(modifier = Modifier.height(1.dp))
+          TextSecondary(text = text2, fontSize = 11.5.sp)
         }
       }
 

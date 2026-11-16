@@ -10,8 +10,13 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.sp
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.DrawerValue
@@ -230,20 +235,25 @@ private fun HomeContent(
         selectedTabIndex = pagerState.currentPage,
         indicator = { tabPositions ->
           TabRowDefaults.SecondaryIndicator(
-            modifier = Modifier.tabIndicatorOffset(tabPositions[pagerState.currentPage]),
+            modifier = Modifier
+              .tabIndicatorOffset(tabPositions[pagerState.currentPage])
+              .padding(horizontal = 14.dp)
+              .clip(RoundedCornerShape(topStart = 3.dp, topEnd = 3.dp)),
             height = 3.dp,
             color = LocalTheme.current.secondary
           )
         },
-        edgePadding = 0.dp,
+        edgePadding = 8.dp,
         containerColor = LocalTheme.current.mainBackground
       ) {
         libraries.forEachIndexed { index, library ->
           val theme = LocalTheme.current
           var lastClickTime by remember { mutableLongStateOf(0L) }
+          val isSelected = pagerState.currentPage == index
 
           Tab(
-            selected = pagerState.currentPage == index,
+            modifier = Modifier.height(40.dp),
+            selected = isSelected,
             onClick = {
               val currentTime = System.currentTimeMillis()
               if (currentTime - lastClickTime < 300) {
@@ -255,8 +265,15 @@ private fun HomeContent(
               lastClickTime = currentTime
               scope.launch { pagerState.animateScrollToPage(index) }
             },
-            text = { Text(stringResource(library.stringRes), maxLines = 1) },
-            selectedContentColor = theme.textPrimary,
+            text = {
+              Text(
+                stringResource(library.stringRes),
+                maxLines = 1,
+                fontSize = 13.5.sp,
+                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
+              )
+            },
+            selectedContentColor = theme.secondary,
             unselectedContentColor = theme.textSecondary
           )
         }

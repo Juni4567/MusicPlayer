@@ -56,17 +56,17 @@ internal fun PlayingSeekbarWithText(
       baseProperties.copy(
         trackBackgroundColor = trackBg,
         trackProgressColor = progressColor,
-        trackHeight = 8.dp,
+        trackHeight = 6.dp,
         thumbColor = thumbColor,
-        thumbWidth = 18.dp,
-        thumbHeight = 18.dp,
+        thumbWidth = 14.dp,
+        thumbHeight = 14.dp,
         thumbShape = CircleShape
       )
     }
 
     val tabularStyle = remember {
       TextStyle(
-        fontSize = 12.sp,
+        fontSize = 11.5.sp,
         fontFeatureSettings = "tnum"
       )
     }
@@ -94,7 +94,7 @@ internal fun PlayingSeekbarWithText(
         valueRange = 0f..duration.toFloat().coerceAtLeast(0f),
         modifier = Modifier
           .fillMaxWidth()
-          .height(40.dp)
+          .height(32.dp)
           .padding(horizontal = 4.dp),
         properties = sliderProperties
       )
@@ -104,7 +104,7 @@ internal fun PlayingSeekbarWithText(
         style = tabularStyle,
         maxLines = 1,
         color = theme.textMuted,
-        modifier = Modifier.padding(top = 2.dp)
+        modifier = Modifier.padding(top = 1.dp)
       )
     }
   }

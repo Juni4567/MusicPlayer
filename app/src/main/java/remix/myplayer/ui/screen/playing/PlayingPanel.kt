@@ -70,7 +70,7 @@ private fun Portrait(isVisible: Boolean) {
   Column(
     modifier = Modifier,
     horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.spacedBy(20.dp)
+    verticalArrangement = Arrangement.spacedBy(10.dp)
   ) {
     val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()

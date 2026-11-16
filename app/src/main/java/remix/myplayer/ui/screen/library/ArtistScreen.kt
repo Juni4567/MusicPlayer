@@ -76,7 +76,7 @@ fun ArtistScreen() {
           artist.artistID
         }) { _, artist ->
           ListItem(
-            modifier = Modifier.height(64.dp),
+            modifier = Modifier.height(56.dp),
             model = artist,
             text1 = artist.artist,
             selected = selectedIds.contains(artist.getKey()),

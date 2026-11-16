@@ -363,7 +363,7 @@ private fun PlayQueueDialog(
       } else {
         LazyColumn(
           state = lazyState,
-          modifier = Modifier.heightIn(max = 360.dp)
+          modifier = Modifier.heightIn(max = 400.dp)
         ) {
           itemsIndexed(songs, key = { _, song -> song.id }) { pos, song ->
             val isCurrent = song.id == musicState.song.id
@@ -372,7 +372,7 @@ private fun PlayQueueDialog(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                   .fillMaxWidth()
-                  .height(64.dp)
+                  .height(54.dp)
                   .background(if (isCurrent) surface2 else surface)
                   .clickWithRipple(false) {
                     sendLocalBroadcast(
@@ -387,12 +387,14 @@ private fun PlayQueueDialog(
                   GlideCover(
                     model = song,
                     circle = false,
-                    modifier = Modifier.size(44.dp)
+                    modifier = Modifier
+                      .size(40.dp)
+                      .clip(RoundedCornerShape(8.dp))
                   )
                 }
                 Column(
                   modifier = Modifier
-                    .padding(horizontal = 12.dp)
+                    .padding(horizontal = 10.dp)
                     .weight(1f)
                 ) {
                   TextPrimary(

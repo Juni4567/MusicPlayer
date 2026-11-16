@@ -2,6 +2,16 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.1.9.5] — 2026-11-16
+
+### Highlights
+- **Modern UI & Design Refresh**: Overhauled typography, spacing, elevations, and card surfaces across all main screens for a clean, sleek, high-end appearance
+- **Modern Floating Capsule Mini-Player**: Replaced the legacy edge-to-edge docked bar with a floating capsule player card featuring smooth 16dp rounded corners, subtle outline stroke, integrated 2.5dp hairline progress bar, and circular tonal play/pause control
+- **Compact High-Density Lists**: Streamlined song list item heights to 56dp (down from 68dp/64dp), rounded album cover corners (8dp), and vibrant playing track highlight indicator
+- **Sleek Grids & Albums**: Updated album/artist grid covers from sharp 2dp edges to modern 10dp rounded corners with compact 48dp text info sections
+- **Reclaimed Screen Real Estate**: Compressed library chrome and search header to save ~50dp of vertical space, displaying 1–2 more songs above the fold on all device sizes
+- **Harmonious Now Playing Layout**: Balanced vertical spacing in the portrait player to prevent bottom control collisions on gesture-nav and short-screen devices, with refined 6dp seekbar track and compact play queue dialog
+
 ## [2.1.9.4] — 2026-11-16
 
 ### Highlights

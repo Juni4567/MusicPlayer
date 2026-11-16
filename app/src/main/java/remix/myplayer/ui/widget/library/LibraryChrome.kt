@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -60,36 +59,36 @@ fun LibraryChrome(songs: List<Song>) {
     modifier = Modifier
       .fillMaxWidth()
       .background(theme.mainBackground)
-      .padding(horizontal = 16.dp, vertical = 8.dp)
+      .padding(horizontal = 14.dp, vertical = 6.dp)
   ) {
     Row(
       modifier = Modifier
         .fillMaxWidth()
-        .heightIn(min = 48.dp)
-        .clip(RoundedCornerShape(14.dp))
+        .height(42.dp)
+        .clip(RoundedCornerShape(12.dp))
         .background(surface2)
         .semantics { contentDescription = "Search your library" }
         .clickWithRipple(circle = false) { nav.navigate(RouteSearch) }
-        .padding(horizontal = 14.dp),
+        .padding(horizontal = 12.dp),
       verticalAlignment = Alignment.CenterVertically
     ) {
       Icon(
         imageVector = Icons.Filled.Search,
         contentDescription = null,
         tint = textMuted,
-        modifier = Modifier.size(22.dp)
+        modifier = Modifier.size(20.dp)
       )
       Text(
         text = stringResource(R.string.search_your_library),
         color = textMuted,
-        fontSize = 15.sp,
+        fontSize = 14.sp,
         modifier = Modifier
           .weight(1f)
-          .padding(horizontal = 10.dp)
+          .padding(horizontal = 8.dp)
       )
     }
 
-    Spacer(modifier = Modifier.height(12.dp))
+    Spacer(modifier = Modifier.height(8.dp))
 
     Row(
       modifier = Modifier.fillMaxWidth(),
@@ -123,12 +122,12 @@ fun LibraryChrome(songs: List<Song>) {
     }
 
     if (songs.isNotEmpty()) {
-      Spacer(modifier = Modifier.height(12.dp))
+      Spacer(modifier = Modifier.height(8.dp))
       Row(
         modifier = Modifier
           .fillMaxWidth()
-          .heightIn(min = 48.dp)
-          .clip(RoundedCornerShape(12.dp))
+          .height(42.dp)
+          .clip(RoundedCornerShape(10.dp))
           .clickWithRipple(circle = false) {
             setPlayQueue(songs, MusicUtil.makeCmdIntent(Command.SKIP_TO_NEXT, true))
           }
@@ -139,20 +138,20 @@ fun LibraryChrome(songs: List<Song>) {
           painter = painterResource(R.drawable.ic_shuffle_white_24dp),
           contentDescription = "Shuffle playback",
           tint = theme.secondary,
-          modifier = Modifier.size(22.dp)
+          modifier = Modifier.size(20.dp)
         )
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.width(8.dp))
         Column(modifier = Modifier.weight(1f)) {
           Text(
             text = stringResource(R.string.shuffle_playback),
             color = textPrimary,
-            fontSize = 15.sp,
+            fontSize = 14.sp,
             fontWeight = FontWeight.Medium
           )
           Text(
             text = stringResource(R.string.songs_count_tracks, songs.size),
             color = textSecondary,
-            fontSize = 12.sp
+            fontSize = 11.5.sp
           )
         }
       }
@@ -171,16 +170,16 @@ private fun ShortcutChip(
   Text(
     text = label,
     color = theme.textPrimary,
-    fontSize = 13.sp,
+    fontSize = 12.5.sp,
     fontWeight = FontWeight.Medium,
     textAlign = TextAlign.Center,
     modifier = modifier
-      .heightIn(min = 40.dp)
-      .clip(RoundedCornerShape(20.dp))
+      .height(34.dp)
+      .clip(RoundedCornerShape(17.dp))
       .background(theme.surface2)
-      .border(1.dp, theme.divider, RoundedCornerShape(20.dp))
+      .border(0.8.dp, theme.divider.copy(alpha = 0.5f), RoundedCornerShape(17.dp))
       .semantics { this.contentDescription = contentDescription }
       .clickWithRipple(circle = false, onClick = onClick)
-      .padding(horizontal = 10.dp, vertical = 10.dp)
+      .padding(horizontal = 8.dp, vertical = 7.dp)
   )
 }

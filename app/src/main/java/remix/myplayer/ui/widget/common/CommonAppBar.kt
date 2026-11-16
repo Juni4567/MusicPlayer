@@ -46,7 +46,7 @@ fun CommonAppBar(
           title,
           color = onPrimary,
           fontSize = 18.sp,
-          modifier = Modifier.padding(start = 16.dp)
+          modifier = Modifier.padding(start = 4.dp)
         )
       }
     },

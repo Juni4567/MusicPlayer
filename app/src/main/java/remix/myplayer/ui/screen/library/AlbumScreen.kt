@@ -77,7 +77,7 @@ fun AlbumScreen() {
           album.albumID
         }) { _, album ->
           ListItem(
-            modifier = Modifier.height(64.dp),
+            modifier = Modifier.height(56.dp),
             model = album,
             text1 = album.album,
             text2 = pluralStringResource(

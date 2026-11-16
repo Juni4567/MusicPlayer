@@ -70,7 +70,7 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
         val isPlayingSong = playbackState.song.id == song.id
 
         ListSong(
-          modifier = Modifier.height(68.dp),
+          modifier = Modifier.height(56.dp),
           song = song,
           modelParent = song,
           selected = selected,

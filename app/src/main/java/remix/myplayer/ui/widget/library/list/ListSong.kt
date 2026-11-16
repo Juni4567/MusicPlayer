@@ -32,6 +32,10 @@ import remix.myplayer.ui.widget.common.TextSecondary
 import remix.myplayer.ui.widget.library.GlideCover
 import remix.myplayer.ui.widget.popup.SongPopupButton
 
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
+
 @OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ListSong(
@@ -62,35 +66,40 @@ fun ListSong(
     if (playing) {
       Box(
         modifier = Modifier
-          .width(4.dp)
+          .width(3.5.dp)
           .fillMaxHeight()
-          .padding(vertical = 8.dp)
+          .padding(vertical = 10.dp)
+          .clip(RoundedCornerShape(topEnd = 2.dp, bottomEnd = 2.dp))
           .background(theme.highLightText())
       )
     }
 
     Row(
-      modifier = modifier
-        .fillMaxWidth(),
+      modifier = Modifier
+        .fillMaxWidth()
+        .fillMaxHeight(),
       verticalAlignment = Alignment.CenterVertically
     ) {
       if (num != null) {
         TextPrimary(
-          if (num > 999) "999+" else num.toString(),
+          text = if (num > 999) "999+" else num.toString(),
           textAlign = TextAlign.Center,
+          fontSize = 13.sp,
+          color = if (playing) theme.highLightText() else theme.textSecondary,
           modifier = Modifier
-            .width(40.dp)
-            .padding(horizontal = 4.dp)
+            .width(36.dp)
+            .padding(horizontal = 2.dp)
         )
       } else {
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(12.dp))
       }
 
       GlideCover(
         model = song,
         circle = false,
         modifier = Modifier
-          .size(48.dp)
+          .size(42.dp)
+          .clip(RoundedCornerShape(8.dp))
       )
 
       Column(
@@ -98,9 +107,14 @@ fun ListSong(
         horizontalAlignment = Alignment.Start,
         modifier = Modifier
           .weight(1f)
-          .padding(start = 16.dp, end = 8.dp)
+          .padding(start = 12.dp, end = 6.dp)
       ) {
-        TextPrimary(song.showName, fontSize = 15.sp)
+        TextPrimary(
+          text = song.showName,
+          fontSize = 14.5.sp,
+          fontWeight = if (playing) FontWeight.SemiBold else FontWeight.Medium,
+          color = if (playing) theme.highLightText() else theme.textPrimary
+        )
         Spacer(modifier = Modifier.height(2.dp))
         TextSecondary(
           text = song.artist.ifEmpty { "—" },
