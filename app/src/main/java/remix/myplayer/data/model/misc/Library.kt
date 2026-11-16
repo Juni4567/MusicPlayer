@@ -13,11 +13,13 @@ data class Library(
   val stringRes: Int
     get() = when (tag) {
       TAG_SONG -> R.string.tab_song
+      TAG_FAVORITE -> R.string.tab_favorite
+      TAG_PLAYLIST -> R.string.tab_playlist
+      TAG_FOLDER -> R.string.tab_folder
       TAG_ALBUM -> R.string.tab_album
       TAG_ARTIST -> R.string.tab_artist
-      TAG_PLAYLIST -> R.string.tab_playlist
       TAG_GENRE -> R.string.tab_genre
-      TAG_FOLDER -> R.string.tab_folder
+      TAG_RECENT -> R.string.tab_recent
       TAG_REMOTE -> R.string.tab_remote
       else -> throw IllegalArgumentException("unknown tag: $tag")
     }
@@ -65,6 +67,8 @@ data class Library(
         R.string.name_desc
       )
 
+      TAG_FAVORITE, TAG_RECENT, TAG_REMOTE -> emptyList()
+
       else -> throw IllegalArgumentException("unknown tag: $tag")
     }
 
@@ -111,6 +115,8 @@ data class Library(
         SortOrder.FOLDER_Z_A
       )
 
+      TAG_FAVORITE, TAG_RECENT, TAG_REMOTE -> emptyList()
+
       else -> throw IllegalArgumentException("unknown tag: $tag")
     }
 
@@ -123,15 +129,19 @@ data class Library(
     const val TAG_PLAYLIST = 4
     const val TAG_FOLDER = 5
     const val TAG_REMOTE = 6
+    const val TAG_FAVORITE = 7
+    const val TAG_RECENT = 8
 
     val default = listOf(
-      Library(TAG_SONG),
-      Library(TAG_ALBUM),
-      Library(TAG_ARTIST),
-      Library(TAG_GENRE),
-      Library(TAG_PLAYLIST),
-      Library(TAG_FOLDER),
-      Library(TAG_REMOTE)
+      Library(TAG_SONG, enable = true),
+      Library(TAG_FAVORITE, enable = true),
+      Library(TAG_PLAYLIST, enable = true),
+      Library(TAG_FOLDER, enable = true),
+      Library(TAG_ALBUM, enable = false),
+      Library(TAG_ARTIST, enable = false),
+      Library(TAG_GENRE, enable = false),
+      Library(TAG_RECENT, enable = false),
+      Library(TAG_REMOTE, enable = false)
     )
 
   }

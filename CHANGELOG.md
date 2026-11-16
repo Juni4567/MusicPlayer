@@ -2,6 +2,22 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.9.7] — 2026-11-16
+
+### Highlights
+- **Direct Library Tabs & Clean Defaults**: Moved Favorites, Playlists, and Recent into the main top category tabs. By default, the app displays **Songs, Favorites, Playlists, and Folders**. Added customizable settings in Library categories to enable or disable any tab (Albums, Artists, Genres, Recent, Remote).
+- **Zero-Friction In-Place Live Search**: Search is now located on the same line as "Shuffle" in the Songs tab. Typing instantly filters songs in real-time in the song list with no page redirection, no empty screen loading, no UI shifting, and no keyboard re-opening friction.
+- **In-Place Favorites & Recents**: Tapping the Favorites or Recent tab renders their song collections directly in-place without opening separate screens.
+- **Single-Line Header**: Combined the live search field and "Shuffle" button side-by-side into a single 40dp compact bar.
+- **Solid Now Playing Surface**: Completely removed transparency from the main player background to guarantee crisp, clean visuals without underlying UI bleed-through.
+- **Dedicated Lyrics Button**: Replaced the bullet navigation dots with a dedicated, nicely placed lyrics button on the secondary actions row.
+- **Expanded Mood Presets & Pinned Normal Preset**: Enhanced the main player mood selector with a permanently pinned "Normal" (1.0x) reset button on the left and two neat rows of expanded presets (Slowed & Reverb, Nightcore, Vaporwave, Cardio, Lo-Fi, Warm, Dreamy, Deep, Turbo). Cover artwork size has been comfortably reduced to fit all controls cleanly.
+- **Themed Player Controls & Seekbar**: Main player seekbar progress line, thumb, and play/pause icon button now dynamically reflect the app's accent theme color.
+- **Clean Main Player Top Bar**: Removed the downward caret icon and sanitized song metadata to remove `<unknown>-Download` artifacts, displaying clean artist and album information.
+- **Streamlined Song 3-Dots Menu**: Removed redundant "Add to playing queue" and "Ringtone" options from the song popup menu. Also removed "Play speed" and "Equalizer" from the main player overflow menu.
+- **Minimalist Floating Pill Notifications**: Replaced blocking full-width snackbars and outdated toasts with a modern, floating pill banner ("Playing next") that never obstructs controls.
+- **Dual Release Builds**: Official release includes standard `A-Music-V2.9.7.apk` and pure `A-Music-V2.9.7-FOSS.apk` builds.
+
 ## [2.9.6] — 2026-11-16
 
 ### Highlights

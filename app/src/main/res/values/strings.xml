@@ -109,6 +109,7 @@
   <string name="shortcut_favorites">Favorites</string>
   <string name="shortcut_playlists">Playlists</string>
   <string name="shuffle_playback">Shuffle playback</string>
+  <string name="shuffle">Shuffle</string>
   <string name="songs_count_tracks">%d tracks</string>
   <string name="timer_minutes">%d minutes</string>
   <string name="timer_end_of_song">End of current song</string>
@@ -336,7 +337,7 @@
   <string name="set_album_cover">Set album cover</string>
   <string name="set_artist_cover">Set artist cover</string>
   <string name="set_playlist_cover">Set playlist cover</string>
-  <string name="already_add_to_next_song">Added to next play</string>
+  <string name="already_add_to_next_song">Playing next</string>
   <string name="add_to_next_song">Play next</string>
   <string name="immersive">Immersive status bar</string>
   <string name="immersive_tip">Colorize the notification bar as to match background color</string>
@@ -528,9 +529,15 @@
   <string name="mood_slowed_reverb">Slowed &amp; Reverb</string>
   <string name="mood_nightcore">Nightcore</string>
   <string name="mood_vaporwave">Vaporwave</string>
-  <string name="mood_cardio">Cardio / Workout</string>
-  <string name="mood_lofi">Lo-Fi Study</string>
-  <string name="mood_reset">Standard (1.0x)</string>
+  <string name="mood_cardio">Cardio</string>
+  <string name="mood_lofi">Lo-Fi</string>
+  <string name="mood_warm">Warm</string>
+  <string name="mood_dreamy">Dreamy</string>
+  <string name="mood_deep">Deep</string>
+  <string name="mood_turbo">Turbo</string>
+  <string name="mood_reset">Normal</string>
+  <string name="tab_favorite">Favorites</string>
+  <string name="tab_recent">Recent</string>
   <string name="volume_boost_active">Volume Boost: %d%%</string>
   <string name="virtualizer">Virtualizer</string>
 

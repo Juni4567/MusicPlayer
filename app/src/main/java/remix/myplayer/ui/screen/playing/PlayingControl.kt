@@ -90,7 +90,7 @@ private val itemRes = mapOf(
 internal fun PlayingControl(
   modifier: Modifier = Modifier,
   playbackUiState: PlaybackUiState,
-  swatch: Palette.Swatch,
+  @Suppress("UNUSED_PARAMETER") swatch: Palette.Swatch,
   iconSize: Dp? = null,
   playPauseSize: Dp = 56.dp,
   buttonSize: Dp? = null
@@ -101,7 +101,8 @@ internal fun PlayingControl(
     horizontalArrangement = Arrangement.SpaceEvenly,
     verticalAlignment = Alignment.CenterVertically
   ) {
-    val swatchColor = Color(swatch.rgb)
+    val theme = LocalTheme.current
+    val accentColor = theme.secondary
     val playMode = playbackUiState.playMode
     val viewModel = playbackViewModel
     val iconModifier = if (iconSize != null) Modifier.size(iconSize) else Modifier
@@ -115,7 +116,7 @@ internal fun PlayingControl(
         modifier = iconModifier,
         painter = painterResource(itemRes[playMode]!!.first),
         contentDescription = "PlayingMode",
-        colorFilter = ColorFilter.tint(swatchColor.copy(alpha = 0.85f))
+        colorFilter = ColorFilter.tint(accentColor.copy(alpha = 0.85f))
       )
     }
 
@@ -140,7 +141,7 @@ internal fun PlayingControl(
         modifier = iconModifier,
         painter = painterResource(R.drawable.play_btn_pre),
         contentDescription = "PlayingPrev",
-        colorFilter = ColorFilter.tint(swatchColor)
+        colorFilter = ColorFilter.tint(accentColor)
       )
     }
 
@@ -156,6 +157,7 @@ internal fun PlayingControl(
       buttonSize = buttonSize
     ) {
       val size = with(LocalDensity.current) { playPauseSize.roundToPx() }
+      val playBgColor = theme.secondary.toArgb()
       AndroidView(
         factory = {
           PlayPauseView(it).apply {
@@ -164,7 +166,7 @@ internal fun PlayingControl(
           }
         },
         update = {
-          it.setBackgroundColor(swatch.rgb)
+          it.setBackgroundColor(playBgColor)
           if (it.layoutParams.width != size || it.layoutParams.height != size) {
             it.layoutParams = ViewGroup.LayoutParams(size, size)
           }
@@ -194,7 +196,7 @@ internal fun PlayingControl(
         modifier = iconModifier,
         painter = painterResource(R.drawable.play_btn_next),
         contentDescription = "PlayingNext",
-        colorFilter = ColorFilter.tint(swatchColor)
+        colorFilter = ColorFilter.tint(accentColor)
       )
     }
 
@@ -215,7 +217,7 @@ internal fun PlayingControl(
         modifier = iconModifier,
         painter = painterResource(R.drawable.play_btn_normal_list),
         contentDescription = "PlayingPlayQueue",
-        colorFilter = ColorFilter.tint(swatchColor.copy(alpha = 0.85f))
+        colorFilter = ColorFilter.tint(accentColor.copy(alpha = 0.85f))
       )
     }
   }

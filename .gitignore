@@ -13,4 +13,5 @@
 /.vercel
 /.kotlin
 *.txt
+*.apk
 tools/out/

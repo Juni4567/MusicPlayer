@@ -2,6 +2,8 @@ package remix.myplayer.ui.nav
 
 import android.net.Uri
 import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
@@ -10,14 +12,21 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import remix.myplayer.ui.theme.LocalTheme
 import androidx.core.net.toUri
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
@@ -264,8 +273,29 @@ fun AppNav() {
         hostState = snackBarHostState,
         modifier = Modifier
           .align(Alignment.BottomCenter)
+          .padding(bottom = 76.dp)
           .padding(WindowInsets.safeDrawing.only(WindowInsetsSides.Bottom).asPaddingValues())
-      )
+      ) { data ->
+        Box(
+          modifier = Modifier
+            .padding(horizontal = 24.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(LocalTheme.current.surface.copy(alpha = 0.95f))
+            .border(
+              1.dp,
+              LocalTheme.current.divider.copy(alpha = 0.35f),
+              RoundedCornerShape(20.dp)
+            )
+            .padding(horizontal = 16.dp, vertical = 9.dp)
+        ) {
+          Text(
+            text = data.visuals.message,
+            color = LocalTheme.current.textPrimary,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Medium
+          )
+        }
+      }
     }
 
     LaunchedEffect(Unit) {

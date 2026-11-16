@@ -47,11 +47,12 @@ fun PlayingContainer(content: @Composable () -> Unit) {
   if (!theme.isLight) {
     val background = theme.mainBackground
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
-    val artTint = Color(swatch.rgb).copy(alpha = 0.25f)
+    val artColor = Color(swatch.rgb)
+    val midColor = androidx.compose.ui.graphics.lerp(background, artColor, 0.18f)
     val brush = Brush.verticalGradient(
       colors = listOf(
         background,
-        androidx.compose.ui.graphics.lerp(background, artTint, 0.35f),
+        midColor,
         background
       )
     )
@@ -63,7 +64,8 @@ fun PlayingContainer(content: @Composable () -> Unit) {
     SettingPrefs.BACKGROUND_ADAPTIVE_COLOR -> {
       val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
       val color = remember(initialColor) { Animatable(initialValue = initialColor) }
-      val brush = Brush.verticalGradient(colors = listOf(initialColor, color.value.copy(alpha = 0.30f), initialColor))
+      val midColor = androidx.compose.ui.graphics.lerp(initialColor, color.value, 0.20f)
+      val brush = Brush.verticalGradient(colors = listOf(initialColor, midColor, initialColor))
       Container(brush = brush, content = content)
 
       LaunchedEffect(swatch, initialColor) {
@@ -72,7 +74,8 @@ fun PlayingContainer(content: @Composable () -> Unit) {
     }
 
     SettingPrefs.BACKGROUND_THEME -> {
-      val brush = Brush.verticalGradient(colors = listOf(initialColor, theme.primary.copy(alpha = 0.30f), initialColor))
+      val midColor = androidx.compose.ui.graphics.lerp(initialColor, theme.primary, 0.20f)
+      val brush = Brush.verticalGradient(colors = listOf(initialColor, midColor, initialColor))
       Container(brush = brush, content = content)
     }
 
@@ -96,6 +99,8 @@ private fun Container(
   brush: Brush?,
   content: @Composable () -> Unit
 ) {
+  val theme = LocalTheme.current
+  val solidBackground = if (theme.isLight) Color.White else theme.mainBackground
   // 多窗口 / 系统小窗下 navigationBars 不报告 inset，但国产 ROM 会在小窗底部画手势 / 拖拽条盖住内容；
   // 保证底部总留白 ≥ SmallWindowBottomSafePadding（safeDrawing 已给的 + 额外补的，不重复叠加）。
   val inMultiWindow = rememberInMultiWindowMode()
@@ -108,12 +113,15 @@ private fun Container(
   // 背景在 safeDrawingPadding 之前，铺满全屏（沉浸式）；内容由 safeDrawingPadding 内缩避开 insets。
   val modifier = Modifier
     .fillMaxSize()
+    .background(solidBackground)
     .then(
       if (brush != null) Modifier.background(
         brush = brush,
         shape = RectangleShape
       ) else Modifier
     )
+    .safeDrawingPadding()
+    .padding(bottom = extraBottom)
     .safeDrawingPadding()
     .padding(bottom = extraBottom)
 

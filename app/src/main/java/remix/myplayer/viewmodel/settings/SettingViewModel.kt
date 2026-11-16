@@ -154,15 +154,21 @@ class SettingViewModel @Inject constructor(
 
   init {
     // load libraries
-    val libraries = try {
+    val saved = try {
       Json.decodeFromString<List<Library>>(settingPrefs.libraryJson)
-        .ifEmpty { Library.default }
     } catch (_: Exception) {
+      emptyList()
+    }
+    val libraries = if (saved.isEmpty() || saved.none { it.tag == Library.TAG_FAVORITE }) {
       Library.default
+    } else {
+      val existingTags = saved.map { it.tag }.toSet()
+      val missing = Library.default.filter { it.tag !in existingTags }
+      saved + missing
     }
 
     updateAllLibraries(libraries)
-    changeLibrary(enabledLibraries.value[0])
+    changeLibrary(enabledLibraries.value.firstOrNull() ?: Library.default[0])
   }
 
   fun updateAllLibraries(libraries: List<Library>) {

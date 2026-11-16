@@ -12,7 +12,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -89,7 +88,7 @@ private fun Portrait(isVisible: Boolean) {
     Box(
       contentAlignment = Alignment.Center,
       modifier = Modifier
-        .weight(6.5f)
+        .weight(5.2f)
         .fillMaxWidth()
         .clipToBounds()
         .playingCoverGestures(
@@ -121,29 +120,23 @@ private fun Portrait(isVisible: Boolean) {
         } else {
           PlayingCover(
             modifier = Modifier
-              .padding(start = 16.dp, end = 16.dp)
+              .padding(horizontal = 24.dp)
               .fillMaxWidth()
               .aspectRatio(1f),
             song = playbackState.song
           )
         }
       }
-
-      // Vertical dots at top-left (cover ↔ lyrics via swipe up/down)
-      PlayingModeIndicator(
-        showLyrics = showLyrics,
-        swatch = swatch,
-        modifier = Modifier
-          .align(Alignment.TopStart)
-          .padding(start = 12.dp, top = 8.dp),
-        onSelectCover = { showLyrics = false },
-        onSelectLyrics = { showLyrics = true },
-      )
     }
 
     PlayingMoodPresets(swatch = swatch)
 
-    PlayingSecondaryActions(playbackState.song, swatch)
+    PlayingSecondaryActions(
+      song = playbackState.song,
+      swatch = swatch,
+      showLyrics = showLyrics,
+      onToggleLyrics = { showLyrics = !showLyrics }
+    )
 
     PlayingSeekbarWithText(swatch)
 
@@ -182,49 +175,6 @@ private fun Portrait(isVisible: Boolean) {
         unregisterLocalReceiver(receiver)
       }
     }
-  }
-}
-
-@Composable
-private fun PlayingModeIndicator(
-  showLyrics: Boolean,
-  swatch: Palette.Swatch,
-  modifier: Modifier = Modifier,
-  onSelectCover: (() -> Unit)? = null,
-  onSelectLyrics: (() -> Unit)? = null,
-) {
-  // Vertical stack: lyrics (up) above cover (down)
-  Column(
-    modifier = modifier,
-    verticalArrangement = Arrangement.spacedBy(6.dp),
-    horizontalAlignment = Alignment.CenterHorizontally
-  ) {
-    val highLightColor = Color(swatch.rgb)
-    val normalColor = highLightColor.copy(0.35f)
-    Box(
-      modifier = Modifier
-        .size(width = 6.dp, height = if (showLyrics) 14.dp else 6.dp)
-        .clip(RoundedCornerShape(3.dp))
-        .background(if (showLyrics) highLightColor else normalColor)
-        .clickable(
-          enabled = onSelectLyrics != null,
-          indication = null,
-          interactionSource = remember { MutableInteractionSource() },
-          onClick = { onSelectLyrics?.invoke() }
-        )
-    )
-    Box(
-      modifier = Modifier
-        .size(width = 6.dp, height = if (!showLyrics) 14.dp else 6.dp)
-        .clip(RoundedCornerShape(3.dp))
-        .background(if (!showLyrics) highLightColor else normalColor)
-        .clickable(
-          enabled = onSelectCover != null,
-          indication = null,
-          interactionSource = remember { MutableInteractionSource() },
-          onClick = { onSelectCover?.invoke() }
-        )
-    )
   }
 }
 

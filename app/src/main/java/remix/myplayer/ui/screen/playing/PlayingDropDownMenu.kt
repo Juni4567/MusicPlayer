@@ -12,7 +12,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -22,7 +21,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import remix.myplayer.R
@@ -39,7 +37,6 @@ import remix.myplayer.lyric.LyricSearcher
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.DialogState
 import remix.myplayer.ui.dialog.NormalDialog
-import remix.myplayer.ui.dialog.PlaybackAndEqSheet
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.nav.ExtraRestorePlayingScreen
 import remix.myplayer.ui.nav.LocalNavController
@@ -65,7 +62,6 @@ fun PlayingDropDownMenu(
   val nav = LocalNavController.current
   val settingVM = settingViewModel
   val tagEditVM = tagEditViewModel
-  val settingState by settingVM.settingsState.collectAsStateWithLifecycle()
 
   // Favorite + timer are on the secondary action row; keep overflow for the rest.
   val menuItems =
@@ -73,9 +69,7 @@ fun PlayingDropDownMenu(
       R.string.song_edit,
       R.string.song_detail,
       R.string.add_to_playlist,
-      R.string.eq,
       R.string.lyric,
-      R.string.speed,
       R.string.delete,
     )
   val activity = LocalActivity.current as? BaseActivity
@@ -105,10 +99,6 @@ fun PlayingDropDownMenu(
       mainVM.playingScreenState.snapTo(PlayingScreenValue.Expanded)
     }
   }
-
-  val audioSheetState = rememberDialogState()
-  var initialAudioTab by remember { mutableIntStateOf(0) }
-  PlaybackAndEqSheet(audioSheetState, settingState, initialAudioTab)
 
   val lyricDialogState = rememberDialogState()
 
@@ -191,22 +181,12 @@ fun PlayingDropDownMenu(
               settingVM.showAddSongToPlayListDialog(listOf(song.id))
             }
 
-            R.string.eq -> {
-              initialAudioTab = 1
-              audioSheetState.show()
-            }
-
             R.string.lyric -> {
               if (settingVM.lyricPrefs.tipShown) {
                 lyricDialogState.show()
               } else {
                 checkLyricTip = true
               }
-            }
-
-            R.string.speed -> {
-              initialAudioTab = 0
-              audioSheetState.show()
             }
 
             R.string.delete -> {

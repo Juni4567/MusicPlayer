@@ -82,6 +82,12 @@ class LibraryViewModel @Inject constructor(
   val playLists = playListRepo.allPlayLists()
     .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
+  val favoriteSongs: StateFlow<List<Song>> = kotlinx.coroutines.flow.combine(songs, playLists) { allSongs, lists ->
+    val favList = lists.firstOrNull { it.isFavorite() } ?: return@combine emptyList()
+    val songMap = allSongs.associateBy { it.id }
+    favList.audioIds.mapNotNull { songMap[it] }
+  }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
   private val _folders = MutableStateFlow<List<Folder>>(emptyList())
   val folders: StateFlow<List<Folder>> = _folders.asStateFlow()
 

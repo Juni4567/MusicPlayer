@@ -66,7 +66,7 @@ internal fun HomeAppBar(
       }
     },
     actions = {
-      if (library.tag != Library.TAG_REMOTE) {
+      if (library.sortOrders.isNotEmpty()) {
         ScreenPopupButton(library)
       }
 

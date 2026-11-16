@@ -20,9 +20,11 @@ import remix.myplayer.data.model.misc.Library
 import remix.myplayer.ui.screen.RemoteScreen
 import remix.myplayer.ui.screen.library.AlbumScreen
 import remix.myplayer.ui.screen.library.ArtistScreen
+import remix.myplayer.ui.screen.library.FavoriteScreen
 import remix.myplayer.ui.screen.library.FolderScreen
 import remix.myplayer.ui.screen.library.GenreScreen
 import remix.myplayer.ui.screen.library.PlayListScreen
+import remix.myplayer.ui.screen.library.RecentScreen
 import remix.myplayer.ui.screen.library.SongScreen
 import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.settings.SettingViewModel
@@ -43,11 +45,13 @@ fun ViewPager(
     val library = libraries.getOrNull(page) ?: return@HorizontalPager
     when (library.tag) {
       Library.TAG_SONG -> SongScreen(scrollToCurrentEvent)
+      Library.TAG_FAVORITE -> FavoriteScreen()
+      Library.TAG_PLAYLIST -> PlayListScreen()
+      Library.TAG_FOLDER -> FolderScreen()
       Library.TAG_ALBUM -> AlbumScreen()
       Library.TAG_ARTIST -> ArtistScreen()
       Library.TAG_GENRE -> GenreScreen()
-      Library.TAG_PLAYLIST -> PlayListScreen()
-      Library.TAG_FOLDER -> FolderScreen()
+      Library.TAG_RECENT -> RecentScreen()
       Library.TAG_REMOTE -> RemoteScreen()
       else -> PageContent("Page: ${libraries[page]}")
     }

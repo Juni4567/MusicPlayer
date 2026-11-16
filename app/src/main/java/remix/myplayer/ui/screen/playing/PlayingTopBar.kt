@@ -45,8 +45,6 @@ import kotlin.math.ceil
 @Composable
 @Stable
 internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
-  val mainVM = mainViewModel
-  val scope = rememberCoroutineScope()
   val theme = LocalTheme.current
   val titleColor = if (theme.isLight) theme.textPrimary else Color.White
   val bodyColor = if (theme.isLight) theme.textSecondary else Color.White.copy(alpha = 0.82f)
@@ -65,23 +63,12 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
       .heightIn(min = 56.dp),
     verticalAlignment = Alignment.CenterVertically
   ) {
-    Box(
-      contentAlignment = Alignment.Center,
+    // Spacer matching right 3-dots button size to keep title centered
+    androidx.compose.foundation.layout.Spacer(
       modifier = Modifier
         .padding(8.dp)
         .size(40.dp)
-        .clickWithRipple {
-          scope.launch {
-            mainVM.playingScreenState.animateTo(PlayingScreenValue.Hidden)
-          }
-        }
-    ) {
-      Image(
-        painter = painterResource(R.drawable.icon_player_back),
-        colorFilter = ColorFilter.tint(tintColor),
-        contentDescription = "PlayingBack"
-      )
-    }
+    )
 
     Column(
       modifier = Modifier
@@ -90,26 +77,32 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
-      val title = song.title
-      val artist = song.artist
-      val album = song.album
+      fun cleanMeta(value: String): String {
+        val trimmed = value.trim()
+        if (trimmed.isEmpty() ||
+          trimmed.equals("<unknown>", ignoreCase = true) ||
+          trimmed.equals("unknown", ignoreCase = true) ||
+          trimmed.equals("download", ignoreCase = true) ||
+          trimmed.equals("downloads", ignoreCase = true)
+        ) {
+          return ""
+        }
+        return trimmed
+      }
+
+      val cleanTitle = cleanMeta(song.title).ifEmpty { stringResource(R.string.unknown_song) }
+      val cleanArtist = cleanMeta(song.artist)
+      val cleanAlbum = cleanMeta(song.album)
 
       val detail = when {
-        artist == "" -> {
-          song.album
-        }
-
-        album == "" -> {
-          song.artist
-        }
-
-        else -> {
-          String.format("%s-%s", song.artist, song.album)
-        }
+        cleanArtist.isNotEmpty() && cleanAlbum.isNotEmpty() -> "$cleanArtist · $cleanAlbum"
+        cleanArtist.isNotEmpty() -> cleanArtist
+        cleanAlbum.isNotEmpty() -> cleanAlbum
+        else -> ""
       }
 
       Text(
-        text = title.ifEmpty { stringResource(R.string.unknown_song) },
+        text = cleanTitle,
         color = titleColor,
         fontSize = 17.sp,
         fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
@@ -117,14 +110,21 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
         textAlign = TextAlign.Center,
         modifier = Modifier.basicMarquee()
       )
-      Text(
-        text = if (timerRunning) "$detail · ${timerRemainMin}m" else detail,
-        color = bodyColor,
-        fontSize = 13.5.sp,
-        maxLines = 1,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.basicMarquee()
-      )
+      if (detail.isNotEmpty() || timerRunning) {
+        val detailText = when {
+          detail.isNotEmpty() && timerRunning -> "$detail · ${timerRemainMin}m"
+          detail.isNotEmpty() -> detail
+          else -> "${timerRemainMin}m"
+        }
+        Text(
+          text = detailText,
+          color = bodyColor,
+          fontSize = 13.5.sp,
+          maxLines = 1,
+          textAlign = TextAlign.Center,
+          modifier = Modifier.basicMarquee()
+        )
+      }
     }
 
     var expanded by remember { mutableStateOf(false) }

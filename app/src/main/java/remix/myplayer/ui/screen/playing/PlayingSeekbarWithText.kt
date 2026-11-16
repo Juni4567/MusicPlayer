@@ -12,7 +12,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -30,7 +29,7 @@ import kotlin.math.roundToLong
 
 @Composable
 internal fun PlayingSeekbarWithText(
-  swatch: Palette.Swatch
+  @Suppress("UNUSED_PARAMETER") swatch: Palette.Swatch
 ) {
   val playbackVM = playbackViewModel
   val scope = rememberCoroutineScope()
@@ -49,10 +48,10 @@ internal fun PlayingSeekbarWithText(
 
     val theme = LocalTheme.current
     val trackBg = theme.control
-    val progressColor = Color(swatch.rgb)
-    val thumbColor = if (theme.isLight) theme.textPrimary else Color.White
+    val progressColor = theme.secondary
+    val thumbColor = theme.secondary
     val baseProperties = defaultLineSliderProperties
-    val sliderProperties = remember(swatch.rgb, trackBg, thumbColor) {
+    val sliderProperties = remember(progressColor, trackBg, thumbColor) {
       baseProperties.copy(
         trackBackgroundColor = trackBg,
         trackProgressColor = progressColor,

@@ -36,7 +36,6 @@ import remix.myplayer.util.MusicUtil
 import remix.myplayer.util.Util
 import remix.myplayer.util.ext.clickWithRipple
 import remix.myplayer.viewmodel.libraryViewModel
-import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.tagEditViewModel
 
@@ -78,19 +77,16 @@ private fun SongDropdownMenu(
   val menuItems =
     listOf(
       R.string.add_to_next_song,
-      R.string.add_to_play_queue,
       R.string.add_to_playlist,
       R.string.song_detail,
       R.string.song_edit,
       R.string.collect,
       R.string.share,
-      R.string.ring,
       R.string.delete
     )
   val activity = LocalActivity.current as? BaseActivity
   val settingVM = settingViewModel
   val tagEditVM = tagEditViewModel
-  val playbackVM = playbackViewModel
   val libraryVM = libraryViewModel
   val nav = LocalNavController.current
 
@@ -124,10 +120,6 @@ private fun SongDropdownMenu(
               settingVM.showAddSongToPlayListDialog(listOf(song.id), "")
             }
 
-            R.string.add_to_play_queue -> {
-              playbackVM.insertToQueue(listOf(song))
-            }
-
             R.string.song_detail -> {
               settingVM.showSongDetailDialog(song)
             }
@@ -148,10 +140,6 @@ private fun SongDropdownMenu(
                 libraryVM.playLists.value.firstOrNull { it.isFavorite() } ?: return@DropdownMenuItem
 
               libraryVM.addSongsToPlayList(listOf(song.id), favorite.name)
-            }
-
-            R.string.ring -> {
-              MusicUtil.setRing(activity, song.id)
             }
 
             R.string.share -> {

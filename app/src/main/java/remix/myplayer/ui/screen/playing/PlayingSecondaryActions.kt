@@ -37,11 +37,13 @@ import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.timerViewModel
 
-/** Now Playing secondary row: favorite, timer, audio & equalizer, share. */
+/** Now Playing secondary row: favorite, lyrics, timer, audio & equalizer, share. */
 @Composable
 internal fun PlayingSecondaryActions(
   song: Song,
   @Suppress("UNUSED_PARAMETER") swatch: Palette.Swatch,
+  showLyrics: Boolean = false,
+  onToggleLyrics: () -> Unit = {}
 ) {
   val theme = LocalTheme.current
   val activity = LocalActivity.current as? BaseActivity
@@ -62,7 +64,7 @@ internal fun PlayingSecondaryActions(
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(horizontal = 24.dp),
+      .padding(horizontal = 20.dp),
     horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically
   ) {
@@ -78,6 +80,12 @@ internal fun PlayingSecondaryActions(
       onClick = {
         sendLocalBroadcast(MusicUtil.makeCmdIntent(Command.LOVE))
       }
+    )
+    SecondaryActionIcon(
+      iconRes = R.drawable.ic_lyrics_24dp,
+      contentDescription = "Lyrics",
+      tint = if (showLyrics) theme.secondary else tint.copy(alpha = 0.92f),
+      onClick = onToggleLyrics
     )
     SecondaryActionIcon(
       iconRes = R.drawable.ic_player_timer_24dp,
