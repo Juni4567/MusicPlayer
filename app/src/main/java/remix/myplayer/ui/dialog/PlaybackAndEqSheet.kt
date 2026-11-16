@@ -83,23 +83,7 @@ private val PresetsList = listOf(
   EqPresetItem(R.string.eq_preset_treble, floatArrayOf(-0.25f, -0.1f, 0.15f, 0.45f, 0.65f)),
 )
 
-private data class MoodPresetItem(
-  val nameRes: Int,
-  val icon: String,
-  val speed: Float,
-  val pitch: Float,
-  val echoEnabled: Boolean = false,
-  val echoPreset: Int = 0,
-)
 
-private val MoodPresetsList = listOf(
-  MoodPresetItem(R.string.mood_slowed_reverb, "🌙", 0.85f, 0.92f, echoEnabled = true, echoPreset = 3 /* Hall */),
-  MoodPresetItem(R.string.mood_nightcore, "⚡", 1.20f, 1.15f, echoEnabled = false),
-  MoodPresetItem(R.string.mood_vaporwave, "📼", 0.80f, 0.85f, echoEnabled = true, echoPreset = 5 /* Plate */),
-  MoodPresetItem(R.string.mood_cardio, "🏃", 1.10f, 1.00f, echoEnabled = false),
-  MoodPresetItem(R.string.mood_lofi, "🎧", 0.90f, 1.00f, echoEnabled = false),
-  MoodPresetItem(R.string.mood_reset, "↺", 1.00f, 1.00f, echoEnabled = false),
-)
 
 private val QuickSpeedPresets = listOf(0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f)
 private val QuickPitchPresets = listOf(0.75f, 0.85f, 1.0f, 1.15f, 1.25f, 1.5f)
@@ -203,18 +187,7 @@ fun PlaybackAndEqSheet(
     settingVM.setEchoEnabled(false)
   }
 
-  fun applyMoodPreset(preset: MoodPresetItem) {
-    speedSliderValue = preset.speed
-    pitchSliderValue = preset.pitch
-    MusicServiceRemote.service?.playback?.speed = preset.speed
-    MusicServiceRemote.service?.playback?.pitch = preset.pitch
-    settingVM.setSpeed(preset.speed.toString())
-    settingVM.setPitch(preset.pitch.toString())
-    settingVM.setEchoEnabled(preset.echoEnabled)
-    if (preset.echoEnabled) {
-      settingVM.setEchoPreset(preset.echoPreset)
-    }
-  }
+
 
   MiBottomSheet(
     visible = true,
@@ -285,34 +258,6 @@ fun PlaybackAndEqSheet(
               .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(14.dp),
           ) {
-            // Mood / Immersion Presets
-            Column {
-              Text(
-                text = stringResource(R.string.mood_presets),
-                color = theme.textSecondary,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.padding(bottom = 6.dp)
-              )
-              Row(
-                modifier = Modifier
-                  .fillMaxWidth()
-                  .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-              ) {
-                MoodPresetsList.forEach { mood ->
-                  val selected = abs(speedSliderValue - mood.speed) < 0.02f &&
-                    abs(pitchSliderValue - mood.pitch) < 0.02f &&
-                    (!mood.echoEnabled || echoEnabled)
-                  SheetChip(
-                    label = "${mood.icon} ${stringResource(mood.nameRes)}",
-                    selected = selected,
-                    contentDescription = stringResource(mood.nameRes),
-                    onClick = { applyMoodPreset(mood) },
-                  )
-                }
-              }
-            }
 
             // Speed Slider & Presets
             Column {

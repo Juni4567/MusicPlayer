@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -47,9 +48,9 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
   val mainVM = mainViewModel
   val scope = rememberCoroutineScope()
   val theme = LocalTheme.current
-  val titleColor = if (theme.isLight) Color(swatch.titleTextColor) else theme.textPrimary
-  val bodyColor = if (theme.isLight) Color(swatch.bodyTextColor) else theme.textSecondary
-  val tintColor = if (theme.isLight) titleColor else theme.popupButton()
+  val titleColor = if (theme.isLight) theme.textPrimary else Color.White
+  val bodyColor = if (theme.isLight) theme.textSecondary else Color.White.copy(alpha = 0.82f)
+  val tintColor = if (theme.isLight) theme.textPrimary else Color.White
   val timerRunning by SleepTimer.runningState.collectAsStateWithLifecycle()
   val timerRemainMin = if (timerRunning) {
     ceil(SleepTimer.getMillisUntilFinish() / 60_000.0).toInt().coerceAtLeast(1)
@@ -57,7 +58,13 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
     0
   }
 
-  Row(modifier = Modifier.heightIn(min = 56.dp), verticalAlignment = Alignment.CenterVertically) {
+  Row(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(top = 10.dp, bottom = 4.dp)
+      .heightIn(min = 56.dp),
+    verticalAlignment = Alignment.CenterVertically
+  ) {
     Box(
       contentAlignment = Alignment.Center,
       modifier = Modifier
@@ -78,7 +85,8 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
 
     Column(
       modifier = Modifier
-        .weight(1f),
+        .weight(1f)
+        .padding(horizontal = 8.dp),
       verticalArrangement = Arrangement.Center,
       horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -103,8 +111,8 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
       Text(
         text = title.ifEmpty { stringResource(R.string.unknown_song) },
         color = titleColor,
-        fontSize = 16.sp,
-        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+        fontSize = 17.sp,
+        fontWeight = androidx.compose.ui.text.font.FontWeight.SemiBold,
         maxLines = 1,
         textAlign = TextAlign.Center,
         modifier = Modifier.basicMarquee()
@@ -112,7 +120,7 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
       Text(
         text = if (timerRunning) "$detail · ${timerRemainMin}m" else detail,
         color = bodyColor,
-        fontSize = 13.sp,
+        fontSize = 13.5.sp,
         maxLines = 1,
         textAlign = TextAlign.Center,
         modifier = Modifier.basicMarquee()

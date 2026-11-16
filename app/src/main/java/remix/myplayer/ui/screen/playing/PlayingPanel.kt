@@ -14,6 +14,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -33,6 +34,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -43,6 +45,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.launch
+import remix.myplayer.viewmodel.PlayingScreenValue
+import remix.myplayer.viewmodel.mainViewModel
 import androidx.palette.graphics.Palette
 import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.lyric.LyricManager
@@ -67,10 +72,13 @@ fun PlayingPanel(isVisible: Boolean) {
 
 @Composable
 private fun Portrait(isVisible: Boolean) {
+  val scope = rememberCoroutineScope()
+  val mainVM = mainViewModel
+
   Column(
     modifier = Modifier,
     horizontalAlignment = Alignment.CenterHorizontally,
-    verticalArrangement = Arrangement.spacedBy(10.dp)
+    verticalArrangement = Arrangement.spacedBy(8.dp)
   ) {
     val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
@@ -81,13 +89,18 @@ private fun Portrait(isVisible: Boolean) {
     Box(
       contentAlignment = Alignment.Center,
       modifier = Modifier
-        .weight(7f)
+        .weight(6.5f)
         .fillMaxWidth()
         .clipToBounds()
         .playingCoverGestures(
           showingLyrics = showLyrics,
           onShowLyrics = { showLyrics = true },
           onHideLyrics = { showLyrics = false },
+          onMinimize = {
+            scope.launch {
+              mainVM.playingScreenState.animateTo(PlayingScreenValue.Hidden)
+            }
+          }
         )
     ) {
       AnimatedContent(
@@ -127,6 +140,8 @@ private fun Portrait(isVisible: Boolean) {
         onSelectLyrics = { showLyrics = true },
       )
     }
+
+    PlayingMoodPresets(swatch = swatch)
 
     PlayingSecondaryActions(playbackState.song, swatch)
 
@@ -237,6 +252,9 @@ private fun RegularLandscape(isVisible: Boolean) {
     val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
 
+    val scope = rememberCoroutineScope()
+    val mainVM = mainViewModel
+
     PlayingTopBar(playbackState.song, swatch)
 
     Row(modifier = Modifier.weight(3f)) {
@@ -248,6 +266,11 @@ private fun RegularLandscape(isVisible: Boolean) {
             showingLyrics = false,
             onShowLyrics = {},
             onHideLyrics = {},
+            onMinimize = {
+              scope.launch {
+                mainVM.playingScreenState.animateTo(PlayingScreenValue.Hidden)
+              }
+            }
           ),
         contentAlignment = Alignment.Center
       ) {
@@ -292,6 +315,9 @@ private fun CompactLandscape(isVisible: Boolean, useExpandedControls: Boolean) {
     val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
 
+    val scope = rememberCoroutineScope()
+    val mainVM = mainViewModel
+
     Column(
       modifier = Modifier
         .weight(1f)
@@ -310,6 +336,11 @@ private fun CompactLandscape(isVisible: Boolean, useExpandedControls: Boolean) {
             showingLyrics = false,
             onShowLyrics = {},
             onHideLyrics = {},
+            onMinimize = {
+              scope.launch {
+                mainVM.playingScreenState.animateTo(PlayingScreenValue.Hidden)
+              }
+            }
           ),
         contentAlignment = Alignment.Center
       ) {

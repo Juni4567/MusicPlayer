@@ -47,11 +47,11 @@ fun PlayingContainer(content: @Composable () -> Unit) {
   if (!theme.isLight) {
     val background = theme.mainBackground
     val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
-    val artTint = Color(swatch.rgb).copy(alpha = 0.28f)
+    val artTint = Color(swatch.rgb).copy(alpha = 0.25f)
     val brush = Brush.verticalGradient(
       colors = listOf(
-        androidx.compose.ui.graphics.lerp(background, artTint, 0.55f),
         background,
+        androidx.compose.ui.graphics.lerp(background, artTint, 0.35f),
         background
       )
     )
@@ -63,7 +63,7 @@ fun PlayingContainer(content: @Composable () -> Unit) {
     SettingPrefs.BACKGROUND_ADAPTIVE_COLOR -> {
       val swatch by playbackViewModel.swatch.collectAsStateWithLifecycle()
       val color = remember(initialColor) { Animatable(initialValue = initialColor) }
-      val brush = Brush.verticalGradient(colors = listOf(color.value, initialColor))
+      val brush = Brush.verticalGradient(colors = listOf(initialColor, color.value.copy(alpha = 0.30f), initialColor))
       Container(brush = brush, content = content)
 
       LaunchedEffect(swatch, initialColor) {
@@ -72,7 +72,7 @@ fun PlayingContainer(content: @Composable () -> Unit) {
     }
 
     SettingPrefs.BACKGROUND_THEME -> {
-      val brush = Brush.verticalGradient(colors = listOf(theme.primary, initialColor))
+      val brush = Brush.verticalGradient(colors = listOf(initialColor, theme.primary.copy(alpha = 0.30f), initialColor))
       Container(brush = brush, content = content)
     }
 

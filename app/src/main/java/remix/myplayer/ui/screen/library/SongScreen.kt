@@ -59,6 +59,7 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
 
     LazyColumn(
       state = listState,
+      contentPadding = androidx.compose.foundation.layout.PaddingValues(bottom = 16.dp),
       modifier = Modifier
         .weight(1f)
         .verticalScrollbar(listState)

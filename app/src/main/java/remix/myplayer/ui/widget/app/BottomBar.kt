@@ -62,6 +62,8 @@ import androidx.compose.foundation.border
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 
+import kotlinx.coroutines.delay
+
 private const val triggerThreshold = 10
 
 @Composable
@@ -69,6 +71,7 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
   val mainVM = mainViewModel
   val scope = rememberCoroutineScope()
   val playbackState by vm.playbackUiState.collectAsStateWithLifecycle()
+  val seekBarUiState by vm.seekBarUiState.collectAsStateWithLifecycle()
   val theme = LocalTheme.current
   val interactionSource = remember { MutableInteractionSource() }
 
@@ -129,26 +132,49 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
   Column(
     modifier = modifier
       .fillMaxWidth()
-      .padding(horizontal = 8.dp, vertical = 4.dp)
+      .padding(start = 10.dp, end = 10.dp, top = 8.dp, bottom = 6.dp)
       .clip(RoundedCornerShape(16.dp))
-      .border(BorderStroke(0.8.dp, divider.copy(alpha = 0.45f)), RoundedCornerShape(16.dp))
+      .border(BorderStroke(1.dp, divider.copy(alpha = 0.5f)), RoundedCornerShape(16.dp))
       .background(surface)
       .semantics { contentDescription = "BottomBar" }
   ) {
     if (isSongValid) {
-      ProgressAware { progress, duration ->
-        val fraction = if (duration > 0) (progress.toFloat() / duration.toFloat()).coerceIn(0f, 1f) else 0f
-        Box(
-          modifier = Modifier
-            .fillMaxWidth()
-            .height(2.5.dp)
-            .background(divider.copy(alpha = 0.35f))
-        ) {
-          Box(
-            modifier = Modifier
-              .fillMaxWidth(fraction)
-              .height(2.5.dp)
-              .background(accent)
+      Box(
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(top = 4.dp, start = 10.dp, end = 10.dp)
+          .height(20.dp),
+        contentAlignment = Alignment.Center
+      ) {
+        ProgressAware { progress, duration ->
+          val value = if (seekBarUiState.interacting && seekBarUiState.uiProgress != null) {
+            seekBarUiState.uiProgress!!.toFloat()
+          } else {
+            progress.toFloat()
+          }
+          LineSlider(
+            value = value,
+            onValueChange = { v ->
+              vm.setSeekbarUiState(v.roundToLong(), true)
+            },
+            onValueChangeFinished = {
+              vm.setProgress(vm.seekBarUiState.value.uiProgress ?: progress)
+              scope.launch {
+                delay(400)
+                vm.setSeekbarUiState(null, false)
+              }
+            },
+            valueRange = 0f..(duration.toFloat().coerceAtLeast(1f)),
+            modifier = Modifier.fillMaxWidth(),
+            properties = defaultLineSliderProperties.copy(
+              trackHeight = 3.5.dp,
+              trackProgressColor = accent,
+              trackBackgroundColor = divider.copy(alpha = 0.4f),
+              thumbColor = accent,
+              thumbWidth = 12.dp,
+              thumbHeight = 12.dp,
+              thumbShape = CircleShape,
+            ),
           )
         }
       }

@@ -59,8 +59,8 @@ android {
         minSdk = 21
         targetSdk = 36
 
-        versionCode = 21905
-        versionName = "2.1.9.5"
+        versionCode = 29600
+        versionName = "2.9.6"
 
         vectorDrawables.useSupportLibrary = true
 
@@ -256,13 +256,8 @@ androidComponents {
             ?: return@onVariants
         if (flavor != "normal" && flavor != "foss") return@onVariants
 
-        val sortPrefix = when (flavor) {
-            "normal" -> "1"
-            "foss" -> "2"
-            else -> return@onVariants
-        }
         val versionName = android.defaultConfig.versionName.orEmpty()
-        val apkName = "${sortPrefix}-A-Music-v${versionName}-${flavor}-release.apk"
+        val apkName = if (flavor == "foss") "A-Music-V${versionName}-FOSS.apk" else "A-Music-V${versionName}.apk"
         val taskName =
             "rename${variant.name.replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }}Apk"
 

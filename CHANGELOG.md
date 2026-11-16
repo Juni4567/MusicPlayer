@@ -2,6 +2,16 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.9.6] — 2026-11-16
+
+### Highlights
+- **Interactive Mini-Player Seekbar**: Restored fully interactive slider seeking on the bottom miniplayer with dedicated touch targeting and isolated touch areas, preventing accidental track expansion or song tapping
+- **Mood Presets on Main Player**: Moved immersion mood presets (Slowed & Reverb, Nightcore, Vaporwave, Cardio, Lo-Fi, Reset) directly to the Now Playing player screen as a fast, accessible chip carousel
+- **Cover Swipe-Down to Minimize**: Swiping down anywhere on the cover artwork or main player smoothly collapses the player down to the miniplayer
+- **Eliminated Unwanted Lyric Searching**: Removed the accidental swipe-up gesture that was getting stuck on empty "Searching..." lyrics states
+- **High-Contrast Song Title & Clean Background**: Lowered the song title with comfortable top breathing room and eliminated the dark gradient overlay behind the title bar for crystal-clear readability
+- **Dual Release Builds**: Official release includes standard `A-Music-V2.9.6.apk` and pure `A-Music-V2.9.6-FOSS.apk` builds
+
 ## [2.1.9.5] — 2026-11-16
 
 ### Highlights
