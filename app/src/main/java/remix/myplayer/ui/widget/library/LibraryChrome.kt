@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Search
@@ -21,10 +23,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import remix.myplayer.R
@@ -45,6 +50,8 @@ fun LibraryChrome(
   val surface2 = theme.surface2
   val textPrimary = theme.textPrimary
   val textMuted = theme.textMuted
+  val focusManager = LocalFocusManager.current
+  val keyboardController = LocalSoftwareKeyboardController.current
 
   Row(
     modifier = Modifier
@@ -88,6 +95,15 @@ fun LibraryChrome(
             color = textPrimary,
             fontSize = 13.5.sp
           ),
+          keyboardOptions = KeyboardOptions(
+            imeAction = ImeAction.Search
+          ),
+          keyboardActions = KeyboardActions(
+            onSearch = {
+              focusManager.clearFocus()
+              keyboardController?.hide()
+            }
+          ),
           modifier = Modifier.fillMaxWidth()
         )
       }
@@ -98,7 +114,11 @@ fun LibraryChrome(
           tint = textMuted,
           modifier = Modifier
             .size(18.dp)
-            .clickWithRipple(circle = true) { onSearchQueryChange("") }
+            .clickWithRipple(circle = true) {
+              onSearchQueryChange("")
+              focusManager.clearFocus()
+              keyboardController?.hide()
+            }
         )
       }
     }
@@ -112,6 +132,8 @@ fun LibraryChrome(
         .clip(RoundedCornerShape(12.dp))
         .background(surface2)
         .clickWithRipple(circle = false) {
+          focusManager.clearFocus()
+          keyboardController?.hide()
           if (songs.isNotEmpty()) {
             setPlayQueue(songs, MusicUtil.makeCmdIntent(Command.SKIP_TO_NEXT, true))
           }

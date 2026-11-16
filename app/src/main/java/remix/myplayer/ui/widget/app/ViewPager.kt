@@ -57,7 +57,19 @@ fun ViewPager(
     }
   }
 
+  val focusManager = androidx.compose.ui.platform.LocalFocusManager.current
+  val keyboardController = androidx.compose.ui.platform.LocalSoftwareKeyboardController.current
+
+  LaunchedEffect(pagerState.isScrollInProgress) {
+    if (pagerState.isScrollInProgress) {
+      focusManager.clearFocus()
+      keyboardController?.hide()
+    }
+  }
+
   LaunchedEffect(pagerState.currentPage) {
+    focusManager.clearFocus()
+    keyboardController?.hide()
     libraries.getOrNull(pagerState.currentPage)?.let {
       vm.changeLibrary(it)
     }

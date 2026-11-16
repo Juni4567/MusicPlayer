@@ -20,6 +20,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -50,6 +52,8 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
   val listState = rememberLazyListState()
   val songs by libraryVM.songs.collectAsStateWithLifecycle()
   val context = LocalContext.current
+  val focusManager = LocalFocusManager.current
+  val keyboardController = LocalSoftwareKeyboardController.current
   val popupEnabled = !multiSelectState.isShowInLibrary()
   val theme = LocalTheme.current
 
@@ -65,6 +69,20 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
           song.album.lowercase().contains(q)
       }
     }
+  }
+
+  // Dismiss keyboard and clear search focus when scrolling the song list
+  LaunchedEffect(listState.isScrollInProgress) {
+    if (listState.isScrollInProgress) {
+      focusManager.clearFocus()
+      keyboardController?.hide()
+    }
+  }
+
+  // Dismiss keyboard and clear search focus whenever playback starts/changes
+  LaunchedEffect(playbackState.song.id) {
+    focusManager.clearFocus()
+    keyboardController?.hide()
   }
 
   LaunchedEffect(scrollToCurrentEvent) {
@@ -125,6 +143,9 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
             playing = isPlayingSong,
             popupEnabled = popupEnabled,
             onClickSong = {
+              focusManager.clearFocus()
+              keyboardController?.hide()
+
               if (filteredSongs.isEmpty()) {
                 return@ListSong
               }
@@ -140,6 +161,8 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
               )
             },
             onLongClickSong = {
+              focusManager.clearFocus()
+              keyboardController?.hide()
               mainVM.showMultiSelect(context, MultiSelectState.Where.Song, song)
             }
           )
