@@ -500,6 +500,14 @@
   <string name="zh_traditional">Traditional Chinese</string>
   <string name="english">English</string>
   <string name="japanese">Japanese</string>
+  <string name="polish">Polish</string>
+
+  <string name="playback_and_eq">Playback &amp; Equalizer</string>
+  <string name="audio_effects">Sound &amp; EQ</string>
+  <string name="playback_tab">Playback</string>
+  <string name="equalizer_tab">Equalizer</string>
+  <string name="reset_default">Reset</string>
+  <string name="reset_playback">Reset playback</string>
 
   <string name="bass_boost">Bass boost</string>
   <string name="eq_preset_flat">Flat</string>

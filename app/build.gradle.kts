@@ -59,8 +59,8 @@ android {
         minSdk = 21
         targetSdk = 36
 
-        versionCode = 21901
-        versionName = "2.1.9.1"
+        versionCode = 21902
+        versionName = "2.1.9.2"
 
         vectorDrawables.useSupportLibrary = true
 
@@ -198,6 +198,11 @@ android {
     // composeOptions {
     //     kotlinCompilerExtensionVersion = "1.5.13"
     // }
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
     dependenciesInfo {
         includeInApk = false
     }

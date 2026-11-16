@@ -10,6 +10,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,8 +25,7 @@ import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.service.Command
 import remix.myplayer.ui.activity.base.BaseActivity
-import remix.myplayer.ui.dialog.EqualizerSheet
-import remix.myplayer.ui.dialog.SpeedDialog
+import remix.myplayer.ui.dialog.PlaybackAndEqSheet
 import remix.myplayer.ui.dialog.rememberDialogState
 import remix.myplayer.ui.theme.LocalTheme
 import remix.myplayer.ui.theme.popupButton
@@ -35,7 +37,7 @@ import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
 import remix.myplayer.viewmodel.timerViewModel
 
-/** Now Playing secondary row: favorite, timer, speed, share, equalizer. */
+/** Now Playing secondary row: favorite, timer, audio & equalizer, share. */
 @Composable
 internal fun PlayingSecondaryActions(
   song: Song,
@@ -48,16 +50,20 @@ internal fun PlayingSecondaryActions(
   val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
   val isFavorite = playbackState.isFavorite
   val tint = theme.popupButton()
-  val eqSheetState = rememberDialogState()
-  val speedDialogState = rememberDialogState()
-  EqualizerSheet(eqSheetState)
-  SpeedDialog(speedDialogState, settingState)
+
+  val audioSheetState = rememberDialogState()
+  var initialTab by remember { mutableIntStateOf(0) }
+  PlaybackAndEqSheet(
+    state = audioSheetState,
+    settingState = settingState,
+    initialTab = initialTab
+  )
 
   Row(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(horizontal = 20.dp),
-    horizontalArrangement = Arrangement.SpaceEvenly,
+      .padding(horizontal = 24.dp),
+    horizontalArrangement = Arrangement.SpaceBetween,
     verticalAlignment = Alignment.CenterVertically
   ) {
     SecondaryActionIcon(
@@ -80,10 +86,13 @@ internal fun PlayingSecondaryActions(
       onClick = { timerVM.showTimerDialog() }
     )
     SecondaryActionIcon(
-      iconRes = R.drawable.ic_player_speed_24dp,
-      contentDescription = "Playback speed",
+      iconRes = R.drawable.ic_player_eq_24dp,
+      contentDescription = "Sound effects and equalizer",
       tint = tint.copy(alpha = 0.92f),
-      onClick = { speedDialogState.show() }
+      onClick = {
+        initialTab = 0
+        audioSheetState.show()
+      }
     )
     SecondaryActionIcon(
       iconRes = R.drawable.ic_share_24dp,
@@ -95,12 +104,6 @@ internal fun PlayingSecondaryActions(
           Intent.createChooser(Util.createShareSongFileIntent(song, activity), null)
         )
       }
-    )
-    SecondaryActionIcon(
-      iconRes = R.drawable.ic_player_eq_24dp,
-      contentDescription = "Equalizer",
-      tint = tint.copy(alpha = 0.92f),
-      onClick = { eqSheetState.show() }
     )
   }
 }

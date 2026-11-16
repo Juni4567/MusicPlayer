@@ -432,6 +432,14 @@
   <string name="lyric_delay_x_second">Opóźniono o %1$s s</string>
   <string name="lyric_adjust_font_size">Dopasuj rozmiar czcionki</string>
   <string name="speed">Prędkość odtwarzania</string>
+  <string name="playback_effects">Odtwarzanie</string>
+  <string name="playback_and_eq">Odtwarzanie i korektor</string>
+  <string name="audio_effects">Dźwięk i korektor</string>
+  <string name="playback_tab">Odtwarzanie</string>
+  <string name="equalizer_tab">Korektor</string>
+  <string name="reset_default">Resetuj</string>
+  <string name="reset_playback">Zresetuj odtwarzanie</string>
+  <string name="pitch">Wysokość dźwięku</string>
   <string name="whether_change_theme">Aplikacja jest obecnie w trybie nocnym. Czy na pewno chcesz zmienić kolory motywu?</string>
   <string name="embedded_lyric">Zaszyty w pliku</string>
   <string name="default_lyric_priority">Domyślny</string>

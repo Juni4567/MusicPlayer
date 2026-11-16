@@ -1,6 +1,7 @@
 package remix.myplayer.ui.screen.playing
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.gestures.animateTo
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -100,17 +101,21 @@ internal fun PlayingTopBar(song: Song, swatch: Palette.Swatch) {
       }
 
       Text(
-        title.ifEmpty { stringResource(R.string.unknown_song) },
+        text = title.ifEmpty { stringResource(R.string.unknown_song) },
         color = titleColor,
         fontSize = 16.sp,
-        maxLines = 1
+        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+        maxLines = 1,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.basicMarquee()
       )
       Text(
-        if (timerRunning) "$detail · ${timerRemainMin}m" else detail,
+        text = if (timerRunning) "$detail · ${timerRemainMin}m" else detail,
         color = bodyColor,
-        fontSize = 14.sp,
+        fontSize = 13.sp,
         maxLines = 1,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        modifier = Modifier.basicMarquee()
       )
     }
 

@@ -40,6 +40,9 @@ import androidx.core.graphics.toColorInt
 import remix.myplayer.ui.theme.APlayerTheme
 import remix.myplayer.ui.theme.LocalTheme
 
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.draw.clip
+
 @Immutable
 data class LineSliderProperties(
   val trackHeight: Dp,
@@ -77,11 +80,26 @@ fun LineSlider(
   properties: LineSliderProperties = defaultLineSliderProperties,
 ) {
   val theme = LocalTheme.current
+  val interactions = remember { mutableStateListOf<Interaction>() }
+  LaunchedEffect(interactionSource) {
+    interactionSource.interactions.collect { interaction ->
+      when (interaction) {
+        is PressInteraction.Press -> interactions.add(interaction)
+        is PressInteraction.Release -> interactions.remove(interaction.press)
+        is PressInteraction.Cancel -> interactions.remove(interaction.press)
+        is DragInteraction.Start -> interactions.add(interaction)
+        is DragInteraction.Stop -> interactions.remove(interaction.start)
+        is DragInteraction.Cancel -> interactions.remove(interaction.start)
+      }
+    }
+  }
 
-  val sliderAnimValue by animateFloatAsState(targetValue = value)
+  val isInteracting = interactions.isNotEmpty()
+  val sliderAnimValue by animateFloatAsState(targetValue = value, label = "LineSliderAnim")
+  val displayValue = if (isInteracting) value else sliderAnimValue
 
   Slider(
-    value = sliderAnimValue,
+    value = displayValue,
     onValueChange = onValueChange,
     onValueChangeFinished = onValueChangeFinished,
     modifier = modifier,
@@ -98,22 +116,9 @@ fun LineSlider(
       )
     },
     thumb = {
-      val interactions = remember { mutableStateListOf<Interaction>() }
-      LaunchedEffect(interactionSource) {
-        interactionSource.interactions.collect { interaction ->
-          when (interaction) {
-            is PressInteraction.Press -> interactions.add(interaction)
-            is PressInteraction.Release -> interactions.remove(interaction.press)
-            is PressInteraction.Cancel -> interactions.remove(interaction.press)
-            is DragInteraction.Start -> interactions.add(interaction)
-            is DragInteraction.Stop -> interactions.remove(interaction.start)
-            is DragInteraction.Cancel -> interactions.remove(interaction.start)
-          }
-        }
-      }
-
       val thumbScaleAnimValue by animateFloatAsState(
-        targetValue = if (interactions.isNotEmpty()) 1.3f else 1f
+        targetValue = if (isInteracting) 1.3f else 1f,
+        label = "ThumbScaleAnim"
       )
 
       Box(
@@ -139,18 +144,29 @@ private fun Track(
   background: Color,
   progress: Color
 ) {
-  Spacer(
+  val shape = RoundedCornerShape(trackHeight / 2)
+  val rangeSpan = sliderState.valueRange.endInclusive - sliderState.valueRange.start
+  val fraction = if (rangeSpan > 0f) {
+    ((sliderState.value - sliderState.valueRange.start) / rangeSpan).coerceIn(0f, 1f)
+  } else {
+    0f
+  }
+
+  Box(
     modifier = Modifier
       .fillMaxWidth()
       .height(trackHeight)
+      .clip(shape)
       .background(background)
-  )
-  Spacer(
-    modifier = Modifier
-      .fillMaxWidth(fraction = (sliderState.value - sliderState.valueRange.start) / (sliderState.valueRange.endInclusive - sliderState.valueRange.start))
-      .height(trackHeight)
-      .background(progress)
-  )
+  ) {
+    Spacer(
+      modifier = Modifier
+        .fillMaxWidth(fraction = fraction)
+        .fillMaxHeight()
+        .clip(shape)
+        .background(progress)
+    )
+  }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

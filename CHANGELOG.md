@@ -2,6 +2,29 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.1.9.2] — 2026-11-16
+
+### Highlights
+- Unified **Playback & Equalizer** bottom sheet with compact segmented tabs
+- Continuous sliders for **Playback Speed** (0.50x – 2.00x) and **Pitch** (0.50 – 1.50) with instant real-time audio update
+- Streamlined Now Playing secondary action bar with optimized touch targets
+
+### UI & UX
+- Merged playback effects and equalizer into a single compact sheet (`PlaybackAndEqSheet`) with `[Playback]` | `[Equalizer]` tabs
+- Speed slider with live readout, quick `1.0x` reset button, and quick-preset chips
+- Pitch slider with live readout, quick `1.0` reset button, and preset chips
+- Upgraded `LineSlider` with rounded capsule track ends and zero-latency drag interaction
+- Marquee text scrolling for long song titles and artist details in Now Playing top bar
+- Streamlined secondary actions bar: Favorite, Sleep Timer, Sound & EQ, Share
+
+### Localization & Stability
+- Added localized strings for merged audio controls in English, Simplified Chinese, Traditional Chinese, Japanese, and Polish
+- Resolved missing default resource warning for Polish locale
+- Configured unit test Android resources for AGP 9.0+ Compose preview support
+
+### Notes
+- Signed for sideload with this fork’s debug keystore
+
 ## [2.1.9.1] — 2026-10-19
 
 ### Highlights
@@ -162,6 +185,7 @@ All notable changes to A-Music (fork of APlayer) are documented in this file.
 
 - See upstream APlayer release notes
 
+[2.1.9.2]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.9.2
 [2.1.9.1]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.9.1
 [2.1.9.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.9.0
 [2.1.8.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.8.0

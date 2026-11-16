@@ -429,6 +429,14 @@
   <string name="lyric_delay_x_second">延後%1$s秒</string>
   <string name="lyric_adjust_font_size">調整字體大小</string>
   <string name="speed">播放速度</string>
+  <string name="playback_effects">播放效果</string>
+  <string name="playback_and_eq">播放與等化器</string>
+  <string name="audio_effects">音效與等化器</string>
+  <string name="playback_tab">播放效果</string>
+  <string name="equalizer_tab">等化器</string>
+  <string name="reset_default">重設</string>
+  <string name="reset_playback">重設播放效果</string>
+  <string name="pitch">音調</string>
   <string name="whether_change_theme">當前為夜間模式，是否切換主題顏色？</string>
   <string name="embedded_lyric">曲目內嵌</string>
   <string name="default_lyric_priority">預設</string>

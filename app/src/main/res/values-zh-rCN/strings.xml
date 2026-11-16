@@ -430,6 +430,12 @@
   <string name="lyric_adjust_font_size">调整字体大小</string>
   <string name="speed">播放倍速</string>
   <string name="playback_effects">播放效果</string>
+  <string name="playback_and_eq">播放与均衡器</string>
+  <string name="audio_effects">音效与均衡器</string>
+  <string name="playback_tab">播放效果</string>
+  <string name="equalizer_tab">均衡器</string>
+  <string name="reset_default">重置</string>
+  <string name="reset_playback">重置播放效果</string>
   <string name="pitch">音调</string>
   <string name="volume_boost">音量增强</string>
   <string name="volume_boost_hint">最高 200%。增强过高可能造成失真。</string>
