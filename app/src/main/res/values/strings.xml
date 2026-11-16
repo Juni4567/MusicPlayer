@@ -511,6 +511,11 @@
 
   <string name="bass_boost">Bass boost</string>
   <string name="eq_preset_flat">Flat</string>
+  <string name="eq_preset_clear_vocals">Clear Vocals</string>
+  <string name="eq_preset_bass_surge">Sub-Bass Surge</string>
+  <string name="eq_preset_spatial_3d">3D Spatial</string>
+  <string name="eq_preset_anti_fatigue">Anti-Fatigue</string>
+  <string name="eq_preset_acoustic_hall">Acoustic Hall</string>
   <string name="eq_preset_pop">Pop</string>
   <string name="eq_preset_rock">Rock</string>
   <string name="eq_preset_jazz">Jazz</string>
@@ -519,6 +524,14 @@
   <string name="eq_preset_bass">Bass</string>
   <string name="eq_preset_treble">Treble</string>
   <string name="eq_presets">Presets</string>
+  <string name="mood_presets">Mood Presets</string>
+  <string name="mood_slowed_reverb">Slowed &amp; Reverb</string>
+  <string name="mood_nightcore">Nightcore</string>
+  <string name="mood_vaporwave">Vaporwave</string>
+  <string name="mood_cardio">Cardio / Workout</string>
+  <string name="mood_lofi">Lo-Fi Study</string>
+  <string name="mood_reset">Standard (1.0x)</string>
+  <string name="volume_boost_active">Volume Boost: %d%%</string>
   <string name="virtualizer">Virtualizer</string>
 
   <string name="audio_focus">Ignore audio focus</string>

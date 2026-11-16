@@ -15,6 +15,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,14 +36,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import remix.myplayer.data.prefs.SettingPrefs
+import remix.myplayer.helper.VolumeBoostHudController
+import remix.myplayer.service.MusicServiceRemote
+import remix.myplayer.viewmodel.settingViewModel
 import androidx.core.graphics.toColorInt
 import androidx.palette.graphics.Palette
 import kotlinx.coroutines.delay
@@ -150,45 +156,70 @@ private fun VolumeSeekbar(swatchColor: Color, onValueChange: () -> Unit) {
   val audioManager = remember {
     context.getSystemService(AUDIO_SERVICE) as AudioManager
   }
+  val settingVM = settingViewModel
+  val settingState by settingVM.settingsState.collectAsStateWithLifecycle()
+  val volumeBoost = settingState.play.volumeBoost
+
   Row(
-    horizontalArrangement = Arrangement.spacedBy(40.dp),
+    horizontalArrangement = Arrangement.spacedBy(24.dp),
+    verticalAlignment = Alignment.CenterVertically,
     modifier = Modifier.padding(horizontal = 18.dp)
   ) {
     CenterInBox(
       Modifier
         .size(48.dp)
         .clickWithRipple {
-          audioManager.adjustStreamVolume(
-            STREAM_MUSIC,
-            AudioManager.ADJUST_LOWER,
-            AudioManager.FLAG_PLAY_SOUND
-          )
+          if (volumeBoost > 1.0f) {
+            val newBoost = (volumeBoost - 0.05f).coerceAtLeast(1.0f)
+            settingVM.setVolumeBoost(newBoost)
+            MusicServiceRemote.service?.replayGainController?.processor?.setVolumeBoost(newBoost)
+            VolumeBoostHudController.show(newBoost)
+          } else {
+            audioManager.adjustStreamVolume(
+              STREAM_MUSIC,
+              AudioManager.ADJUST_LOWER,
+              AudioManager.FLAG_PLAY_SOUND
+            )
+          }
           onValueChange()
         }) {
       Image(
         painter = painterResource(R.drawable.ic_volume_down_black_24dp),
         contentDescription = "PlayingBottomBarVolumeDown",
-        colorFilter = ColorFilter.tint(swatchColor.copy(0.5f))
+        colorFilter = ColorFilter.tint(
+          if (volumeBoost > 1.0f) Color(0xFFFF9800) else swatchColor.copy(0.6f)
+        )
       )
     }
 
-    VolumeSeekBar(audioManager, swatchColor, onValueChange)
+    VolumeSeekBar(audioManager, swatchColor, volumeBoost, onValueChange)
 
     CenterInBox(
       Modifier
         .size(48.dp)
         .clickWithRipple {
-          audioManager.adjustStreamVolume(
-            STREAM_MUSIC,
-            AudioManager.ADJUST_RAISE,
-            AudioManager.FLAG_PLAY_SOUND
-          )
+          val maxStream = audioManager.getStreamMaxVolume(STREAM_MUSIC)
+          val currentStream = audioManager.getStreamVolume(STREAM_MUSIC)
+          if (currentStream < maxStream) {
+            audioManager.adjustStreamVolume(
+              STREAM_MUSIC,
+              AudioManager.ADJUST_RAISE,
+              AudioManager.FLAG_PLAY_SOUND
+            )
+          } else {
+            val newBoost = (volumeBoost + 0.05f).coerceAtMost(SettingPrefs.VOLUME_BOOST_MAX)
+            settingVM.setVolumeBoost(newBoost)
+            MusicServiceRemote.service?.replayGainController?.processor?.setVolumeBoost(newBoost)
+            VolumeBoostHudController.show(newBoost)
+          }
           onValueChange()
         }) {
       Image(
         painter = painterResource(R.drawable.ic_volume_up_black_24dp),
         contentDescription = "PlayingBottomBarVolumeUp",
-        colorFilter = ColorFilter.tint(swatchColor.copy(0.5f))
+        colorFilter = ColorFilter.tint(
+          if (volumeBoost > 1.0f) Color(0xFFFF9800) else swatchColor.copy(0.6f)
+        )
       )
     }
   }
@@ -198,66 +229,103 @@ private fun VolumeSeekbar(swatchColor: Color, onValueChange: () -> Unit) {
 private fun RowScope.VolumeSeekBar(
   audioManager: AudioManager,
   swatchColor: Color,
+  volumeBoost: Float,
   onValueChange: () -> Unit
 ) {
   val context = LocalContext.current
-  var min by remember {
-    mutableIntStateOf(0)
-  }
-  var max by remember {
-    mutableIntStateOf(1)
-  }
-  var current by remember {
-    mutableIntStateOf(0)
-  }
-  var isSliderDragging by remember {
-    mutableStateOf(false)
+  val settingVM = settingViewModel
+  var minStream by remember { mutableIntStateOf(0) }
+  var maxStream by remember { mutableIntStateOf(1) }
+  var currentStream by remember { mutableIntStateOf(0) }
+  var isSliderDragging by remember { mutableStateOf(false) }
+
+  val isBoosted = volumeBoost > 1.0f
+  val currentCompositeValue = if (isBoosted) {
+    100f + (volumeBoost - 1.0f) * 100f
+  } else {
+    if (maxStream > 0) (currentStream.toFloat() / maxStream) * 100f else 0f
   }
 
-  LineSlider(
-    value = current.toFloat(),
-    valueRange = min.toFloat()..max.toFloat(),
-    steps = (max - min - 1).coerceAtLeast(0),
-    onValueChange = {
-      isSliderDragging = true
-      val volume = it.roundToInt().coerceIn(min, max)
-      if (volume != current) {
-        current = volume
-        audioManager.setStreamVolume(
-          STREAM_MUSIC,
-          current,
-          0
-        )
-      }
-      onValueChange()
-    },
-    onValueChangeFinished = {
-      isSliderDragging = false
-      current = audioManager.getStreamVolume(STREAM_MUSIC).coerceIn(min, max)
-    },
-    modifier = Modifier
-      .height(48.dp)
-      .weight(1f),
-    properties = defaultLineSliderProperties.copy(
-      trackHeight = 2.dp,
-      trackBackgroundColor = LocalTheme.current.control,
-      trackProgressColor = swatchColor,
-      thumbColor = swatchColor,
-      thumbWidth = 2.dp,
-      thumbHeight = 6.dp,
-      thumbShape = RectangleShape
+  Column(
+    horizontalAlignment = Alignment.CenterHorizontally,
+    modifier = Modifier.weight(1f)
+  ) {
+    // Volume / Boost status label
+    val statusText = if (isBoosted) {
+      "🔥 BOOST ${(volumeBoost * 100f).roundToInt()}%"
+    } else if (currentStream >= maxStream && maxStream > 0) {
+      "100%"
+    } else {
+      "${currentCompositeValue.roundToInt()}%"
+    }
+
+    Text(
+      text = statusText,
+      fontSize = 11.sp,
+      fontWeight = if (isBoosted) FontWeight.Bold else FontWeight.Medium,
+      color = if (isBoosted) Color(0xFFFF9800) else swatchColor.copy(alpha = 0.75f),
+      maxLines = 1
     )
-  )
+
+    LineSlider(
+      value = currentCompositeValue.coerceIn(0f, 200f),
+      valueRange = 0f..200f,
+      steps = 199,
+      onValueChange = { targetVal ->
+        isSliderDragging = true
+        if (targetVal <= 100f) {
+          if (volumeBoost > 1.0f) {
+            settingVM.setVolumeBoost(1.0f)
+            MusicServiceRemote.service?.replayGainController?.processor?.setVolumeBoost(1.0f)
+          }
+          val vol = if (maxStream > 0) {
+            ((targetVal / 100f) * maxStream).roundToInt().coerceIn(minStream, maxStream)
+          } else 0
+          if (vol != currentStream) {
+            currentStream = vol
+            audioManager.setStreamVolume(STREAM_MUSIC, vol, 0)
+          }
+        } else {
+          if (currentStream != maxStream) {
+            currentStream = maxStream
+            audioManager.setStreamVolume(STREAM_MUSIC, maxStream, 0)
+          }
+          val newBoost = (1.0f + (targetVal - 100f) / 100f).coerceIn(1.0f, SettingPrefs.VOLUME_BOOST_MAX)
+          val snapped = SettingPrefs.normalizeVolumeBoost(newBoost)
+          settingVM.setVolumeBoost(snapped)
+          MusicServiceRemote.service?.replayGainController?.processor?.setVolumeBoost(snapped)
+          VolumeBoostHudController.show(snapped)
+        }
+        onValueChange()
+      },
+      onValueChangeFinished = {
+        isSliderDragging = false
+        currentStream = audioManager.getStreamVolume(STREAM_MUSIC).coerceIn(minStream, maxStream)
+      },
+      modifier = Modifier
+        .fillMaxWidth()
+        .height(32.dp),
+      properties = defaultLineSliderProperties.copy(
+        trackHeight = 3.dp,
+        trackBackgroundColor = LocalTheme.current.control,
+        trackProgressColor = if (isBoosted) Color(0xFFFF9800) else swatchColor,
+        thumbColor = if (isBoosted) Color(0xFFFF9800) else swatchColor,
+        thumbWidth = 4.dp,
+        thumbHeight = 10.dp,
+        thumbShape = RoundedCornerShape(2.dp)
+      )
+    )
+  }
 
   LaunchedEffect(Unit) {
-    min = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+    minStream = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
       audioManager.getStreamMinVolume(STREAM_MUSIC)
     } else 0
-    max = audioManager.getStreamMaxVolume(STREAM_MUSIC)
-    current = audioManager.getStreamVolume(STREAM_MUSIC).coerceIn(min, max)
+    maxStream = audioManager.getStreamMaxVolume(STREAM_MUSIC)
+    currentStream = audioManager.getStreamVolume(STREAM_MUSIC).coerceIn(minStream, maxStream)
   }
 
-  DisposableEffect(audioManager, context, min, max) {
+  DisposableEffect(audioManager, context, minStream, maxStream) {
     val receiver = object : BroadcastReceiver() {
       override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != ACTION_VOLUME_CHANGED) return
@@ -268,7 +336,7 @@ private fun RowScope.VolumeSeekBar(
           EXTRA_VOLUME_STREAM_VALUE,
           audioManager.getStreamVolume(STREAM_MUSIC)
         )
-        current = volume.coerceIn(min, max)
+        currentStream = volume.coerceIn(minStream, maxStream)
       }
     }
     val filter = IntentFilter(ACTION_VOLUME_CHANGED)

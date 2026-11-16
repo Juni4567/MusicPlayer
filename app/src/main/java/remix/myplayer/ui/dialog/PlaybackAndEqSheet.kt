@@ -45,7 +45,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import remix.myplayer.R
-import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.service.MusicServiceRemote
 import remix.myplayer.ui.theme.LocalTheme
@@ -60,10 +59,20 @@ import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-private class EqPresetItem(val nameRes: Int, val gains: FloatArray)
+private class EqPresetItem(
+  val nameRes: Int,
+  val gains: FloatArray,
+  val bassBoost: Int? = null,
+  val virtualizer: Int? = null,
+)
 
 private val PresetsList = listOf(
   EqPresetItem(R.string.eq_preset_flat, floatArrayOf(0f, 0f, 0f, 0f, 0f)),
+  EqPresetItem(R.string.eq_preset_clear_vocals, floatArrayOf(-0.35f, -0.2f, 0.25f, 0.45f, 0.1f), bassBoost = 0, virtualizer = 0),
+  EqPresetItem(R.string.eq_preset_bass_surge, floatArrayOf(0.75f, 0.4f, -0.1f, -0.15f, 0.1f), bassBoost = 650),
+  EqPresetItem(R.string.eq_preset_spatial_3d, floatArrayOf(0.2f, 0.05f, -0.1f, 0.15f, 0.35f), virtualizer = 750),
+  EqPresetItem(R.string.eq_preset_anti_fatigue, floatArrayOf(0.1f, 0.15f, 0.05f, -0.3f, -0.55f), bassBoost = 0),
+  EqPresetItem(R.string.eq_preset_acoustic_hall, floatArrayOf(0.0f, 0.15f, 0.1f, 0.3f, 0.35f), virtualizer = 350),
   EqPresetItem(R.string.eq_preset_rock, floatArrayOf(0.45f, 0.25f, -0.1f, 0.2f, 0.4f)),
   EqPresetItem(R.string.eq_preset_pop, floatArrayOf(-0.15f, 0.25f, 0.35f, 0.2f, -0.1f)),
   EqPresetItem(R.string.eq_preset_classical, floatArrayOf(0.4f, 0.25f, -0.2f, 0.25f, 0.35f)),
@@ -72,6 +81,24 @@ private val PresetsList = listOf(
   EqPresetItem(R.string.eq_preset_dance, floatArrayOf(0.5f, 0.35f, 0.05f, -0.1f, 0.25f)),
   EqPresetItem(R.string.eq_preset_bass, floatArrayOf(0.7f, 0.45f, 0.1f, -0.15f, -0.2f)),
   EqPresetItem(R.string.eq_preset_treble, floatArrayOf(-0.25f, -0.1f, 0.15f, 0.45f, 0.65f)),
+)
+
+private data class MoodPresetItem(
+  val nameRes: Int,
+  val icon: String,
+  val speed: Float,
+  val pitch: Float,
+  val echoEnabled: Boolean = false,
+  val echoPreset: Int = 0,
+)
+
+private val MoodPresetsList = listOf(
+  MoodPresetItem(R.string.mood_slowed_reverb, "🌙", 0.85f, 0.92f, echoEnabled = true, echoPreset = 3 /* Hall */),
+  MoodPresetItem(R.string.mood_nightcore, "⚡", 1.20f, 1.15f, echoEnabled = false),
+  MoodPresetItem(R.string.mood_vaporwave, "📼", 0.80f, 0.85f, echoEnabled = true, echoPreset = 5 /* Plate */),
+  MoodPresetItem(R.string.mood_cardio, "🏃", 1.10f, 1.00f, echoEnabled = false),
+  MoodPresetItem(R.string.mood_lofi, "🎧", 0.90f, 1.00f, echoEnabled = false),
+  MoodPresetItem(R.string.mood_reset, "↺", 1.00f, 1.00f, echoEnabled = false),
 )
 
 private val QuickSpeedPresets = listOf(0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 2.0f)
@@ -110,9 +137,6 @@ fun PlaybackAndEqSheet(
   val currentPitch = settingState.play.pitch.toFloatOrNull() ?: 1.0f
   var pitchSliderValue by remember(currentPitch) { mutableFloatStateOf(currentPitch) }
 
-  var volumeBoost by remember(settingState.play.volumeBoost) {
-    mutableFloatStateOf(settingState.play.volumeBoost)
-  }
   val echoEnabled = settingState.play.enableEcho
   val echoPreset = settingState.play.echoPreset.coerceIn(0, EchoPresetNameRes.lastIndex)
 
@@ -172,14 +196,24 @@ fun PlaybackAndEqSheet(
   fun resetPlayback() {
     speedSliderValue = 1.0f
     pitchSliderValue = 1.0f
-    volumeBoost = 1.0f
     MusicServiceRemote.service?.playback?.speed = 1.0f
     MusicServiceRemote.service?.playback?.pitch = 1.0f
-    MusicServiceRemote.service?.replayGainController?.processor?.setVolumeBoost(1.0f)
     settingVM.setSpeed("1.0")
     settingVM.setPitch("1.0")
-    settingVM.setVolumeBoost(1.0f)
     settingVM.setEchoEnabled(false)
+  }
+
+  fun applyMoodPreset(preset: MoodPresetItem) {
+    speedSliderValue = preset.speed
+    pitchSliderValue = preset.pitch
+    MusicServiceRemote.service?.playback?.speed = preset.speed
+    MusicServiceRemote.service?.playback?.pitch = preset.pitch
+    settingVM.setSpeed(preset.speed.toString())
+    settingVM.setPitch(preset.pitch.toString())
+    settingVM.setEchoEnabled(preset.echoEnabled)
+    if (preset.echoEnabled) {
+      settingVM.setEchoPreset(preset.echoPreset)
+    }
   }
 
   MiBottomSheet(
@@ -249,8 +283,37 @@ fun PlaybackAndEqSheet(
             modifier = Modifier
               .fillMaxWidth()
               .verticalScroll(rememberScrollState()),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
           ) {
+            // Mood / Immersion Presets
+            Column {
+              Text(
+                text = stringResource(R.string.mood_presets),
+                color = theme.textSecondary,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(bottom = 6.dp)
+              )
+              Row(
+                modifier = Modifier
+                  .fillMaxWidth()
+                  .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+              ) {
+                MoodPresetsList.forEach { mood ->
+                  val selected = abs(speedSliderValue - mood.speed) < 0.02f &&
+                    abs(pitchSliderValue - mood.pitch) < 0.02f &&
+                    (!mood.echoEnabled || echoEnabled)
+                  SheetChip(
+                    label = "${mood.icon} ${stringResource(mood.nameRes)}",
+                    selected = selected,
+                    contentDescription = stringResource(mood.nameRes),
+                    onClick = { applyMoodPreset(mood) },
+                  )
+                }
+              }
+            }
+
             // Speed Slider & Presets
             Column {
               Row(
@@ -425,27 +488,6 @@ fun PlaybackAndEqSheet(
               }
             }
 
-            // Volume Boost Slider
-            val volumePercent = (volumeBoost * 100f).roundToInt()
-            SheetSliderRow(
-              label = stringResource(R.string.volume_boost),
-              valueLabel = "$volumePercent%",
-              value = volumeBoost,
-              valueRange = SettingPrefs.VOLUME_BOOST_MIN..SettingPrefs.VOLUME_BOOST_MAX,
-              steps = ((SettingPrefs.VOLUME_BOOST_MAX - SettingPrefs.VOLUME_BOOST_MIN) /
-                SettingPrefs.VOLUME_BOOST_STEP).roundToInt() - 1,
-              contentDescription = "Volume boost $volumePercent percent",
-              onValueChange = { v ->
-                val normalized = SettingPrefs.normalizeVolumeBoost(v)
-                volumeBoost = normalized
-                MusicServiceRemote.service
-                  ?.replayGainController
-                  ?.processor
-                  ?.setVolumeBoost(normalized)
-              },
-              onValueChangeFinished = { settingVM.setVolumeBoost(volumeBoost) },
-            )
-
             // Echo Effect Section
             Column {
               Row(
@@ -604,6 +646,18 @@ fun PlaybackAndEqSheet(
                       contentDescription = stringResource(preset.nameRes),
                       onClick = {
                         EQHelper.applyRelativeGains(preset.gains)
+                        preset.bassBoost?.let { b ->
+                          bassStrength = b.toFloat()
+                          if (EQHelper.isBassBoostEnabled) {
+                            EQHelper.bassBoostStrength = b
+                          }
+                        }
+                        preset.virtualizer?.let { v ->
+                          virtualizerStrength = v.toFloat()
+                          if (EQHelper.isVirtualizerEnabled) {
+                            EQHelper.virtualizerStrength = v
+                          }
+                        }
                         selectedPreset = index
                         refreshBands()
                       },

@@ -2,6 +2,25 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.1.9.3] — 2026-11-16
+
+### Highlights
+- Added **Mood & Immersion Presets** (Slowed & Reverb, Nightcore, Vaporwave, Cardio, Lo-Fi, Reset) to the Playback settings tab
+- Added **Acoustic & Audio Enhancement Profiles** (Clear Vocals, Sub-Bass Surge, 3D Spatial, Anti-Fatigue, Acoustic Hall) to the Equalizer tab
+- Removed volume boost slider from the audio sheet; volume boost is now seamlessly controlled via Volume Up/Down buttons and icons
+- Volume boost can only exceed 100% when the app is focused, with an animated in-app Volume Boost HUD bar
+
+### Audio & Controls
+- Quick mood presets instantly apply speed, pitch, and reverb combinations with live audio response
+- Equalizer presets apply target frequency curves and automatically adjust Bass Boost and Virtualizer strengths
+- Volume bar on the Now Playing screen supports the complete 0%–200% scale with distinct amber boost indicator and readout
+- Tapping the Volume Up icon past 100% raises volume boost by +5% increments up to 200%; Volume Down decreases boost before lowering system volume
+- Hardware volume keys increase boost above 100% only while the app is active in foreground
+- In-app floating Volume Boost HUD banner displays real-time boost percentage and visual progress
+
+### Notes
+- Signed for sideload with this fork’s debug keystore
+
 ## [2.1.9.2] — 2026-11-16
 
 ### Highlights
@@ -185,6 +204,7 @@ All notable changes to A-Music (fork of APlayer) are documented in this file.
 
 - See upstream APlayer release notes
 
+[2.1.9.3]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.9.3
 [2.1.9.2]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.9.2
 [2.1.9.1]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.9.1
 [2.1.9.0]: https://github.com/Juni4567/MusicPlayer/releases/tag/v2.1.9.0
