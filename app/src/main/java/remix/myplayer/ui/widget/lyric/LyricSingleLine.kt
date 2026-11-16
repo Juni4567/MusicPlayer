@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.TextUnit
-import remix.myplayer.data.prefs.DesktopLyricPrefs.Companion.ELLIPSIS
+import remix.myplayer.data.prefs.LyricPrefs.Companion.ELLIPSIS
 import remix.myplayer.lyric.LyricLine
 import remix.myplayer.lyric.PerWordLyricLine
 import remix.myplayer.ui.widget.lyric.PerWordLyricHelper.drawPerWordOverlay

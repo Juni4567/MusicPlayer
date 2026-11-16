@@ -111,7 +111,6 @@ class SettingPrefs @Inject constructor(
   var blacklist by PrefsDelegate(sp, PrefKeys.Setting.BLACKLIST, emptySet<String>())
   var deleteSource by PrefsDelegate(sp, PrefKeys.Setting.DELETE_SOURCE, false)
 
-  var lockScreen by PrefsDelegate(sp, PrefKeys.Setting.LOCKSCREEN, LOCKSCREEN_SYSTEM)
   var language by PrefsDelegate(sp, PrefKeys.Setting.LANGUAGE, AUTO)
   var uiFontScale by PrefsDelegate(
     sp,
@@ -119,7 +118,6 @@ class SettingPrefs @Inject constructor(
     UI_FONT_SCALE_DEFAULT
   )
   var playAtBreakPoint by PrefsDelegate(sp, PrefKeys.Setting.PLAY_AT_BREAKPOINT, false)
-  var shake by PrefsDelegate(sp, PrefKeys.Setting.SHAKE, false)
   var showDisplayName by PrefsDelegate(sp, PrefKeys.Setting.SHOW_DISPLAYNAME, false)
 
   var ignoreAudioFocus by PrefsDelegate(sp, PrefKeys.Setting.AUDIO_FOCUS, false)
@@ -238,11 +236,6 @@ class SettingPrefs @Inject constructor(
     const val DOWNLOAD_COVER_NEVER = 2
 
     const val CLASSIC_NOTIFY_BACKGROUND_SYSTEM = 0
-
-    // 0:软件锁屏 1:系统锁屏 2:关闭
-    const val LOCKSCREEN_APLAYER: Int = 0
-    const val LOCKSCREEN_SYSTEM: Int = 1
-    const val LOCKSCREEN_CLOSE: Int = 2
 
     // 播放模式
     const val MODE_LOOP: Int = 1

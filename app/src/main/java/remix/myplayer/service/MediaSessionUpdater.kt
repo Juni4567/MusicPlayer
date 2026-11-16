@@ -21,7 +21,6 @@ import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.model.audio.Song.Companion.EMPTY_SONG
 import remix.myplayer.data.prefs.SettingPrefs
-import remix.myplayer.data.prefs.SettingPrefs.Companion.LOCKSCREEN_CLOSE
 import remix.myplayer.service.playback.Playback
 import remix.myplayer.ui.nav.MessageNotifier
 import remix.myplayer.ui.theme.ThemeController
@@ -33,8 +32,6 @@ import javax.inject.Inject
 data class MediaSessionExtras(
   val isFavorite: Boolean,
   val playMode: Int,
-  val desktopLyricEnabled: Boolean,
-  val desktopLyricLocked: Boolean,
   val timerRunning: Boolean,
 )
 
@@ -82,7 +79,6 @@ class MediaSessionUpdater @Inject constructor(
     context: Context,
     mediaSession: MediaSessionCompat,
     playback: Playback,
-    lockScreen: Int,
     extras: MediaSessionExtras,
   ) {
     val currentSong = playback.currentSong ?: EMPTY_SONG
@@ -104,12 +100,6 @@ class MediaSessionUpdater @Inject constructor(
 
     mediaSession.setMetadata(builder.build())
     updatePlaybackState(context, mediaSession, playback, extras)
-
-    val shouldLoadAlbumArt =
-      lockScreen != LOCKSCREEN_CLOSE || Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-    if (!shouldLoadAlbumArt) {
-      return
-    }
 
     val placeholder =
       if (themeController.appTheme.isLight) R.drawable.album_empty_bg_day else R.drawable.album_empty_bg_night
@@ -179,27 +169,6 @@ class MediaSessionUpdater @Inject constructor(
             if (extras.timerRunning) R.string.cancel_timer else R.string.start_timer
           ),
           if (extras.timerRunning) R.drawable.ic_timer_on_24dp else R.drawable.ic_player_timer_24dp
-        ).build()
-      )
-      builder.addCustomAction(
-        PlaybackStateCompat.CustomAction.Builder(
-          if (extras.desktopLyricLocked) {
-            MusicService.ACTION_UNLOCK_DESKTOP_LYRIC
-          } else {
-            MusicService.ACTION_TOGGLE_DESKTOP_LYRIC
-          },
-          context.getString(
-            when {
-              extras.desktopLyricLocked -> R.string.media_action_unlock_lyrics
-              extras.desktopLyricEnabled -> R.string.close_desktop_lyrics
-              else -> R.string.media_action_desktop_lyrics
-            }
-          ),
-          if (extras.desktopLyricEnabled || extras.desktopLyricLocked) {
-            R.drawable.icon_notify_desktop_lyric_unlock
-          } else {
-            R.drawable.icon_notify_lyric
-          }
         ).build()
       )
     }

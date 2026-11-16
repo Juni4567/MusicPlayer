@@ -38,7 +38,6 @@ import kotlinx.coroutines.withContext
 import remix.myplayer.App.Companion.context
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
-import remix.myplayer.misc.floatpermission.rom.RomUtils
 import remix.myplayer.misc.manager.APlayerActivityManager
 import remix.myplayer.ui.nav.MessageNotifier
 import timber.log.Timber
@@ -506,11 +505,24 @@ object Util {
    * 判断是否支持状态栏歌词
    */
   fun isSupportStatusBarLyric(context: Context): Boolean {
-    return RomUtils.checkIsMeizuRom() || Settings.System.getInt(
+    val isMeizu = Build.DISPLAY.lowercase().contains("flyme")
+    val hasStatusBarLyricSetting = Settings.System.getInt(
       context.contentResolver,
       "status_bar_show_lyric",
       0
-    ) != 0 || RomUtils.checkIsbaolong24Rom() || RomUtils.checkIsexTHmUIRom()
+    ) != 0
+    val isBaolong24 = !getSystemProperty("org.baolong24.device").isNullOrEmpty()
+    val isExthm = !getSystemProperty("ro.exthm.device").isNullOrEmpty()
+    return isMeizu || hasStatusBarLyricSetting || isBaolong24 || isExthm
+  }
+
+  private fun getSystemProperty(propName: String): String? {
+    return try {
+      val p = Runtime.getRuntime().exec("getprop $propName")
+      p.inputStream.bufferedReader().use { it.readLine() }
+    } catch (e: Exception) {
+      null
+    }
   }
 
   /**

@@ -67,8 +67,6 @@ NotifyImpl24(context: MusicService) : Notify(context) {
     val deleteIntent = Intent(MusicService.ACTION_CMD)
     deleteIntent.putExtra(EXTRA_COMMAND, Command.CLOSE_NOTIFY)
 
-    val desktopLyricLock = lyricManager.isDesktopLyricLocked
-
     val notification = NotificationCompat.Builder(service, PLAYING_NOTIFICATION_CHANNEL_ID)
       .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
       .setSmallIcon(R.drawable.icon_notifbar)
@@ -84,16 +82,6 @@ NotifyImpl24(context: MusicService) : Notify(context) {
         R.drawable.ic_skip_next_black_24dp, service.getString(R.string.next),
         buildPendingIntent(service, Command.SKIP_TO_NEXT)
       )
-      // 根据当前桌面歌词的状态判断是显示开关桌面歌词还是解锁桌面歌词
-      // 当前显示了桌面歌词并且已经锁定,显示解锁的按钮
-      .addAction(
-        if (desktopLyricLock) R.drawable.ic_lock_open_black_24dp else R.drawable.ic_desktop_lyric_black_24dp,
-        service.getString(if (desktopLyricLock) R.string.desktop_lyric__unlock else R.string.desktop_lyric_lock),
-        buildPendingIntent(
-          service,
-          if (desktopLyricLock) Command.UNLOCK_DESKTOP_LYRIC else Command.TOGGLE_DESKTOP_LYRIC
-        )
-      )
       .setDeleteIntent(buildPendingIntent(service, Command.CLOSE_NOTIFY))
       .setContentIntent(contentIntent)
       .setContentTitle(song.title)
@@ -104,7 +92,7 @@ NotifyImpl24(context: MusicService) : Notify(context) {
       .setContentText(song.artist + " - " + song.album)
       .setStyle(
         androidx.media.app.NotificationCompat.MediaStyle()
-          .setShowActionsInCompactView(0, 1, 2, 3)
+          .setShowActionsInCompactView(0, 1, 2)
           .setMediaSession(service.mediaSession.sessionToken)
       )
       .build()

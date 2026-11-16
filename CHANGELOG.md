@@ -2,6 +2,25 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.1.9.4] — 2026-11-16
+
+### Highlights
+- Major codebase cleanup: stripped legacy telemetry, obsolete ROM floating hacks, unused libraries, and redundant background services
+- Removed **Tencent Bugly SDK** crash reporting & tracking dependencies
+- Removed **Google Play In-App Billing** library (`BillingClient`)
+- Removed **Shake to Skip** sensor listener and wake-lock background logic
+- Removed legacy **Custom Lock Screen Activity** in favor of native system MediaSession lock screen integration
+- Removed **Desktop / Floating Window Lyrics** and eliminated the dangerous `SYSTEM_ALERT_WINDOW` permission
+- Removed 500ms foreground polling loop from LyricManager, optimizing battery and idle CPU usage
+
+### Permissions & Privacy
+- Removed `android.permission.SYSTEM_ALERT_WINDOW`
+- Removed accelerometer sensor hardware requirement
+- Zero third-party telemetry, trackers, or commercial SDKs
+
+### Notes
+- Signed for sideload with this fork’s debug keystore
+
 ## [2.1.9.3] — 2026-11-16
 
 ### Highlights

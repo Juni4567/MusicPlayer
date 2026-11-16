@@ -8,13 +8,11 @@ import remix.myplayer.ui.screen.playing.PlayingCoverAnimationStyle
 @Stable
 data class CommonSettings(
   val scanSize: Int,
-  val lockScreen: Int,
   val manualScanFolder: String,
   val blacklist: Set<String>,
   val deleteIds: Set<String>,
   val language: Int,
   val uiFontScale: Float,
-  val shake: Boolean,
   val showDisplayName: Boolean,
 )
 
@@ -87,7 +85,6 @@ data class CoverSettings(
 
 @Stable
 data class LyricSettings(
-  val desktopLyricEnabled: Boolean,
   val statusBarLyricEnabled: Boolean,
   val translationEnabled: Boolean,
   val fontScale: Float,

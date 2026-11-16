@@ -24,8 +24,6 @@ class ExitReceiver : BroadcastReceiver() {
     ServiceManager.StopAll()
     //      //关闭通知
 //        ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE)).cancelAll();
-    //停止摇一摇
-//        ShakeDetector.getInstance().stopListen();
     //关闭所有activity
     finishAll()
     Handler(Looper.getMainLooper()).postDelayed({

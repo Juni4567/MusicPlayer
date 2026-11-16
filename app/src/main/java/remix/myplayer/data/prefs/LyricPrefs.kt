@@ -9,8 +9,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * 通用的歌词配置，桌面歌词的配置在DesktopLyricPrefs
- * @see remix.myplayer.data.prefs.DesktopLyricPrefs
+ * 通用的歌词配置
  */
 @Singleton
 class LyricPrefs @Inject constructor(
@@ -33,7 +32,6 @@ class LyricPrefs @Inject constructor(
 
   var tipShown by PrefsDelegate(sp, KEY_LYRIC_LOCAL_TIP_SHOWN, false)
 
-  var desktopLyricEnabled by PrefsDelegate(sp, KEY_DESKTOP_LYRIC_ENABLED, false)
   var statusBarLyricEnabled by PrefsDelegate(sp, KEY_STATUS_BAR_LYRIC_ENABLED, false)
 
   var fontScale by PrefsDelegate(sp, KEY_LYRIC_FONT_SCALE, 1.0f)
@@ -56,6 +54,8 @@ class LyricPrefs @Inject constructor(
 
   companion object {
 
+    const val ELLIPSIS = "…"
+
     private val defaultLyricOrderList = listOf(
       LyricOrder.Embedded,
       LyricOrder.Local,
@@ -67,10 +67,6 @@ class LyricPrefs @Inject constructor(
 
     // StatusBar
     const val KEY_STATUS_BAR_LYRIC_ENABLED: String = "status_bar_lyric_enabled"
-
-    // Desktop
-    const val KEY_DESKTOP_LYRIC_ENABLED = "desktop_lyric_enabled"
-    const val KEY_DESKTOP_LYRIC_LOCKED = "desktop_lyric_locked"
 
     // LyricScreen
     const val KEY_LYRIC_FONT_SCALE = "lyric_font_scale"

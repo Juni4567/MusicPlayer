@@ -1,6 +1,5 @@
 package remix.myplayer.viewmodel.settings
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.compose.ui.graphics.Color
@@ -27,7 +26,6 @@ import remix.myplayer.data.model.misc.Library.Companion.TAG_SONG
 import remix.myplayer.data.model.misc.LyricOrder
 import remix.myplayer.data.prefs.LyricPrefs
 import remix.myplayer.data.prefs.SettingPrefs
-import remix.myplayer.helper.ShakeDetector
 import remix.myplayer.lyric.LyricManager
 import remix.myplayer.lyric.LyricManager.Companion.ACTION_LYRIC
 import remix.myplayer.lyric.LyricManager.Companion.CHANGE_LYRIC
@@ -77,13 +75,11 @@ class SettingViewModel @Inject constructor(
   private fun loadState(): SettingsState = SettingsState(
     common = CommonSettings(
       scanSize = settingPrefs.scanSize,
-      lockScreen = settingPrefs.lockScreen,
       manualScanFolder = settingPrefs.manualScanFolder,
       blacklist = settingPrefs.blacklist,
       deleteIds = settingPrefs.deleteIds,
       language = settingPrefs.language,
       uiFontScale = SettingPrefs.normalizeUiFontScale(settingPrefs.uiFontScale),
-      shake = settingPrefs.shake,
       showDisplayName = settingPrefs.showDisplayName
     ),
     play = PlaySettings(
@@ -145,7 +141,6 @@ class SettingViewModel @Inject constructor(
       coverAnimationSpeed = settingPrefs.playingCoverAnimationSpeed
     ),
     lyric = LyricSettings(
-      desktopLyricEnabled = lyricPrefs.desktopLyricEnabled,
       statusBarLyricEnabled = lyricPrefs.statusBarLyricEnabled,
       translationEnabled = lyricPrefs.translationEnabled,
       fontScale = lyricPrefs.fontScale,
@@ -194,11 +189,6 @@ class SettingViewModel @Inject constructor(
     _settingsState.update { it.copy(common = it.common.copy(scanSize = kb)) }
   }
 
-  fun setLockScreen(mode: Int) {
-    settingPrefs.lockScreen = mode
-    _settingsState.update { it.copy(common = it.common.copy(lockScreen = mode)) }
-  }
-
   fun setManualScanFolder(path: String) {
     settingPrefs.manualScanFolder = path
     _settingsState.update { it.copy(common = it.common.copy(manualScanFolder = path)) }
@@ -212,17 +202,6 @@ class SettingViewModel @Inject constructor(
   fun setDeleteIds(values: Set<String>) {
     settingPrefs.deleteIds = values
     _settingsState.update { it.copy(common = it.common.copy(deleteIds = values)) }
-  }
-
-  fun setShake(enabled: Boolean) {
-    settingPrefs.shake = enabled
-    _settingsState.update { it.copy(common = it.common.copy(shake = enabled)) }
-
-    if (enabled) {
-      ShakeDetector.getInstance().beginListen()
-    } else {
-      ShakeDetector.getInstance().stopListen()
-    }
   }
 
   fun setShowDisplayName(enabled: Boolean) {
@@ -448,11 +427,6 @@ class SettingViewModel @Inject constructor(
   }
 
   // -------- Lyric 分组 ----------
-  fun setDesktopLyricEnabled(enabled: Boolean, activity: Activity?) {
-    lyricManager.setDesktopLyricEnabled(enabled, activity)
-    _settingsState.update { it.copy(lyric = it.lyric.copy(desktopLyricEnabled = enabled)) }
-  }
-
   fun setStatusBarLyricEnabled(enabled: Boolean) {
     lyricManager.isStatusBarLyricEnabled = enabled
     _settingsState.update { it.copy(lyric = it.lyric.copy(statusBarLyricEnabled = enabled)) }

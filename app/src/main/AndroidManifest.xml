@@ -12,12 +12,9 @@
   <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
   <uses-permission android:name="android.permission.VIBRATE"/>
   <uses-permission android:name="android.permission.WAKE_LOCK"/>
-  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
   <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
   <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
   <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-
-  <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="false"/>
 
   <queries>
     <intent>
@@ -100,13 +97,6 @@
       </intent-filter>
     </activity>
 
-    <!-- 锁屏页 -->
-    <activity
-      android:excludeFromRecents="true"
-      android:exported="false"
-      android:launchMode="singleInstance"
-      android:name=".ui.activity.LockScreenActivity"
-      android:theme="@style/LockScreenActivity"/>
     <!-- shortcut过渡 -->
     <activity
       android:excludeFromRecents="true"

@@ -1,7 +1,3 @@
-# bugly
-# https://bugly.qq.com/docs/user-guide/instruction-manual-android/
--keep public class com.tencent.bugly.** { *; }
--dontwarn com.tencent.bugly.**
 
 # smbj
 -dontwarn com.hierynomus.**

@@ -38,13 +38,7 @@ abstract class Notify internal constructor(internal var service: MusicService) {
 
   protected var target: CustomTarget<Bitmap>? = null
 
-  protected val lyricManager = service.lyricManager
-
   var isNotifyShowing = false
-    set(value) {
-      field = value
-      lyricManager.isNotifyShowing = value
-    }
 
   private val notificationManager: NotificationManager by lazy {
     service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

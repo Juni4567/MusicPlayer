@@ -31,18 +31,15 @@ import remix.myplayer.ui.screen.setting.logic.common.BreakPointLogic
 import remix.myplayer.ui.screen.setting.logic.common.ExportPlayListLogic
 import remix.myplayer.ui.screen.setting.logic.common.ImportPlayListLogic
 import remix.myplayer.ui.screen.setting.logic.common.LanguageLogic
-import remix.myplayer.ui.screen.setting.logic.common.LockScreenLogic
 import remix.myplayer.ui.screen.setting.logic.common.ManualScanLogic
 import remix.myplayer.ui.screen.setting.logic.common.RestoreDeleteLogic
 import remix.myplayer.ui.screen.setting.logic.common.ScanSizeLogic
-import remix.myplayer.ui.screen.setting.logic.common.ShakeLogic
 import remix.myplayer.ui.screen.setting.logic.common.ShowDisplayNameLogic
 import remix.myplayer.ui.screen.setting.logic.common.UiFontScaleLogic
 import remix.myplayer.ui.screen.setting.logic.cover.AutoDownloadLogic
 import remix.myplayer.ui.screen.setting.logic.cover.DownloadSourceLogic
 import remix.myplayer.ui.screen.setting.logic.cover.IgnoreMediaStoreLogic
 import remix.myplayer.ui.screen.setting.logic.library.LibraryLogic
-import remix.myplayer.ui.screen.setting.logic.lyric.DesktopLyricLogic
 import remix.myplayer.ui.screen.setting.logic.lyric.LyricPriorityLogic
 import remix.myplayer.ui.screen.setting.logic.lyric.StatusBarLyricLogic
 import remix.myplayer.ui.screen.setting.logic.lyric.TranslationLogic
@@ -192,8 +189,6 @@ private fun CommonPreferenceItems() {
 
   BlackListLogic()
 
-  LockScreenLogic()
-
   ManualScanLogic()
 
   ImportPlayListLogic()
@@ -205,8 +200,6 @@ private fun CommonPreferenceItems() {
   LanguageLogic()
 
   UiFontScaleLogic()
-
-  ShakeLogic()
 
   ShowDisplayNameLogic()
 }
@@ -276,8 +269,6 @@ private fun NotificationPreferenceItems() {
 
 @Composable
 private fun LyricPreferenceItems() {
-  DesktopLyricLogic()
-
   TranslationLogic()
 
   StatusBarLyricLogic()

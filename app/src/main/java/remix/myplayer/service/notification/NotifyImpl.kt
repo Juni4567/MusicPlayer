@@ -63,15 +63,8 @@ class NotifyImpl(context: MusicService) : Notify(context) {
       remoteView.setViewVisibility(R.id.notify_bg, View.VISIBLE)
     }
 
-    //桌面歌词
-    remoteBigView.setImageViewResource(
-      R.id.notify_lyric,
-      if (lyricManager.isDesktopLyricEnabled) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric
-    )
-    remoteView.setImageViewResource(
-      R.id.notify_lyric,
-      if (lyricManager.isDesktopLyricEnabled) R.drawable.icon_notify_desktop_lyric_unlock else R.drawable.icon_notify_lyric
-    )
+    remoteBigView.setViewVisibility(R.id.notify_lyric, View.GONE)
+    remoteView.setViewVisibility(R.id.notify_lyric, View.GONE)
 
     //设置播放按钮
     if (!isPlay) {
@@ -166,13 +159,5 @@ class NotifyImpl(context: MusicService) : Notify(context) {
     val closeIntent = buildPendingIntent(context, Command.CLOSE_NOTIFY)
     remoteBigView.setOnClickPendingIntent(R.id.notify_close, closeIntent)
     remoteView.setOnClickPendingIntent(R.id.notify_close, closeIntent)
-
-    //桌面歌词
-    val lyricIntent = buildPendingIntent(
-      context,
-      if (lyricManager.isDesktopLyricLocked) Command.UNLOCK_DESKTOP_LYRIC else Command.TOGGLE_DESKTOP_LYRIC
-    )
-    remoteBigView.setOnClickPendingIntent(R.id.notify_lyric, lyricIntent)
-    remoteView.setOnClickPendingIntent(R.id.notify_lyric, lyricIntent)
   }
 }

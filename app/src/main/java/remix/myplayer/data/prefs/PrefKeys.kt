@@ -25,15 +25,6 @@ object PrefKeys {
     /** 曲库配置 */
     const val LIBRARY = "library_category"
 
-    /** 锁屏设置 */
-    const val LOCKSCREEN = "lockScreen"
-
-    /** 摇一摇 */
-    const val SHAKE = "shake"
-
-    /** 是否开启桌面歌词 */
-    const val DESKTOP_LYRIC_SHOW = "desktop_lyric_show"
-
     /** 是否开启状态栏歌词 */
     const val STATUSBAR_LYRIC_SHOW = "statusbar_lyric_show"
 

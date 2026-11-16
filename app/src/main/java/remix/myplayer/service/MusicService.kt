@@ -35,16 +35,12 @@ import remix.myplayer.data.model.audio.Song
 import remix.myplayer.data.model.audio.Song.Companion.EMPTY_SONG
 import remix.myplayer.data.prefs.PrefKeys
 import remix.myplayer.data.prefs.SettingPrefs
-import remix.myplayer.data.prefs.SettingPrefs.Companion.LOCKSCREEN_APLAYER
-import remix.myplayer.data.prefs.SettingPrefs.Companion.LOCKSCREEN_CLOSE
-import remix.myplayer.data.prefs.SettingPrefs.Companion.LOCKSCREEN_SYSTEM
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_LOOP
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_REPEAT
 import remix.myplayer.data.prefs.SettingPrefs.Companion.MODE_SHUFFLE
 import remix.myplayer.data.prefs.SettingPrefs.Companion.OPEN_SOFTWARE
 import remix.myplayer.helper.EQHelper
 import remix.myplayer.helper.LanguageHelper
-import remix.myplayer.helper.ShakeDetector
 import remix.myplayer.helper.SleepTimer
 import remix.myplayer.lyric.LyricManager
 import remix.myplayer.misc.receiver.ExitReceiver
@@ -64,7 +60,6 @@ import remix.myplayer.service.playback.EchoController
 import remix.myplayer.service.playback.ReplayGainController
 import remix.myplayer.service.playback.PlaybackFavoriteState
 import remix.myplayer.service.playback.PlaybackProgressSaver
-import remix.myplayer.ui.activity.LockScreenActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PERMISSION
 import remix.myplayer.ui.activity.base.BaseMusicActivity.Companion.EXTRA_PLAYLIST
@@ -352,19 +347,6 @@ class MusicService : BaseService(),
           updateNotification()
         }
       }
-      // 锁屏
-      PrefKeys.Setting.LOCKSCREEN -> {
-        when (settingPrefs.lockScreen) {
-          LOCKSCREEN_CLOSE -> mediaSessionUpdater.clear(mediaSession)
-          LOCKSCREEN_SYSTEM, LOCKSCREEN_APLAYER -> mediaSessionUpdater.updateMetadata(
-            this,
-            mediaSession,
-            playback,
-            settingPrefs.lockScreen,
-            mediaSessionExtras()
-          )
-        }
-      }
       // 断点播放
       PrefKeys.Setting.PLAY_AT_BREAKPOINT -> {
         if (!settingPrefs.playAtBreakPoint) {
@@ -482,8 +464,6 @@ class MusicService : BaseService(),
       }
     })
 
-    lyricManager.isServiceAvailable = true
-
     audioFocusManager.attach(this)
     setUpPlayback()
     setUpSession()
@@ -562,14 +542,6 @@ class MusicService : BaseService(),
             handleCommand(Intent(ACTION_CMD).putExtra(EXTRA_COMMAND, Command.CHANGE_MODEL))
           ACTION_TOGGLE_TIMER ->
             handleCommand(Intent(ACTION_CMD).putExtra(EXTRA_COMMAND, Command.TOGGLE_TIMER))
-          ACTION_UNLOCK_DESKTOP_LYRIC -> {
-            lyricManager.isDesktopLyricLocked = false
-            updatePlaybackState()
-          }
-          ACTION_TOGGLE_DESKTOP_LYRIC -> {
-            lyricManager.setDesktopLyricEnabled(!lyricManager.isDesktopLyricEnabled)
-            updatePlaybackState()
-          }
         }
       }
     })
@@ -738,8 +710,6 @@ class MusicService : BaseService(),
 
     notify.stopForegroundAndNotification()
 
-    lyricManager.isServiceAvailable = false
-
     updateNotification()
 
     audioFocusManager.detach()
@@ -757,8 +727,6 @@ class MusicService : BaseService(),
       .unregisterOnSharedPreferenceChangeListener(this)
 
     contentResolver.unregisterContentObserver(mediaStoreObserver)
-
-    ShakeDetector.getInstance().stopListen()
 
     alreadyUnInit = true
   }
@@ -1144,7 +1112,6 @@ class MusicService : BaseService(),
       this,
       mediaSession,
       playback,
-      settingPrefs.lockScreen,
       mediaSessionExtras()
     )
     // 是否需要保存进度
@@ -1252,10 +1219,6 @@ class MusicService : BaseService(),
           }
         }
       }
-      // 桌面歌词
-      Command.TOGGLE_DESKTOP_LYRIC -> {
-        lyricManager.setDesktopLyricEnabled(!lyricManager.isDesktopLyricEnabled)
-      }
       // 临时播放一首歌曲
       Command.PLAY_TEMP -> {
         intent.getSerializableExtra(EXTRA_SONG)?.let {
@@ -1273,10 +1236,6 @@ class MusicService : BaseService(),
           playQueueStore.save(playback.getPlaylist())
           start(true)
         }
-      }
-      // 解锁桌面歌词
-      Command.UNLOCK_DESKTOP_LYRIC -> {
-        lyricManager.isDesktopLyricLocked = false
       }
       // 某一首歌曲添加至下一首播放
       Command.ADD_TO_NEXT_SONG -> {
@@ -1330,8 +1289,6 @@ class MusicService : BaseService(),
     return MediaSessionExtras(
       isFavorite = stateSource.currentPlaybackUiState.isFavorite,
       playMode = settingPrefs.playModel,
-      desktopLyricEnabled = lyricManager.isDesktopLyricEnabled,
-      desktopLyricLocked = lyricManager.isDesktopLyricLocked,
       timerRunning = SleepTimer.isTicking(),
     )
   }
@@ -1360,11 +1317,6 @@ class MusicService : BaseService(),
 
       // 通知栏样式
       settingPrefs.classicNotify = Build.VERSION.SDK_INT < Build.VERSION_CODES.N
-    }
-
-    // 摇一摇
-    if (settingPrefs.shake) {
-      ShakeDetector.getInstance().beginListen()
     }
 
     restorePlayList()
@@ -1435,17 +1387,6 @@ class MusicService : BaseService(),
       Timber.tag("ScreenReceiver").v(action)
       if (Intent.ACTION_SCREEN_ON == action) {
         screenOn = true
-        //显示锁屏
-        if (isPlaying && settingPrefs.lockScreen == LOCKSCREEN_APLAYER) {
-          try {
-            context.startActivity(
-              Intent(context, LockScreenActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            )
-          } catch (e: Exception) {
-            Timber.v("启动锁屏页失败: $e")
-          }
-        }
         //重新开始更新桌面部件
         appWidgetUpdater.updateWidget(this@MusicService, this@MusicService, isPlaying, screenOn)
       } else {
@@ -1485,8 +1426,6 @@ class MusicService : BaseService(),
     const val ACTION_SHORTCUT_LASTADDED = "$APLAYER_PACKAGE_NAME.shortcut.last_added"
     const val ACTION_CMD = "$APLAYER_PACKAGE_NAME.cmd"
     const val ACTION_WIDGET_UPDATE = "$APLAYER_PACKAGE_NAME.widget_update"
-    const val ACTION_UNLOCK_DESKTOP_LYRIC = "$APLAYER_PACKAGE_NAME.unlock.desktop_lyric"
-    const val ACTION_TOGGLE_DESKTOP_LYRIC = "$APLAYER_PACKAGE_NAME.toggle.desktop_lyric"
     const val ACTION_LOVE = "$APLAYER_PACKAGE_NAME.love"
     const val ACTION_CHANGE_MODE = "$APLAYER_PACKAGE_NAME.change_mode"
     const val ACTION_TOGGLE_TIMER = "$APLAYER_PACKAGE_NAME.toggle_timer"

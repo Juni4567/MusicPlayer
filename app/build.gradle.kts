@@ -59,8 +59,8 @@ android {
         minSdk = 21
         targetSdk = 36
 
-        versionCode = 21903
-        versionName = "2.1.9.3"
+        versionCode = 21904
+        versionName = "2.1.9.4"
 
         vectorDrawables.useSupportLibrary = true
 
@@ -162,11 +162,6 @@ android {
         create("normal") {
             dimension = "distribution"
             isDefault = true
-            buildConfigField(
-                "String",
-                "BUGLY_APP_ID",
-                "\"${properties.getProperty("BUGLY_APP_ID")}\""
-            )
             buildConfigField("boolean", "ENABLE_UPDATE", "true")
         }
         create("foss") {
@@ -333,11 +328,7 @@ dependencies {
 
     debugImplementation(libs.leakcanary)
 
-    val normalImplementation by configurations
-    normalImplementation(libs.bugly)
-
     val googleImplementation by configurations
-    googleImplementation(libs.billingclient)
     googleImplementation(libs.play.feature.delivery)
     googleImplementation(libs.play.feature.delivery.ktx)
 
@@ -364,52 +355,4 @@ dependencies {
     "baselineProfile"(project(":baselineprofile"))
 
     implementation(project(":taglib"))
-}
-
-// 上传mapping文件
-if (properties.getProperty("BUGLY_UPLOAD") == "1") {
-    val uploadMapping by tasks.registering(Exec::class) {
-        description = "upload bugly"
-        val jarFile = File(properties.getProperty("BUGLY_JAR") ?: "")
-        if (!jarFile.exists()) {
-            logger.warn("jarFile: ${jarFile.absolutePath} don't exist")
-            return@registering
-        }
-
-        val appId = properties.getProperty("BUGLY_APP_ID")
-        val appKey = properties.getProperty("BUGLY_APP_KEY")
-        if (appId.isNullOrEmpty() || appKey.isNullOrEmpty()) {
-            logger.warn("appId or appKey for bugly is invalid")
-            return@registering
-        }
-
-        val mappingFile =
-            file("${project.layout.buildDirectory.asFile.get()}/outputs/mapping/normalRelease/mapping.txt")
-        val args = listOf(
-            "-appid",
-            appId,
-            "-appkey",
-            appKey,
-            "-bundleid",
-            android.defaultConfig.applicationId ?: "",
-            "-version",
-            android.defaultConfig.versionName ?: "",
-            "-buildNo",
-            (android.defaultConfig.versionCode ?: 0).toString(),
-            "-platform",
-            "Android",
-            "-inputMapping",
-            mappingFile.absolutePath
-        )
-
-        commandLine = listOf("java", "-jar", jarFile.absolutePath) + args
-        standardOutput = System.out
-        errorOutput = System.out
-    }
-
-    tasks.whenTaskAdded {
-        if (name == "assembleNormalRelease") {
-            finalizedBy(uploadMapping)
-        }
-    }
 }
