@@ -69,8 +69,11 @@ fun ListItem(
       verticalArrangement = Arrangement.Center
     ) {
       TextPrimary(text = remix.myplayer.util.Util.sanitizeMeta(text1).ifEmpty { text1 }, fontSize = 14.5.sp, fontWeight = FontWeight.Medium)
-      Spacer(modifier = Modifier.height(2.dp))
-      TextSecondary(text = remix.myplayer.util.Util.sanitizeMeta(text2).ifEmpty { "—" }, fontSize = 12.sp)
+      val clean2 = remix.myplayer.util.Util.sanitizeMeta(text2)
+      if (clean2.isNotEmpty()) {
+        Spacer(modifier = Modifier.height(2.dp))
+        TextSecondary(text = clean2, fontSize = 12.sp)
+      }
     }
 
     LibraryItemPopupButton(model = model, enabled = popupEnabled)

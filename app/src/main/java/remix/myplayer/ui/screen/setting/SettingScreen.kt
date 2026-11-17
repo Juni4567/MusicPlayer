@@ -120,21 +120,31 @@ fun SettingDetailScreen(categoryKey: String) {
     topBar = { CommonAppBar(title = stringResource(category.titleRes), actions = emptyList()) },
     containerColor = LocalTheme.current.mainBackground,
   ) { contentPadding ->
+    val theme = LocalTheme.current
     LazyColumn(
-      contentPadding = PaddingValues(top = 8.dp, bottom = 24.dp),
+      contentPadding = PaddingValues(horizontal = 14.dp, vertical = 12.dp),
       modifier = Modifier.padding(contentPadding)
     ) {
       item {
-        when (category) {
-          SettingCategory.Common -> CommonPreferenceItems()
-          SettingCategory.Play -> PlayPreferenceItems()
-          SettingCategory.Color -> ColorPreferenceItems()
-          SettingCategory.Library -> LibraryPreferenceItems()
-          SettingCategory.PlayingScreen -> PlayingScreenPreferenceItems()
-          SettingCategory.Cover -> CoverPreferenceItems()
-          SettingCategory.Lyric -> LyricPreferenceItems()
-          SettingCategory.Notification -> NotificationPreferenceItems()
-          SettingCategory.Other -> OtherPreferenceItems()
+        Column(
+          modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(16.dp))
+            .background(theme.surface2)
+            .border(0.8.dp, theme.divider.copy(alpha = 0.35f), RoundedCornerShape(16.dp))
+            .padding(vertical = 4.dp)
+        ) {
+          when (category) {
+            SettingCategory.Common -> CommonPreferenceItems()
+            SettingCategory.Play -> PlayPreferenceItems()
+            SettingCategory.Color -> ColorPreferenceItems()
+            SettingCategory.Library -> LibraryPreferenceItems()
+            SettingCategory.PlayingScreen -> PlayingScreenPreferenceItems()
+            SettingCategory.Cover -> CoverPreferenceItems()
+            SettingCategory.Lyric -> LyricPreferenceItems()
+            SettingCategory.Notification -> NotificationPreferenceItems()
+            SettingCategory.Other -> OtherPreferenceItems()
+          }
         }
       }
     }
@@ -362,14 +372,7 @@ private fun LyricPreferenceItems() {
 @Composable
 private fun OtherPreferenceItems() {
   val mainViewModel = mainViewModel
-  val activity = LocalActivity.current
   val nav = LocalNavController.current
-
-  ArrowPreference(R.string.eq_setting) {
-    EQHelper.startEqualizer(activity ?: return@ArrowPreference) {
-      nav.navigate(RouteEq)
-    }
-  }
 
   ArrowPreference(R.string.about_info) {
     nav.navigate(RouteAbout)

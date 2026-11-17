@@ -105,7 +105,7 @@
   <string name="go_to_library">Go to library</string>
   <string name="now_playing">Now playing</string>
   <string name="search_your_library">Search your library</string>
-  <string name="search_in_audio_files">Search in %d audio files</string>
+  <string name="search_in_audio_files">Search in %d Audio files</string>
   <string name="shortcut_recent">Recent</string>
   <string name="shortcut_favorites">Favorites</string>
   <string name="shortcut_playlists">Playlists</string>

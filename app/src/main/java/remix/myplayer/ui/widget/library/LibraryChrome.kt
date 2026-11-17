@@ -44,7 +44,8 @@ import remix.myplayer.util.ext.clickWithRipple
 fun LibraryChrome(
   songs: List<Song>,
   searchQuery: String,
-  onSearchQueryChange: (String) -> Unit
+  onSearchQueryChange: (String) -> Unit,
+  totalSongCount: Int = songs.size
 ) {
   val theme = LocalTheme.current
   val surface2 = theme.surface2
@@ -79,8 +80,9 @@ fun LibraryChrome(
       Spacer(modifier = Modifier.width(6.dp))
       Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
         if (searchQuery.isEmpty()) {
-          val placeholderText = if (songs.isNotEmpty()) {
-            stringResource(R.string.search_in_audio_files, songs.size)
+          val count = if (totalSongCount > 0) totalSongCount else songs.size
+          val placeholderText = if (count > 0) {
+            stringResource(R.string.search_in_audio_files, count)
           } else {
             stringResource(R.string.search_your_library)
           }

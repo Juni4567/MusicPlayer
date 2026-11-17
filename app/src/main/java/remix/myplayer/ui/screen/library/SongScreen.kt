@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -31,7 +32,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
@@ -72,7 +72,6 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
   val popupEnabled = !multiSelectState.isShowInLibrary()
   val theme = LocalTheme.current
   val coroutineScope = rememberCoroutineScope()
-  val density = LocalDensity.current
 
   var searchQuery by remember { mutableStateOf("") }
   val filteredSongs = remember(songs, searchQuery) {
@@ -119,7 +118,8 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
     LibraryChrome(
       songs = filteredSongs,
       searchQuery = searchQuery,
-      onSearchQueryChange = { searchQuery = it }
+      onSearchQueryChange = { searchQuery = it },
+      totalSongCount = songs.size
     )
 
     val selectedIds by remember {
@@ -208,11 +208,14 @@ fun SongScreen(scrollToCurrentEvent: SharedFlow<Unit>? = null) {
               .background(theme.secondary)
               .clickWithRipple(circle = true) {
                 if (playingIndex >= 0) {
-                  val viewportHeight = listState.layoutInfo.viewportSize.height
-                  val itemHeightPx = with(density) { 56.dp.roundToPx() }
-                  val centerOffset = -((viewportHeight - itemHeightPx) / 2).coerceAtLeast(0)
                   coroutineScope.launch {
-                    listState.animateScrollToItem(playingIndex, centerOffset)
+                    listState.scrollToItem(playingIndex)
+                    val item = listState.layoutInfo.visibleItemsInfo.firstOrNull { it.index == playingIndex }
+                    if (item != null) {
+                      val viewportHeight = listState.layoutInfo.viewportSize.height
+                      val delta = (item.offset + item.size / 2) - (viewportHeight / 2)
+                      listState.animateScrollBy(delta.toFloat())
+                    }
                   }
                 }
               },

@@ -94,20 +94,20 @@ fun Preference(
       .clickWithRipple(false) {
         onClick()
       }
-      .background(color = LocalTheme.current.mainBackground, shape = RectangleShape)
-      .padding(horizontal = 16.dp, vertical = 10.dp),
+      .background(color = Color.Transparent, shape = RectangleShape)
+      .padding(horizontal = 16.dp, vertical = 12.dp),
     verticalAlignment = Alignment.CenterVertically) {
     leading?.invoke()
 
     Column(
       modifier = Modifier
-        .padding(end = 16.dp)
+        .padding(end = 14.dp)
         .weight(1f),
       verticalArrangement = Arrangement.Center
     ) {
-      TextPrimary(title, modifier = Modifier.padding(bottom = 4.dp), fontSize = 16.sp)
+      TextPrimary(title, modifier = Modifier.padding(bottom = 3.dp), fontSize = 15.5.sp)
       if (content != null) {
-        TextSecondary(content, fontSize = 14.sp, maxLine = Int.MAX_VALUE)
+        TextSecondary(content, fontSize = 13.sp, maxLine = Int.MAX_VALUE)
       }
     }
 

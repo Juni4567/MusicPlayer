@@ -5,7 +5,7 @@
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
-  <!-- Vibrant Blue-to-Pink gradient background -->
+  <!-- Flat Matte Hot Fuchsia (#FB24E1) to App Colors (#6366F1 / #2563EB) Gradient -->
   <path
       android:pathData="M0,0h108v108h-108z">
     <aapt:attr name="android:fillColor">
@@ -15,26 +15,25 @@
           android:endX="96"
           android:endY="96"
           android:type="linear">
-        <item android:offset="0.0" android:color="#FF1E40AF" />
-        <item android:offset="0.25" android:color="#FF3B82F6" />
-        <item android:offset="0.55" android:color="#FF8B5CF6" />
-        <item android:offset="0.80" android:color="#FFEC4899" />
-        <item android:offset="1.0" android:color="#FFF43F5E" />
+        <item android:offset="0.0" android:color="#FFFB24E1" />
+        <item android:offset="0.35" android:color="#FFC026D3" />
+        <item android:offset="0.70" android:color="#FF6366F1" />
+        <item android:offset="1.0" android:color="#FF2563EB" />
       </gradient>
     </aapt:attr>
   </path>
 
-  <!-- Ambient light orb glow in top-left and bottom-right -->
+  <!-- Ambient diffuse color orbs for depth without glossy specular reflection -->
   <path
       android:pathData="M0,0h108v108h-108z">
     <aapt:attr name="android:fillColor">
       <gradient
-          android:centerX="36"
-          android:centerY="32"
+          android:centerX="32"
+          android:centerY="30"
           android:gradientRadius="48"
           android:type="radial">
-        <item android:offset="0.0" android:color="#4060A5FA" />
-        <item android:offset="1.0" android:color="#0060A5FA" />
+        <item android:offset="0.0" android:color="#33FB24E1" />
+        <item android:offset="1.0" android:color="#00FB24E1" />
       </gradient>
     </aapt:attr>
   </path>
@@ -42,29 +41,12 @@
       android:pathData="M0,0h108v108h-108z">
     <aapt:attr name="android:fillColor">
       <gradient
-          android:centerX="76"
-          android:centerY="80"
-          android:gradientRadius="42"
+          android:centerX="78"
+          android:centerY="78"
+          android:gradientRadius="48"
           android:type="radial">
-        <item android:offset="0.0" android:color="#4DF472B6" />
-        <item android:offset="1.0" android:color="#00F472B6" />
-      </gradient>
-    </aapt:attr>
-  </path>
-
-  <!-- Glossy iOS-style upper curvature highlight -->
-  <path
-      android:pathData="M0,0 L108,0 L108,44 C76,52 32,50 0,38 Z">
-    <aapt:attr name="android:fillColor">
-      <gradient
-          android:startX="54"
-          android:startY="0"
-          android:endX="54"
-          android:endY="48"
-          android:type="linear">
-        <item android:offset="0.0" android:color="#59FFFFFF" />
-        <item android:offset="0.65" android:color="#1AFFFFFF" />
-        <item android:offset="1.0" android:color="#00FFFFFF" />
+        <item android:offset="0.0" android:color="#332563EB" />
+        <item android:offset="1.0" android:color="#002563EB" />
       </gradient>
     </aapt:attr>
   </path>

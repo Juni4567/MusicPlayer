@@ -318,21 +318,32 @@ object Util {
    * @return
    */
   /**
-   * Cleans and sanitizes metadata strings by stripping '<unknown>' artifacts, leading/trailing hyphens,
-   * and providing clean fallbacks.
+   * Cleans and sanitizes metadata strings by stripping '<unknown>', 'unknown', and bracketed tags,
+   * leading/trailing hyphens, and returning an empty string if missing.
    */
   fun sanitizeMeta(raw: String?, fallback: String = ""): String {
     if (raw == null) return fallback
     var s = raw.trim()
-    if (s.equals("<unknown>", ignoreCase = true) || s.equals("unknown", ignoreCase = true)) {
+    if (s.equals("<unknown>", ignoreCase = true) ||
+      s.equals("unknown", ignoreCase = true) ||
+      s.equals("unknown artist", ignoreCase = true) ||
+      s.equals("unknown album", ignoreCase = true) ||
+      s.equals("<unknown artist>", ignoreCase = true) ||
+      s.equals("<unknown album>", ignoreCase = true) ||
+      s.equals("[unknown]", ignoreCase = true) ||
+      s.equals("(unknown)", ignoreCase = true) ||
+      s.equals("{unknown}", ignoreCase = true) ||
+      s.equals("—") ||
+      s.equals("-")
+    ) {
       return fallback
     }
-    if (s.contains("<unknown>", ignoreCase = true)) {
-      s = s.replace(Regex("(?i)<unknown>\\s*[-–—]?\\s*"), "")
-        .replace(Regex("(?i)\\s*[-–—]?\\s*<unknown>"), "")
-        .replace(Regex("(?i)<unknown>"), "")
-        .trim()
-    }
+
+    // Strip bracketed unknown tags like <unknown>, [unknown], (unknown), {unknown}
+    s = s.replace(Regex("(?i)[-–—]?\\s*[<\\[({]?\\s*unknown(?:\\s+(?:artist|album))?\\s*[>\\])}]?\\s*[-–—]?"), " ")
+      .replace(Regex("\\s+"), " ")
+      .trim(' ', '-', '–', '—')
+
     return s.ifEmpty { fallback }
   }
 
@@ -344,8 +355,8 @@ object Util {
         val s = if (clean.lastIndexOf(".") > 0) clean.substring(0, clean.lastIndexOf(".")) else clean
         s.ifEmpty { context.getString(R.string.unknown_song) }
       }
-      TYPE_ARTIST -> clean.ifEmpty { context.getString(R.string.unknown_artist) }
-      TYPE_ALBUM -> clean.ifEmpty { context.getString(R.string.unknown_album) }
+      TYPE_ARTIST -> clean
+      TYPE_ALBUM -> clean
       else -> clean
     }
   }

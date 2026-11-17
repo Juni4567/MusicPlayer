@@ -207,19 +207,25 @@ fun BottomBar(modifier: Modifier = Modifier, vm: PlaybackViewModel = playbackVie
           fontSize = 14.5.sp,
           fontWeight = FontWeight.SemiBold
         )
-        Spacer(modifier = Modifier.height(2.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-          TextSecondary(
-            text = playbackState.song.cleanArtist.ifEmpty { "—" },
-            fontSize = 12.sp,
-            modifier = Modifier.weight(1f, fill = false)
-          )
-          if (timerRunning) {
-            TextPrimary(
-              text = " · ${timerRemainMin}m",
-              fontSize = 11.5.sp,
-              color = accent
-            )
+        val cleanArtist = playbackState.song.cleanArtist
+        if (cleanArtist.isNotEmpty() || timerRunning) {
+          Spacer(modifier = Modifier.height(2.dp))
+          Row(verticalAlignment = Alignment.CenterVertically) {
+            if (cleanArtist.isNotEmpty()) {
+              TextSecondary(
+                text = cleanArtist,
+                fontSize = 12.sp,
+                modifier = Modifier.weight(1f, fill = false)
+              )
+            }
+            if (timerRunning) {
+              val prefix = if (cleanArtist.isNotEmpty()) " · " else ""
+              TextPrimary(
+                text = "$prefix${timerRemainMin}m",
+                fontSize = 11.5.sp,
+                color = accent
+              )
+            }
           }
         }
       }

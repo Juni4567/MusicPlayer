@@ -389,11 +389,13 @@ private fun PlayQueueDialog(
                 fontSize = 14.5.sp,
                 fontWeight = FontWeight.SemiBold
               )
-              Spacer(modifier = Modifier.height(2.dp))
-              TextSecondary(
-                text = currentSong.cleanArtist.ifEmpty { "—" },
-                fontSize = 12.sp
-              )
+              if (currentSong.cleanArtist.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(2.dp))
+                TextSecondary(
+                  text = currentSong.cleanArtist,
+                  fontSize = 12.sp
+                )
+              }
             }
           }
         }
@@ -510,10 +512,10 @@ private fun PlayQueueDialog(
                       fontWeight = if (isCurrent) FontWeight.SemiBold else FontWeight.Medium
                     )
                   }
-                  if (song.valid()) {
+                  if (song.valid() && song.cleanArtist.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(2.dp))
                     TextSecondary(
-                      text = song.cleanArtist.ifEmpty { "—" },
+                      text = song.cleanArtist,
                       fontSize = 11.5.sp
                     )
                   }

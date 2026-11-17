@@ -2,6 +2,23 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.9.10] — 2026-11-17
+
+### Highlights
+- **Flat Matte iOS-Style Vector App Icon**: Redesigned the adaptive app icon with a crisp, flat matte aesthetic. Features a glowing white beamed eighth note (♫) centered on a vibrant `#fb24e1` (hot fuchsia) to indigo/royal blue (`#6366F1` / `#2563EB`) gradient, accented with subtle concentric soundwave rings and delicate light sparkles. Strictly zero glossy overlay and zero reflections.
+- **Redesigned Modern "Up Next" Pill in Player**: Transformed the old flat rectangular Next Song box in the main player utility bar into a sleek capsule pill card with next track thumbnail, `"UP NEXT"` accent badge, clean title + artist, and subtle navigation chevron.
+- **5 New Randomized Minimalist Generative Cover Concepts**: Upgraded procedural covers with 5 brand-new geometric and abstract concepts across 6 curated palettes (Neon Purples, Deep Emerald Greens, Warm Sunset Oranges, Cosmic Blues, Liquid Metallic, Cyber Neon):
+  - *Minimalist Constellations with Fluid Watercolor/Gradient Backdrops*
+  - *Abstract Liquid Metallic Blobs with Chromatic Specular Highlights*
+  - *Sharp Low-Poly Wireframe Crystals with Faceted Shading*
+  - *Geometric Neon Wireframe Landscapes with Perspective Horizon Grid*
+  - *Floating 3D Shapes with Ambient Drop Shadows and Wireframe Edges*
+- **Exact Viewport-Centering Floating Button**: Enhanced the Song screen floating action button (`ic_my_location`) to compute exact viewport dimensions and item center offsets, scrolling the playing track smoothly to the dead center of the screen.
+- **Dynamic Search Placeholder Track Count**: Refined the search placeholder to `"Search in %d Audio files"`, dynamically referencing the library's total track count.
+- **Complete Elimination of `<unknown>` and Empty Fallbacks**: Thoroughly sanitized metadata to strip `<unknown>`, `unknown`, `[unknown]`, `(unknown)`, and bracketed tags. If artist or album information is absent, the UI leaves it cleanly empty without displaying `" — "` or `"Unknown artist"` or fallback placeholders.
+- **Modern & Accessible Settings UI**: Re-categorized settings into clean, rounded card containers with accessible typography, minimum 52dp touch targets, transparent row backgrounds, and eliminated duplicate Equalizer entries.
+- **Dual Release Builds**: Official release includes standard `A-Music-V2.9.10.apk` and pure `A-Music-V2.9.10-FOSS.apk` builds.
+
 ## [2.9.9] — 2026-11-17
 
 ### Highlights

@@ -115,11 +115,13 @@ fun ListSong(
           fontWeight = if (playing) FontWeight.SemiBold else FontWeight.Medium,
           color = if (playing) theme.highLightText() else theme.textPrimary
         )
-        Spacer(modifier = Modifier.height(2.dp))
-        TextSecondary(
-          text = song.cleanArtist.ifEmpty { "—" },
-          fontSize = 12.sp
-        )
+        if (song.cleanArtist.isNotEmpty()) {
+          Spacer(modifier = Modifier.height(2.dp))
+          TextSecondary(
+            text = song.cleanArtist,
+            fontSize = 12.sp
+          )
+        }
       }
 
       SongPopupButton(

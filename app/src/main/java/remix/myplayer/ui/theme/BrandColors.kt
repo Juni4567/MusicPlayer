@@ -23,26 +23,27 @@ object BrandColors {
     colors = listOf(BrandStart, BrandEnd)
   )
 
+  /**
+   * 6 Curated aesthetic color schemes for procedural artwork:
+   * Neon Purples, Deep Emerald Greens, Warm Sunset Oranges, Cosmic Blues, Liquid Metallic, Cyber Neon.
+   */
+  val CuratedPalettes: List<List<Color>> = listOf(
+    // 0: Neon Purples
+    listOf(Color(0xFF2E1065), Color(0xFF6B21A8), Color(0xFFA855F7), Color(0xFFC084FC)),
+    // 1: Deep Emerald Greens
+    listOf(Color(0xFF022C22), Color(0xFF065F46), Color(0xFF10B981), Color(0xFF6EE7B7)),
+    // 2: Warm Sunset Oranges
+    listOf(Color(0xFF451A03), Color(0xFFC2410C), Color(0xFFEA580C), Color(0xFFFBBF24)),
+    // 3: Cosmic Blues
+    listOf(Color(0xFF0B1120), Color(0xFF1E3A8A), Color(0xFF2563EB), Color(0xFF38BDF8)),
+    // 4: Liquid Metallic
+    listOf(Color(0xFF0F172A), Color(0xFF334155), Color(0xFF64748B), Color(0xFFCBD5E1)),
+    // 5: Cyber Neon
+    listOf(Color(0xFF500724), Color(0xFFBE185D), Color(0xFFF43F5E), Color(0xFF06B6D4)),
+  )
+
   fun patternColors(seed: Long): List<Color> {
-    val palette = listOf(
-      Color(0xFFE91E8C), // Vivid Pink
-      Color(0xFF6366F1), // Electric Indigo
-      Color(0xFF2563EB), // Royal Blue
-      Color(0xFF06B6D4), // Cyan
-      Color(0xFF10B981), // Emerald
-      Color(0xFFF59E0B), // Warm Gold
-      Color(0xFFFF7A45), // Sunset Orange
-      Color(0xFF8B5CF6), // Purple
-      Color(0xFFEC4899), // Deep Rose
-      Color(0xFF14B8A6), // Teal
-      Color(0xFF3B82F6), // Blue
-      Color(0xFFA855F7), // Neon Violet
-    )
-    val start = ((seed ushr 1) % palette.size).toInt()
-    return listOf(
-      palette[start],
-      palette[(start + 3) % palette.size],
-      palette[(start + 6) % palette.size],
-    )
+    val paletteIndex = kotlin.math.abs((seed xor 0x3CA58F1EL).toInt()) % CuratedPalettes.size
+    return CuratedPalettes[paletteIndex]
   }
 }
