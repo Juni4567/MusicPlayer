@@ -138,10 +138,10 @@ private fun NextSong(musicState: PlaybackUiState, swatchColor: Color, onClick: (
     modifier = Modifier
       .padding(horizontal = 24.dp)
       .fillMaxWidth()
-      .height(42.dp)
-      .clip(RoundedCornerShape(21.dp))
+      .height(36.dp)
+      .clip(RoundedCornerShape(18.dp))
       .background(theme.surface2.copy(alpha = 0.85f))
-      .border(0.8.dp, swatchColor.copy(alpha = 0.25f), RoundedCornerShape(21.dp))
+      .border(0.8.dp, swatchColor.copy(alpha = 0.25f), RoundedCornerShape(18.dp))
       .clickWithRipple(circle = false) {
         onClick?.invoke()
       }
@@ -152,28 +152,28 @@ private fun NextSong(musicState: PlaybackUiState, swatchColor: Color, onClick: (
       model = nextSong,
       circle = true,
       modifier = Modifier
-        .size(28.dp)
+        .size(24.dp)
         .clip(CircleShape)
     )
 
-    Spacer(modifier = Modifier.width(8.dp))
+    Spacer(modifier = Modifier.width(6.dp))
 
     Box(
       modifier = Modifier
-        .clip(RoundedCornerShape(6.dp))
+        .clip(RoundedCornerShape(4.dp))
         .background(swatchColor.copy(alpha = 0.16f))
-        .padding(horizontal = 6.dp, vertical = 2.dp)
+        .padding(horizontal = 5.dp, vertical = 1.dp)
     ) {
       Text(
         text = "UP NEXT",
         color = swatchColor,
-        fontSize = 9.sp,
+        fontSize = 8.5.sp,
         fontWeight = FontWeight.Bold,
         letterSpacing = 0.5.sp
       )
     }
 
-    Spacer(modifier = Modifier.width(8.dp))
+    Spacer(modifier = Modifier.width(6.dp))
 
     Row(
       modifier = Modifier.weight(1f),
@@ -182,7 +182,7 @@ private fun NextSong(musicState: PlaybackUiState, swatchColor: Color, onClick: (
       Text(
         text = cleanTitle,
         color = theme.textPrimary,
-        fontSize = 12.5.sp,
+        fontSize = 12.sp,
         fontWeight = FontWeight.Medium,
         maxLines = 1,
         overflow = TextOverflow.Ellipsis,
@@ -192,7 +192,7 @@ private fun NextSong(musicState: PlaybackUiState, swatchColor: Color, onClick: (
         Text(
           text = " · $cleanArtist",
           color = theme.textSecondary,
-          fontSize = 11.5.sp,
+          fontSize = 11.sp,
           maxLines = 1,
           overflow = TextOverflow.Ellipsis
         )
@@ -205,7 +205,7 @@ private fun NextSong(musicState: PlaybackUiState, swatchColor: Color, onClick: (
       painter = painterResource(R.drawable.ic_navigate_next_white_24dp),
       contentDescription = null,
       colorFilter = ColorFilter.tint(theme.textMuted),
-      modifier = Modifier.size(18.dp)
+      modifier = Modifier.size(16.dp)
     )
   }
 }

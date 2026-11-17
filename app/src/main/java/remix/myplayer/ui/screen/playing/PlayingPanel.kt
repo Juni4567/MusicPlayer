@@ -148,9 +148,9 @@ private fun Portrait(isVisible: Boolean) {
     if (showBottomBar) {
       PlayingUtilityBar(
         Modifier
-          .weight(1.5f)
+          .weight(1.0f)
           .fillMaxWidth()
-          .padding(top = 12.dp),
+          .padding(top = 4.dp),
         playingScreenBottom,
         playbackState,
         swatch

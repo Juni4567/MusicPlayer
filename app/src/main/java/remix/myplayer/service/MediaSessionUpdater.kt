@@ -86,16 +86,23 @@ class MediaSessionUpdater @Inject constructor(
       return
     }
 
+    val title = currentSong.showName.ifEmpty {
+      currentSong.title.ifEmpty { context.getString(R.string.unknown_song) }
+    }
+    val artist = currentSong.cleanArtist.ifEmpty {
+      currentSong.artist.ifEmpty { context.getString(R.string.unknown_artist) }
+    }
+
     val builder = MediaMetadataCompat.Builder()
       .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, currentSong.id.toString())
       .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, currentSong.album)
-      .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, currentSong.artist)
-      .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, currentSong.artist)
+      .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist)
+      .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ARTIST, artist)
       .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, currentSong.duration)
       .putLong(MediaMetadataCompat.METADATA_KEY_TRACK_NUMBER, (playback.currentIndex + 1).toLong())
-      .putString(MediaMetadataCompat.METADATA_KEY_TITLE, currentSong.title)
-      .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, currentSong.title)
-      .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, currentSong.artist)
+      .putString(MediaMetadataCompat.METADATA_KEY_TITLE, title)
+      .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_TITLE, title)
+      .putString(MediaMetadataCompat.METADATA_KEY_DISPLAY_SUBTITLE, artist)
       .putLong(MediaMetadataCompat.METADATA_KEY_NUM_TRACKS, playback.itemCount.toLong())
 
     mediaSession.setMetadata(builder.build())
@@ -119,7 +126,10 @@ class MediaSessionUpdater @Inject constructor(
         }
 
         private fun setMediaSessionData(result: Bitmap?) {
-          builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, copy(result))
+          val copied = copy(result)
+          builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, copied)
+          builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ART, copied)
+          builder.putBitmap(MediaMetadataCompat.METADATA_KEY_DISPLAY_ICON, copied)
           mediaSession.setMetadata(builder.build())
           updatePlaybackState(context, mediaSession, playback, extras)
         }

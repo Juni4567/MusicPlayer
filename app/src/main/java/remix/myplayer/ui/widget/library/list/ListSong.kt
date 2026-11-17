@@ -97,9 +97,7 @@ fun ListSong(
       GlideCover(
         model = song,
         circle = false,
-        modifier = Modifier
-          .size(42.dp)
-          .clip(RoundedCornerShape(8.dp))
+        modifier = Modifier.size(42.dp)
       )
 
       Column(

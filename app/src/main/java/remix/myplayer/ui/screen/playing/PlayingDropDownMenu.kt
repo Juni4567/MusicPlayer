@@ -66,6 +66,7 @@ fun PlayingDropDownMenu(
   // Favorite + timer are on the secondary action row; keep overflow for the rest.
   val menuItems =
     listOf(
+      R.string.share,
       R.string.song_edit,
       R.string.song_detail,
       R.string.add_to_playlist,
@@ -160,6 +161,14 @@ fun PlayingDropDownMenu(
         text = { Text(stringResource(res), color = LocalTheme.current.textPrimary) },
         onClick = {
           when (res) {
+            R.string.share -> {
+              if (activity != null) {
+                activity.startActivity(
+                  Intent.createChooser(remix.myplayer.util.Util.createShareSongFileIntent(song, activity), null)
+                )
+              }
+            }
+
             R.string.song_edit -> {
               if (activity == null) {
                 return@DropdownMenuItem

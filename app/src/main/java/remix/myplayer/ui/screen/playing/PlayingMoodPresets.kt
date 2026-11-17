@@ -167,15 +167,15 @@ internal fun PlayingMoodPresets(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.Center,
       modifier = Modifier
-        .padding(start = 16.dp, end = 6.dp)
-        .height(60.dp)
-        .width(66.dp)
-        .clip(RoundedCornerShape(12.dp))
+        .padding(start = 16.dp, end = 8.dp)
+        .height(72.dp)
+        .width(68.dp)
+        .clip(RoundedCornerShape(14.dp))
         .background(if (isNormalSelected) accent.copy(alpha = 0.22f) else theme.surface2)
         .border(
           0.9.dp,
           if (isNormalSelected) accent else theme.divider.copy(alpha = 0.45f),
-          RoundedCornerShape(12.dp)
+          RoundedCornerShape(14.dp)
         )
         .semantics { contentDescription = "Normal playback preset" }
         .clickWithRipple(circle = false) {
@@ -186,13 +186,13 @@ internal fun PlayingMoodPresets(
         Text(
           text = "↺",
           color = if (isNormalSelected) accent else theme.textPrimary,
-          fontSize = 15.sp,
+          fontSize = 17.sp,
           fontWeight = FontWeight.Bold
         )
         Text(
           text = stringResource(R.string.mood_reset),
           color = if (isNormalSelected) accent else theme.textSecondary,
-          fontSize = 11.sp,
+          fontSize = 11.5.sp,
           fontWeight = if (isNormalSelected) FontWeight.SemiBold else FontWeight.Medium
         )
       }
@@ -203,9 +203,9 @@ internal fun PlayingMoodPresets(
       rows = GridCells.Fixed(2),
       modifier = Modifier
         .weight(1f)
-        .height(62.dp),
-      horizontalArrangement = Arrangement.spacedBy(6.dp),
-      verticalArrangement = Arrangement.spacedBy(6.dp),
+        .height(72.dp),
+      horizontalArrangement = Arrangement.spacedBy(7.dp),
+      verticalArrangement = Arrangement.spacedBy(7.dp),
       contentPadding = PaddingValues(end = 16.dp)
     ) {
       items(OtherMoodPresets, key = { it.nameRes }) { preset ->
@@ -222,20 +222,20 @@ internal fun PlayingMoodPresets(
         Row(
           verticalAlignment = Alignment.CenterVertically,
           modifier = Modifier
-            .height(28.dp)
-            .clip(RoundedCornerShape(14.dp))
+            .height(32.dp)
+            .clip(RoundedCornerShape(16.dp))
             .background(chipBg)
-            .border(0.9.dp, chipBorder, RoundedCornerShape(14.dp))
+            .border(0.9.dp, chipBorder, RoundedCornerShape(16.dp))
             .semantics { contentDescription = label }
             .clickWithRipple(circle = false) {
               applyPreset(preset)
             }
-            .padding(horizontal = 9.dp)
+            .padding(horizontal = 12.dp)
         ) {
           Text(
             text = label,
             color = textColor,
-            fontSize = 11.5.sp,
+            fontSize = 12.5.sp,
             fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium
           )
         }

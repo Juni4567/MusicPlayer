@@ -101,6 +101,9 @@ class MusicService : BaseService(),
   lateinit var mediaSessionUpdater: MediaSessionUpdater
 
   @Inject
+  lateinit var themeController: remix.myplayer.ui.theme.ThemeController
+
+  @Inject
   lateinit var lyricManager: LyricManager
 
   @Inject

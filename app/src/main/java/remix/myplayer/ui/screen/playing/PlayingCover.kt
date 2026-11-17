@@ -30,6 +30,8 @@ import remix.myplayer.data.prefs.SettingPrefs
 import remix.myplayer.glide.addBitmapListener
 import remix.myplayer.service.Command
 import remix.myplayer.service.playback.MusicStateSource
+import androidx.compose.animation.core.keyframes
+import kotlin.math.roundToInt
 import remix.myplayer.ui.widget.library.PatternCover
 import remix.myplayer.viewmodel.playbackViewModel
 import remix.myplayer.viewmodel.settingViewModel
@@ -96,19 +98,61 @@ internal fun PlayingCover(modifier: Modifier, song: Song) {
   val isPlaying = playbackUiState.isPlaying
   val beatAnimationEnabled = settingState.cover.beatAnimationEnabled
 
+  val playbackSpeed = settingState.play.speed.toFloatOrNull()?.coerceIn(0.5f, 2.5f) ?: 1.0f
+  val basePeriod = (480f / playbackSpeed).roundToInt().coerceIn(240, 1000)
+
   val infiniteTransition = rememberInfiniteTransition(label = "CoverBeatTransition")
+
+  // Punchy musical kick pulse with syncopated sub-bounce
   val beatScale by if (isPlaying && beatAnimationEnabled) {
     infiniteTransition.animateFloat(
       initialValue = 1.0f,
-      targetValue = 1.032f,
+      targetValue = 1.052f,
       animationSpec = infiniteRepeatable(
-        animation = tween(durationMillis = 540, easing = FastOutSlowInEasing),
-        repeatMode = RepeatMode.Reverse
+        animation = keyframes {
+          durationMillis = basePeriod
+          1.0f at 0
+          1.052f at (basePeriod * 0.22f).roundToInt() using FastOutSlowInEasing
+          1.012f at (basePeriod * 0.55f).roundToInt()
+          1.028f at (basePeriod * 0.72f).roundToInt()
+          1.0f at basePeriod
+        },
+        repeatMode = RepeatMode.Restart
       ),
       label = "BeatScale"
     )
   } else {
     remember { mutableFloatStateOf(1.0f) }
+  }
+
+  // Fluid wave sway / rhythmic rotational tilt
+  val waveRotation by if (isPlaying && beatAnimationEnabled) {
+    infiniteTransition.animateFloat(
+      initialValue = -1.6f,
+      targetValue = 1.6f,
+      animationSpec = infiniteRepeatable(
+        animation = tween(durationMillis = basePeriod * 2, easing = FastOutSlowInEasing),
+        repeatMode = RepeatMode.Reverse
+      ),
+      label = "WaveRotation"
+    )
+  } else {
+    remember { mutableFloatStateOf(0f) }
+  }
+
+  // Fluid vertical wave bobbing
+  val waveOffsetY by if (isPlaying && beatAnimationEnabled) {
+    infiniteTransition.animateFloat(
+      initialValue = -3.5f,
+      targetValue = 3.5f,
+      animationSpec = infiniteRepeatable(
+        animation = tween(durationMillis = (basePeriod * 1.5f).roundToInt(), easing = FastOutSlowInEasing),
+        repeatMode = RepeatMode.Reverse
+      ),
+      label = "WaveOffsetY"
+    )
+  } else {
+    remember { mutableFloatStateOf(0f) }
   }
 
   Timber.v("coverAnimationStyle: $coverAnimationStyle")
@@ -130,6 +174,8 @@ internal fun PlayingCover(modifier: Modifier, song: Song) {
       Modifier.graphicsLayer {
         scaleX = beatScale
         scaleY = beatScale
+        rotationZ = waveRotation
+        translationY = waveOffsetY * density
       }
     } else {
       Modifier

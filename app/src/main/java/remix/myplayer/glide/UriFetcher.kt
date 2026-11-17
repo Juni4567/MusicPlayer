@@ -126,10 +126,11 @@ class UriFetcher @Inject constructor(
         return Uri.EMPTY
       }
       // 自定义封面
-//      val customArtFile = getCustomThumbIfExist(song.albumId, Constants.ALBUM)
-//      if (customArtFile != null) {
-//        return Uri.fromFile(customArtFile)
-//      }
+      val customArtFile = getCustomThumbIfExist(song.albumId, Constants.ALBUM)
+        ?: getCustomThumbIfExist(song.id, Constants.SONG)
+      if (customArtFile != null) {
+        return Uri.fromFile(customArtFile)
+      }
 
       // 内置
       if (ignoreMediaStore()) {
@@ -187,10 +188,10 @@ class UriFetcher @Inject constructor(
 
   private fun fetch(album: Album): Uri {
     // 自定义封面
-//    val customArtFile = getCustomThumbIfExist(album.albumID, Constants.ALBUM)
-//    if (customArtFile != null) {
-//      return Uri.fromFile(customArtFile)
-//    }
+    val customArtFile = getCustomThumbIfExist(album.albumID, Constants.ALBUM)
+    if (customArtFile != null) {
+      return Uri.fromFile(customArtFile)
+    }
 
     // 内置
     if (ignoreMediaStore()) {
@@ -243,10 +244,10 @@ class UriFetcher @Inject constructor(
 
   private fun fetch(artist: Artist): Uri {
     // 自定义封面
-//    val customArtFile = getCustomThumbIfExist(artist.artistID, Constants.ARTIST)
-//    if (customArtFile != null) {
-//      return Uri.fromFile(customArtFile)
-//    }
+    val customArtFile = getCustomThumbIfExist(artist.artistID, Constants.ARTIST)
+    if (customArtFile != null) {
+      return Uri.fromFile(customArtFile)
+    }
 
     // 内置
     val imageUrl = getArtistArt(artist.artistID)
@@ -293,10 +294,10 @@ class UriFetcher @Inject constructor(
 
   private fun fetch(playList: PlayList): Uri {
     // 自定义封面
-//    val customArtFile = getCustomThumbIfExist(playList.id, Constants.PLAYLIST)
-//    if (customArtFile != null) {
-//      return Uri.fromFile(customArtFile)
-//    }
+    val customArtFile = getCustomThumbIfExist(playList.id, Constants.PLAYLIST)
+    if (customArtFile != null) {
+      return Uri.fromFile(customArtFile)
+    }
 
     val songs = runBlocking { songRepo.getSongsByModels(listOf(playList)) }
 

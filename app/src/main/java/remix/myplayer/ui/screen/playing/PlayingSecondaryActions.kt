@@ -24,6 +24,8 @@ import androidx.palette.graphics.Palette
 import remix.myplayer.R
 import remix.myplayer.data.model.audio.Song
 import remix.myplayer.service.Command
+import remix.myplayer.service.MusicServiceRemote
+import androidx.compose.ui.res.stringResource
 import remix.myplayer.ui.activity.base.BaseActivity
 import remix.myplayer.ui.dialog.PlaybackAndEqSheet
 import remix.myplayer.ui.dialog.rememberDialogState
@@ -46,9 +48,9 @@ internal fun PlayingSecondaryActions(
   onToggleLyrics: () -> Unit = {}
 ) {
   val theme = LocalTheme.current
-  val activity = LocalActivity.current as? BaseActivity
+  val settingVM = settingViewModel
   val timerVM = timerViewModel
-  val settingState by settingViewModel.settingsState.collectAsStateWithLifecycle()
+  val settingState by settingVM.settingsState.collectAsStateWithLifecycle()
   val playbackState by playbackViewModel.playbackUiState.collectAsStateWithLifecycle()
   val isFavorite = playbackState.isFavorite
   val tint = theme.popupButton()
@@ -103,14 +105,15 @@ internal fun PlayingSecondaryActions(
       }
     )
     SecondaryActionIcon(
-      iconRes = R.drawable.ic_share_24dp,
-      contentDescription = "Share",
+      iconRes = R.drawable.ic_refresh_24dp,
+      contentDescription = stringResource(R.string.mood_reset),
       tint = tint.copy(alpha = 0.92f),
       onClick = {
-        activity ?: return@SecondaryActionIcon
-        activity.startActivity(
-          Intent.createChooser(Util.createShareSongFileIntent(song, activity), null)
-        )
+        MusicServiceRemote.service?.playback?.speed = 1.0f
+        MusicServiceRemote.service?.playback?.pitch = 1.0f
+        settingVM.setSpeed("1.0")
+        settingVM.setPitch("1.0")
+        settingVM.setEchoEnabled(false)
       }
     )
   }

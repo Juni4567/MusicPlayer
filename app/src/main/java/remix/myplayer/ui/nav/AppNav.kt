@@ -228,6 +228,9 @@ fun AppNav() {
               }
 
               CropScreen(destinationUri = destinationUri, onCropSuccess = {
+                try {
+                  com.bumptech.glide.Glide.get(context).clearMemory()
+                } catch (_: Exception) {}
                 libraryVM.fetchMedia(
                   clear = true,
                   updateAlbumVersion = type == Constants.ALBUM,

@@ -2,6 +2,27 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.9.11] — 2026-11-18
+
+### Highlights
+- **Audio-Reactive Dancing Cover Animation**: Cover art now dynamically grooves and dances with the rhythm, beats, and waves of the music. Features punchy kick-drum pulse animations with syncopated sub-bounces, fluid rhythmic rotational sway (±1.6°), and vertical floating wave bobbing, dynamically scaled and synced with playback speed.
+- **Enlarged, Prominent Moods UI & Compacted Next Song View**:
+  - Expanded mood preset chips to 32dp height, larger 12.5sp typography, generous horizontal padding, and a prominent 72dp pinned Normal reset tile.
+  - Streamlined the "Up Next" bar to a compact 36dp pill to maximize vertical breathing space for the player and mood presets.
+- **Dedicated "Reset Mood" Button in Secondary Actions**:
+  - Moved song file Sharing into the main player 3-dots popup menu.
+  - Added an instant "Reset Mood" action button (`ic_refresh_24dp`) right beside the Equalizer and Sleep Timer for effortless one-tap restoration of 1.0x speed, 1.0x pitch, and flat echo.
+- **Fluid Cover Drag-Down Dismissal**: Fixed gesture contention on the cover art where vertical drag events were intercepted. Downward dragging anywhere on the cover image now translates seamlessly into real-time interactive player sheet dismissal.
+- **Zero-Allocation Smooth List Scrolling**: Eliminated list scrolling jank by pre-computing and caching all Canvas paths, radial brushes, and gradients in `PatternCover.kt`. Zero heap allocations during scroll frames deliver locked 60/120fps performance.
+- **Custom Cover Upload Fix**: Re-enabled custom thumbnail resolution across songs, albums, and playlists in `UriFetcher.kt`, coupled with automatic Glide memory cache eviction upon cropping new album art.
+- **12 Curated Palettes & 8 Procedural Art Styles**: Expanded procedural generative covers to 12 curated aesthetic palettes with a 64-bit mixer for maximum entropy and 8 distinct generative styles (Constellations, Liquid Blobs, Low-Poly Crystal, Synthwave Sunset, Isometric 3D Cube, Geometric Mandala, Aurora Waves, Orbital Planetary).
+- **Overhauled Notification Miniplayer & MediaSession**:
+  - Real Song Title & Artist Display: Replaced generic `"A-Music is running"` text with accurate song titles and artist/album metadata.
+  - Persistent Artwork: Retains and renders cover art reliably across notifications and lockscreen media controls (`METADATA_KEY_ALBUM_ART`, `METADATA_KEY_ART`, `METADATA_KEY_DISPLAY_ICON`).
+  - One-Tap Close Action: Added a dedicated Close (`ic_close_white_24dp`) button to immediately exit playback and dismiss the notification from anywhere.
+  - Dynamic App Color Theming: Tints the notification player background and media controls with the user's active app theme secondary accent color.
+- **Dual Release Builds**: Official release includes standard `A-Music-V2.9.11.apk` and pure `A-Music-V2.9.11-FOSS.apk` builds.
+
 ## [2.9.10] — 2026-11-17
 
 ### Highlights
