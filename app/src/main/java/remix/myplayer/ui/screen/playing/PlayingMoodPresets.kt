@@ -3,13 +3,11 @@ package remix.myplayer.ui.screen.playing
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyHorizontalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -154,91 +152,49 @@ internal fun PlayingMoodPresets(
     }
   }
 
-  val isNormalSelected = abs(currentSpeed - NormalMoodPreset.speed) < 0.02f &&
-    abs(currentPitch - NormalMoodPreset.pitch) < 0.02f &&
-    !echoEnabled
-
-  Row(
-    modifier = modifier.fillMaxWidth(),
-    verticalAlignment = Alignment.CenterVertically
+  LazyHorizontalGrid(
+    rows = GridCells.Fixed(2),
+    modifier = modifier
+      .fillMaxWidth()
+      .height(72.dp),
+    horizontalArrangement = Arrangement.spacedBy(7.dp),
+    verticalArrangement = Arrangement.spacedBy(7.dp),
+    contentPadding = PaddingValues(horizontal = 16.dp)
   ) {
-    // Pinned Standard / Normal preset on the left
-    Row(
-      verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.Center,
-      modifier = Modifier
-        .padding(start = 16.dp, end = 8.dp)
-        .height(72.dp)
-        .width(68.dp)
-        .clip(RoundedCornerShape(14.dp))
-        .background(if (isNormalSelected) accent.copy(alpha = 0.22f) else theme.surface2)
-        .border(
-          0.9.dp,
-          if (isNormalSelected) accent else theme.divider.copy(alpha = 0.45f),
-          RoundedCornerShape(14.dp)
-        )
-        .semantics { contentDescription = "Normal playback preset" }
-        .clickWithRipple(circle = false) {
-          applyPreset(NormalMoodPreset)
-        }
-    ) {
-      Column(horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(
-          text = "↺",
-          color = if (isNormalSelected) accent else theme.textPrimary,
-          fontSize = 17.sp,
-          fontWeight = FontWeight.Bold
-        )
-        Text(
-          text = stringResource(R.string.mood_reset),
-          color = if (isNormalSelected) accent else theme.textSecondary,
-          fontSize = 11.5.sp,
-          fontWeight = if (isNormalSelected) FontWeight.SemiBold else FontWeight.Medium
-        )
-      }
-    }
+    items(OtherMoodPresets, key = { it.nameRes }) { preset ->
+      val isSelected = abs(currentSpeed - preset.speed) < 0.02f &&
+        abs(currentPitch - preset.pitch) < 0.02f &&
+        (preset.echoEnabled == echoEnabled)
 
-    // Two rows of scrollable mood presets
-    LazyHorizontalGrid(
-      rows = GridCells.Fixed(2),
-      modifier = Modifier
-        .weight(1f)
-        .height(72.dp),
-      horizontalArrangement = Arrangement.spacedBy(7.dp),
-      verticalArrangement = Arrangement.spacedBy(7.dp),
-      contentPadding = PaddingValues(end = 16.dp)
-    ) {
-      items(OtherMoodPresets, key = { it.nameRes }) { preset ->
-        val isSelected = abs(currentSpeed - preset.speed) < 0.02f &&
-          abs(currentPitch - preset.pitch) < 0.02f &&
-          (preset.echoEnabled == echoEnabled)
+      val chipBg = if (isSelected) accent.copy(alpha = 0.22f) else theme.surface2
+      val chipBorder = if (isSelected) accent else theme.divider.copy(alpha = 0.45f)
+      val textColor = if (isSelected) accent else theme.textSecondary
 
-        val chipBg = if (isSelected) accent.copy(alpha = 0.22f) else theme.surface2
-        val chipBorder = if (isSelected) accent else theme.divider.copy(alpha = 0.45f)
-        val textColor = if (isSelected) accent else theme.textSecondary
+      val label = "${preset.icon} ${stringResource(preset.nameRes)}"
 
-        val label = "${preset.icon} ${stringResource(preset.nameRes)}"
-
-        Row(
-          verticalAlignment = Alignment.CenterVertically,
-          modifier = Modifier
-            .height(32.dp)
-            .clip(RoundedCornerShape(16.dp))
-            .background(chipBg)
-            .border(0.9.dp, chipBorder, RoundedCornerShape(16.dp))
-            .semantics { contentDescription = label }
-            .clickWithRipple(circle = false) {
+      Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+          .height(32.dp)
+          .clip(RoundedCornerShape(16.dp))
+          .background(chipBg)
+          .border(0.9.dp, chipBorder, RoundedCornerShape(16.dp))
+          .semantics { contentDescription = label }
+          .clickWithRipple(circle = false) {
+            if (isSelected) {
+              applyPreset(NormalMoodPreset)
+            } else {
               applyPreset(preset)
             }
-            .padding(horizontal = 12.dp)
-        ) {
-          Text(
-            text = label,
-            color = textColor,
-            fontSize = 12.5.sp,
-            fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium
-          )
-        }
+          }
+          .padding(horizontal = 12.dp)
+      ) {
+        Text(
+          text = label,
+          color = textColor,
+          fontSize = 12.5.sp,
+          fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium
+        )
       }
     }
   }

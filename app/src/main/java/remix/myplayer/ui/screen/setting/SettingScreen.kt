@@ -23,7 +23,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -333,17 +332,6 @@ private fun PlayingScreenPreferenceItems() {
 
 @Composable
 private fun CoverPreferenceItems() {
-  val settingVM = settingViewModel
-  val settingState by settingVM.settingsState.collectAsStateWithLifecycle()
-
-  SwitchPreference(
-    title = stringResource(R.string.beat_reactive_cover),
-    content = stringResource(R.string.beat_reactive_cover_desc),
-    checked = settingState.cover.beatAnimationEnabled
-  ) {
-    settingVM.setBeatAnimationEnabled(it)
-  }
-
   PlayingCoverAnimationLogic()
 
   IgnoreMediaStoreLogic()

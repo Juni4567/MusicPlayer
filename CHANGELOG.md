@@ -2,6 +2,20 @@
 
 All notable changes to A-Music (fork of APlayer) are documented in this file.
 
+## [2.9.12] — 2026-11-18
+
+### Highlights
+- **Static, Crisp Album Cover Artwork**:
+  - Eliminated artificial bouncing, rotating, and pulsing animations on the album cover during music playback, keeping album artwork rock-steady, crisp, and high-performance.
+  - Smooth track-change transition effects (Classic, Parallax Push, Card Squeeze, Page Turn, Slice Stagger, Dissolve Zoom) remain fully functional when switching songs.
+  - Removed deprecated beat-reactive cover toggle and unused background animators from Settings and State.
+- **Streamlined Full-Width Mood Presets**:
+  - Removed the redundant pinned "↺ Normal" tile from the left side of the Mood Presets panel.
+  - Mood presets now span the full width of the screen with clean, balanced horizontal spacing.
+  - Added seamless toggle-to-default interaction: tapping any active mood preset chip instantly turns it off and restores default flat playback (1.0x speed, 1.0x pitch, echo disabled).
+  - One-tap "Reset Mood" action button (`ic_refresh_24dp`) in the secondary action bar remains readily available.
+- **Dual Release Builds**: Official release includes standard `A-Music-V2.9.12.apk` and pure `A-Music-V2.9.12-FOSS.apk` builds.
+
 ## [2.9.11] — 2026-11-18
 
 ### Highlights

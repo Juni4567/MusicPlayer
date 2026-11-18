@@ -540,8 +540,6 @@
   <string name="mood_deep">Deep</string>
   <string name="mood_turbo">Turbo</string>
   <string name="mood_reset">Normal</string>
-  <string name="beat_reactive_cover">Beat-reactive cover</string>
-  <string name="beat_reactive_cover_desc">Animate cover artwork rhythmically with song playback</string>
   <string name="scroll_to_playing">Scroll to playing song</string>
   <string name="now_playing_badge">NOW PLAYING</string>
   <string name="tab_favorite">Favorites</string>

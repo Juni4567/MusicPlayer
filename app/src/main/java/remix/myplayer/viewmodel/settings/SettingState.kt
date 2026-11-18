@@ -81,7 +81,6 @@ data class CoverSettings(
   val downloadSource: Int,
   val coverAnimationStyle: PlayingCoverAnimationStyle,
   val coverAnimationSpeed: Float,
-  val beatAnimationEnabled: Boolean = true,
 )
 
 @Stable

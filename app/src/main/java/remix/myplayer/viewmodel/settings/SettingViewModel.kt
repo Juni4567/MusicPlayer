@@ -138,8 +138,7 @@ class SettingViewModel @Inject constructor(
       autoDownloadCover = settingPrefs.autoDownloadCover,
       downloadSource = settingPrefs.downloadSource,
       coverAnimationStyle = PlayingCoverAnimationStyle.fromPrefValue(settingPrefs.playingCoverAnimationStyle),
-      coverAnimationSpeed = settingPrefs.playingCoverAnimationSpeed,
-      beatAnimationEnabled = settingPrefs.beatReactiveCoverAnimation
+      coverAnimationSpeed = settingPrefs.playingCoverAnimationSpeed
     ),
     lyric = LyricSettings(
       statusBarLyricEnabled = lyricPrefs.statusBarLyricEnabled,
@@ -433,10 +432,7 @@ class SettingViewModel @Inject constructor(
     _settingsState.update { it.copy(cover = it.cover.copy(coverAnimationSpeed = speed)) }
   }
 
-  fun setBeatAnimationEnabled(enabled: Boolean) {
-    settingPrefs.beatReactiveCoverAnimation = enabled
-    _settingsState.update { it.copy(cover = it.cover.copy(beatAnimationEnabled = enabled)) }
-  }
+
 
   // -------- Lyric 分组 ----------
   fun setStatusBarLyricEnabled(enabled: Boolean) {
